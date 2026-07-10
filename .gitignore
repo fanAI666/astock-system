@@ -15,3 +15,7 @@ _intermediate.json
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+
+# ===== 构建产物 / 部署生成物（由 build_deploy.js 生成）=====
+deploy/
+Claw/dist/
