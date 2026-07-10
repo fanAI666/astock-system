@@ -1,0 +1,17 @@
+# ===== 运行时 / 大二进制 =====
+cloudflared.exe
+cloudflared.log
+*.log
+
+# ===== 临时 / 中间产物 =====
+_final_summary.json
+_intermediate.json
+2026-07-10-11-41-14/
+
+# ===== 个人 / 项目记忆（含敏感上下文，勿提交）=====
+.workbuddy/
+
+# ===== Python 缓存 =====
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

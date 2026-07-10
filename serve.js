@@ -1,0 +1,128 @@
+// 选股系统发布服务器
+// 用法:
+//   node serve.js                                正常启动(无口令)
+//   SITE_TOKEN=你的口令 node serve.js           启用口令保护
+//   node serve.js --token 你的口令              (同上, 命令行方式)
+//   PORT=9000 node serve.js                    自定义端口
+const http = require("http");
+const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
+const os = require("os");
+
+const ROOT = "D:\\WorkBuddy";
+const PORT = parseInt(process.env.PORT || "8080", 10);
+const HOST = "0.0.0.0"; // 绑定所有网卡, 接受局域网/公网入站
+
+// 口令: 优先环境变量, 其次命令行 --token, 再否则使用默认
+let TOKEN = process.env.SITE_TOKEN || "";
+const ti = process.argv.indexOf("--token");
+if (ti >= 0 && process.argv[ti + 1]) TOKEN = process.argv[ti + 1];
+if (!TOKEN) TOKEN = "stock2026"; // 默认口令, 请尽快修改
+
+const TOK_VAL = crypto.createHash("sha256").update("sss::" + TOKEN).digest("hex");
+
+const MIME = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".md": "text/markdown; charset=utf-8"
+};
+
+function parseCookies(s) {
+  const o = {};
+  s.split(";").forEach(c => {
+    const i = c.indexOf("=");
+    if (i > 0) o[c.slice(0, i).trim()] = decodeURIComponent(c.slice(i + 1).trim());
+  });
+  return o;
+}
+
+function loginHtml() {
+  return `<!doctype html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>访问保护</title>
+  <style>body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#0f172a;color:#e2e8f0;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
+  .box{background:#1e293b;padding:32px 28px;border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,.4);width:300px}
+  h2{margin:0 0 6px;font-size:18px}.sub{color:#94a3b8;font-size:13px;margin-bottom:20px}
+  input{width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid #334155;border-radius:8px;background:#0f172a;color:#e2e8f0;font-size:15px;margin-bottom:14px}
+  button{width:100%;padding:11px;border:0;border-radius:8px;background:#e23b3b;color:#fff;font-size:15px;cursor:pointer}
+  .err{color:#f87171;font-size:13px;min-height:18px;margin-bottom:8px}</style></head>
+  <body><div class="box"><h2>选股系统 · 访问保护</h2><div class="sub">请输入访问口令</div>
+  <div class="err" id="err"></div>
+  <input id="pw" type="password" placeholder="访问口令" autofocus>
+  <button onclick="go()">进入</button></div>
+  <script>function go(){var p=document.getElementById('pw').value;fetch('/_login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:p})}).then(r=>r.json()).then(function(d){if(d.ok){location.reload();}else{document.getElementById('err').textContent='口令错误';}}).catch(function(){document.getElementById('err').textContent='网络错误';});}
+  document.getElementById('pw').addEventListener('keydown',function(e){if(e.key==='Enter')go();});</script></body></html>`;
+}
+
+function lanIPs() {
+  const out = [];
+  const ifs = os.networkInterfaces();
+  for (const k in ifs) {
+    for (const a of ifs[k]) {
+      if (a.family === "IPv4" && !a.internal) out.push(a.address);
+    }
+  }
+  return out;
+}
+
+const server = http.createServer((req, res) => {
+  // 登录接口
+  if (req.method === "POST" && req.url === "/_login") {
+    let b = "";
+    req.on("data", c => (b += c));
+    req.on("end", () => {
+      let pwd = "";
+      try { pwd = JSON.parse(b).password || ""; } catch (e) {}
+      if (pwd === TOKEN) {
+        res.setHeader("Set-Cookie", `tok=${TOK_VAL}; Path=/; HttpOnly; SameSite=Strict; Max-age=2592000`);
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end('{"ok":true}');
+      } else {
+        res.writeHead(401, { "Content-Type": "application/json" });
+        res.end('{"ok":false}');
+      }
+    });
+    return;
+  }
+
+  // 口令校验
+  const cookies = parseCookies(req.headers.cookie || "");
+  if (cookies.tok !== TOK_VAL) {
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(loginHtml());
+    return;
+  }
+
+  // 静态文件服务
+  let p = decodeURIComponent(req.url.split("?")[0]);
+  if (p === "/") p = "/stock-selection-system.html";
+  const fp = path.normalize(path.join(ROOT, p));
+  if (!fp.startsWith(ROOT)) {
+    res.writeHead(403);
+    res.end("forbidden");
+    return;
+  }
+  fs.readFile(fp, (err, data) => {
+    if (err) {
+      res.writeHead(404);
+      res.end("not found: " + p);
+      return;
+    }
+    res.writeHead(200, {
+      "Content-Type": MIME[path.extname(fp)] || "application/octet-stream; charset=utf-8"
+    });
+    res.end(data);
+  });
+});
+
+server.listen(PORT, HOST, () => {
+  const ips = lanIPs();
+  console.log("==================================================");
+  console.log(" 选股系统发布服务器已启动");
+  console.log(" 监听: " + HOST + ":" + PORT + "  (所有网络接口)");
+  console.log(" 本机: http://localhost:" + PORT + "/stock-selection-system.html");
+  ips.forEach(ip => console.log(" 局域网: http://" + ip + ":" + PORT + "/stock-selection-system.html"));
+  console.log(" 口令保护: 已启用  (当前口令 = '" + TOKEN + "', 请尽快修改)");
+  console.log("==================================================");
+});
