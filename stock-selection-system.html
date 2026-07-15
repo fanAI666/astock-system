@@ -204,6 +204,69 @@
 .cl-toggle{font-size:11px;color:var(--brand);margin-left:auto}
 .offline-dl{display:inline-block;margin-left:8px;font-size:12px;font-weight:600;color:var(--brand);text-decoration:none;border:1px solid var(--brand);border-radius:8px;padding:2px 9px;transition:.15s}
 .offline-dl:hover{background:var(--brand);color:#fff}
+
+/* ============ 资金动态仪表盘 ============ */
+#fundflow .ff-section{background:var(--card);border-radius:14px;padding:18px 20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+#fundflow h3.ff-title{margin:0 0 12px;font-size:15px;color:var(--ink);display:flex;align-items:center;gap:8px}
+#fundflow h3.ff-title .ff-emoji{font-size:17px}
+/* 指数卡片 */
+.idx-row{display:flex;gap:10px;flex-wrap:wrap}
+.idx-card{flex:1;min-width:120px;background:linear-gradient(135deg,#f8fafc,#f1f5f9);border-radius:11px;padding:13px 14px;border:1px solid #e2e8f0}
+.idx-card .idx-name{font-size:12px;color:#64748b;margin-bottom:4px}
+.idx-card .idx-val{font-size:19px;font-weight:700;line-height:1.2}
+.idx-card .idx-pct{font-size:12px;margin-top:3px}
+.idx-card .idx-vol{font-size:11px;color:#94a3b8;margin-top:5px}
+.up-text{color:#dc2626}.dn-text{color:#16a34a}
+/* 资金主线文字 */
+.fund-thread{margin-top:12px;padding:12px 16px;background:linear-gradient(135deg,#fefce8,#fef9c3);border-left:3px solid #ca8a04;border-radius:0 10px 10px 0;font-size:13.5px;line-height:1.7;color:#854d0e}
+.fund-thread strong{color:#a16207}
+/* 热力网格 */
+.heat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.heat-cell{position:relative;padding:12px 8px 10px;text-align:center;border-radius:10px;cursor:pointer;transition:.18s;min-height:56px;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.heat-cell:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.heat-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+.heat-val{font-size:14px;font-weight:700;margin-top:3px}
+.heat-tip{display:none;position:absolute;z-index:30;bottom:calc(100% + 8px;left:50%;transform:translateX(-50%);background:#1e293b;color:#e2e8f0;padding:8px 14px;border-radius:9px;font-size:12.5px;white-space:nowrap;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.heat-cell:hover .heat-tip{display:block}
+/* 双向条形图 */
+.bar-list{display:flex;flex-direction:column;gap:7px}
+.bar-row{display:flex;align-items:center;gap:8px;height:32px}
+.bar-label{width:72px;font-size:12.5px;color:#475569;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{flex:1;display:flex;align-items:center;gap:2px;height:24px;position:relative}
+.bar-in{height:100%;border-radius:6px;transition:width .6s cubic-bezier(.22,1,.36,1);min-width:0;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:11px;font-weight:700;color:#fff;white-space:nowrap}
+.bar-out{height:100%;border-radius:6px;transition:width .6s cubic-bezier(.22,1,.36,1);min-width:0;display:flex;align-items:center;padding-left:6px;font-size:11px;font-weight:700;color:#fff;white-space:nowrap}
+.bar-center{width:1px;background:#cbd5e1;flex-shrink:0;height:28px}
+.bar-amt{width:70px;font-size:12px;text-align:left;font-weight:600;flex-shrink:0}
+/* 风格轮动 */
+.style-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.style-item{text-align:center;padding:14px 10px;border-radius:12px;border:2px solid transparent;transition:.2s}
+.style-item.lead{border-color:var(--brand);background:#eff6ff}
+.style-item .si-name{font-size:12px;color:#64748b;margin-bottom:7px}
+.style-item .si-bar-wrap{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-bottom:6px;position:relative}
+.style-item .si-bar{height:100%;border-radius:4px;transition:width .8s ease}
+.style-item .si-score{font-size:17px;font-weight:700}
+/* 北向资金 */
+.north-box{display:flex;gap:16px;align-items:stretch;flex-wrap:wrap}
+.north-main{flex:1;min-width:200px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:12px;border:1px solid #bbf7d0}
+.north-main .nm-val{font-size:32px;font-weight:800}
+.north-main .nm-label{font-size:13px;color:#166534;margin-top:4px}
+.north-chart{flex:1.5;min-width:280px}
+.north-chart canvas{width:100%;height:180px!important}
+/* 研判建议 */
+.rec-list{display:flex;flex-direction:column;gap:10px}
+.rec-item{padding:14px 18px;border-radius:11px;border-left:4px solid}
+.rec-item.rec-buy{background:#fefce8;border-color:#ca8a04}
+.rec-item.rec-hold{background:#eff6ff;border-color:#2563eb}
+.rec-item.rec-sell{background:#fef2f2;border-color:#dc2626}
+.rec-item .rec-tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-bottom:6px}
+.rec-item .rec-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.rec-item .rec-reason{font-size:12.5px;color:#475569;line-height:1.65}
+@media(max-width:720px){
+  .heat-grid{grid-template-columns:repeat(3,1fr)}
+  .style-grid{grid-template-columns:repeat(2,1fr)}
+  .bar-label{width:58px;font-size:11.5px}
+  .north-box{flex-direction:column}
+}
 </style>
 </head>
 <body>
@@ -240,6 +303,7 @@
     <button data-tab="brief">📑 每日简报</button>
     <button data-tab="journal">📓 交易日志</button>
     <button data-tab="dash">📊 风控看板</button>
+    <button data-tab="fundflow">💰 资金动态</button>
   </nav>
 
   <!-- ===================== 策略概览 ===================== -->
@@ -321,6 +385,51 @@
       <h2><span class="dot"></span>版本更新日志 <span class="tagboard" id="curVer">v—</span></h2>
       <p class="hint">系统迭代记录，点击条目可展开详情。<a class="offline-dl" href="选股系统_离线版.html" download>⬇ 离线版（数据内嵌·双击即用）</a></p>
       <div id="changelog"></div>
+    </div>
+  </section>
+
+  <!-- ===================== 资金动态 ===================== -->
+  <section class="panel" id="fundflow">
+    <!-- 模块1: 大盘概览与资金主线 -->
+    <div class="ff-section">
+      <h3 class="ff-title"><span class="ff-emoji">📈</span> 大盘概览与今日资金主线 <span style="font-size:11px;color:#94a3b8;font-weight:400;margin-left:auto" id="ffTime"></span></h3>
+      <div class="idx-row" id="idxRow"></div>
+      <div class="fund-thread" id="fundThread"></div>
+    </div>
+
+    <!-- 模块2: 行业涨跌热力网格 -->
+    <div class="ff-section">
+      <h3 class="ff-title"><span class="ff-emoji">🔥</span> 一级行业涨跌热力图</h3>
+      <p style="font-size:12px;color:#94a3b8;margin-bottom:10px">共 16 个申万一级行业 · 鼠标悬停查看详情</p>
+      <div class="heat-grid" id="heatGrid"></div>
+    </div>
+
+    <!-- 模块3: 主力资金净流入排行（双向条形） -->
+    <div class="ff-section">
+      <h3 class="ff-title"><span class="ff-emoji">💰</span> 主力资金行业净流入排行 <span style="font-size:11px;color:#94a3b8;font-weight:400">单位：亿元</span></h3>
+      <div class="bar-list" id="barList"></div>
+    </div>
+
+    <!-- 模块4: 风格轮动强弱 -->
+    <div class="ff-section">
+      <h3 class="ff-title"><span class="ff-emoji">🔄</span> 风格轮动强弱对比</h3>
+      <div class="style-grid" id="styleGrid"></div>
+    </div>
+
+    <!-- 模块5: 北向资金动向 -->
+    <div class="ff-section">
+      <h3 class="ff-title"><span class="ff-emoji">🌊</span> 北向资金动向</h3>
+      <div class="north-box">
+        <div class="north-main" id="northMain"></div>
+        <div class="north-chart"><canvas id="northChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- 模块6: 行业配置研判建议 -->
+    <div class="ff-section">
+      <h3 class="ff-title"><span class="ff-emoji">🎯</span> 行业配置研判建议</h3>
+      <div class="rec-list" id="recList"></div>
+      <p style="font-size:11.5px;color:#94a3b8;margin-top:8px;text-align:right">* 以上数据为示意数据（非实时行情），仅供界面展示参考。</p>
     </div>
   </section>
 
@@ -1193,6 +1302,7 @@ function switchTab(id){
   document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("active",b.dataset.tab===id));
   document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id===id));
   if(id==="dash") renderDash();
+  if(id==="fundflow") renderNorthChart();
   // 切到可见面板后，重新调整该面板内所有canvas尺寸（修复隐藏时clientWidth=0的问题）
   requestAnimationFrame(()=>{
     const panel=document.getElementById(id);
@@ -1543,13 +1653,270 @@ async function loadBriefings(){
 }
 function todayStr(){ const d=new Date(),p=n=>(""+n).padStart(2,"0"); return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate()); }
 
+/* ============ 资金动态仪表盘 — 示意数据（集中定义，便于替换真实接口） ============ */
+const FF_DATA={
+  /* ── 模块1: 主要指数 ── */
+  indices:[
+    {name:'上证指数',code:'000001',val:3256.78,pct:+0.85,vol:4832},
+    {name:'深证成指',code:'399001',val:10452.31,pct:+1.32,vol:5821},
+    {name:'创业板指',code:'399006',val:2156.44,pct:+2.15,vol:2987},
+    {name:'科创50',code:'000688',val:978.65,pct:-0.43,vol:712},
+    {name:'沪深300',code:'000300',val:3842.56,pct:+1.08,vol:3156},
+    {name:'中证500',code:'000905',val:5623.19,pct:+0.64,vol:2134}
+  ],
+  fundThread:'今日大盘震荡上行，资金主攻方向为<strong>新能源车链</strong>（宁德时代+3.2%、比亚迪+2.8%领涨）、<strong>半导体设备</strong>（北方华创+4.1%）和<strong>医药创新</strong>（恒瑞+2.4%）三大主线。北向资金全天净流入约<strong>62 亿元</strong>，连续第 3 日净买入。风格上<strong>成长优于价值</strong>，小盘股活跃度提升。',
+
+  /* ── 模块2: 一级行业热力网格（申万一级16个代表）── */
+  heatSectors:[
+    {name:'电力设备',pct:+3.12},
+    {name:'电子',pct:+2.45},
+    {name:'汽车',pct:+2.18},
+    {name:'计算机',pct:+1.86},
+    {name:'通信',pct:+1.54},
+    {name:'医药生物',pct:+1.32},
+    {name:'国防军工',pct:+0.98},
+    {name:'机械设备',pct:+0.75},
+    {name:'食品饮料',pct:-0.23},
+    {name:'银行',pct:-0.41},
+    {name:'非银金融',pct:-0.67},
+    {name:'房地产',pct:-0.89},
+    {name:'建筑装饰',pct:-1.14},
+    {name:'公用事业',pct:-1.35},
+    {name:'煤炭',pct:-1.82},
+    {name:'石油石化',pct:-2.05}
+  ],
+
+  /* ── 模块3: 主力资金净流入排行（亿元）── */
+  fundFlow:[
+    {sector:'电力设备',inflow:+42.3,outflow:-8.1},
+    {sector:'电子',inflow:+35.6,outflow:-5.4},
+    {sector:'汽车',inflow:+28.9,outflow:-3.2},
+    {sector:'医药生物',inflow:+22.1,outflow:-6.8},
+    {sector:'计算机',inflow:+18.4,outflow:-4.1},
+    {sector:'国防军工',inflow:+12.7,outflow:-2.9},
+    {sector:'银行',inflow:+9.3,outflow:-18.6},
+    {sector:'食品饮料',inflow:+6.2,outflow:-24.3},
+    {sector:'房地产',inflow:+3.1,outflow:-21.8},
+    {sector:'煤炭',inflow:+1.4,outflow:-15.2}
+  ],
+
+  /* ── 模块4: 风格因子强弱（0~100 相对分）── */
+  styleFactors:[
+    {name:'大盘成长',score:72,trend:'up'},
+    {name:'大盘价值',score:38,trend:'dn'},
+    {name:'中盘成长',score:65,trend:'up'},
+    {name:'中盘价值',score:30,trend:'dn'},
+    {name:'小盘成长',score:81,trend:'up'},
+    {name:'小盘价值',score:22,trend:'dn'}
+  ],
+
+  /* ── 模块5: 北向资金近N日趋势 ── */
+  northFlow:{
+    todayNet:+62.3,shNet:+38.7,szNet:+23.6,
+    history:[ // 近10日
+      {d:'07-04',net:+12.4},{d:'07-07',net:-8.3},{d:'07-08',net:+28.1},
+      {d:'07-09',net:+45.6},{d:'07-10',net:-5.2},{d:'07-11',net:+33.8},
+      {d:'07-14',net:+51.2},{d:'07-15',net:+62.3}
+    ]
+  },
+
+  /* ── 模块6: 研判建议 ── */
+  recommendations:[
+    {
+      tag:'🟢 加仓方向',
+      type:'rec-buy',
+      title:'新能源车产业链持续获资金青睐',
+      reason:'主力净流入 +42.3 亿居首，行业涨 +3.12%，北向连续 3 日加仓。电池/整车/零部件三环节共振向上，建议超配电力设备板块龙头标的。'
+    },
+    {
+      tag:'🔵 持有观察',
+      type:'rec-hold',
+      title:'电子/半导体关注国产替代节奏',
+      reason:'行业涨 +2.45%，主力净流入 +35.6 亿排第二。AI 算力需求拉动芯片景气度回升，但需警惕估值高位回调风险，持有为主不追高。'
+    },
+    {
+      tag:'🔴 谨慎规避',
+      type:'rec-sell',
+      title:'周期品与地产链承压',
+      reason:'煤炭(-1.82%)、石油石化(-2.05%)、房地产(-0.89%) 主力持续净流出，合计流出超 55 亿。经济弱复苏背景下周期品需求疲软，建议低配或回避。'
+    }
+  ]
+};
+
+/* ============ 渲染函数 ============ */
+
+/* 颜色工具：A股惯例涨红跌绿，深浅按强度分级 */
+function heatColor(pct){
+  if(pct>=3) return{bg:'#dc2626',fg:'#fff'};        // 强红
+  if(pct>=2) return{bg:'#ef4444',fg:'#fff'};          // 中红
+  if(pct>=1) return{bg:'#fca5a5',fg:'#7f1d1d'};       // 浅红
+  if(pct>=0) return{bg:'#fee2e2',fg:'#991b1b'};       // 微红
+  if(pct>=-1) return{bg:'#dcfce7',fg:'#166534'};      // 浅绿
+  if(pct>=-2) return{bg:'#86efac',fg:'#14532d'};      // 中绿
+  return{bg:'#16a34a',fg:'#fff'};                       // 深绿
+}
+
+function pctClass(v){ return v>=0?'up-text':'dn-text'; }
+
+function fmtPct(v){ return (v>=0?'+':'')+v.toFixed(2)+'%'; }
+function fmtAmt(a){ return (a>=0?'+':'')+a.toFixed(1); }
+
+/* 模块1: 大盘指数卡片 */
+function renderIndices(){
+  const row=document.getElementById('idxRow');
+  row.innerHTML=FF_DATA.indices.map(ix=>{
+    const c=pctClass(ix.pct);
+    return `<div class="idx-card">
+      <div class="idx-name">${ix.name}</div>
+      <div class="idx-val ${c}">${ix.val.toLocaleString()}</div>
+      <div class="idx-pct ${c}">${fmtPct(ix.pct)}</div>
+      <div class="idx-vol">成交额 ${(ix.vol/100).toFixed(0)}亿</div>
+    </div>`;
+  }).join('');
+  document.getElementById('fundThread').innerHTML=FF_DATA.fundThread;
+  const now=new Date();
+  document.getElementById('ffTime').textContent=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+}
+
+/* 模块2: 热力网格 */
+function renderHeatGrid(){
+  const grid=document.getElementById('heatGrid');
+  grid.innerHTML=FF_DATA.heatSectors.map(s=>{
+    const hc=heatColor(s.pct);
+    return `<div class="heat-cell" style="background:${hc.bg};color:${hc.fg}">
+      <div class="heat-name">${s.name}</div>
+      <div class="heat-val">${fmtPct(s.pct)}</div>
+      <div class="heat-tip">${s.name}：${fmtPct(s.pct)}</div>
+    </div>`;
+  }).join('');
+}
+
+/* 模块3: 双向条形图 */
+function renderFundBar(){
+  const list=document.getElementById('barList');
+  const maxAbs=Math.max(...FF_DATA.fundFlow.map(f=>Math.max(Math.abs(f.inflow),Math.abs(f.outflow))));
+  list.innerHTML=FF_DATA.fundFlow.map(f=>{
+    const net=f.inflow+f.outflow;
+    const wIn=Math.abs(f.inflow)/maxAbs*100;
+    const wOut=Math.abs(f.outflow)/maxAbs*100;
+    return `<div class="bar-row">
+      <div class="bar-label" title="${f.sector}">${f.sector}</div>
+      <div class="bar-track">
+        <div class="bar-in" style="width:${wIn}%;background:${f.inflow>0?'#dc2626':'#94a3b8'};justify-content:${f.inflow>0?'flex-end':'flex-start';padding-${f.inflow>0?'right':'left'}:6px">${f.inflow>0?fmtAmt(f.inflow):''}</div>
+        <div class="bar-center"></div>
+        <div class="bar-out" style="width:${wOut}%;background:${f.outflow<0?'#16a34a':'#94a3b8'};padding-left:6px">${f.outflow<0?fmtAmt(f.outflow):''}</div>
+      </div>
+      <div class="bar-amt ${pctClass(net)}">${fmtAmt(net)}</div>
+    </div>`}).join('');
+}
+
+/* 模块4: 风格轮动 */
+function renderStyleGrid(){
+  const grid=document.getElementById('styleGrid');
+  const maxScore=Math.max(...FF_DATA.styleFactors.map(s=>s.score));
+  grid.innerHTML=FF_DATA.styleFactors.map(sf=>{
+    const isLead=sf.score>=maxScore*0.8;
+    const pct=(sf.score/100)*100;
+    const barColor=sf.trend==='up'?'#2563eb':'#94a3b8';
+    return `<div class="style-item${isLead?' lead':''}">
+      <div class="si-name">${sf.name}${sf.trend==='up'?' ↗':' ↘'}</div>
+      <div class="si-bar-wrap"><div class="si-bar" style="width:${pct}%;background:${barColor}"></div></div>
+      <div class="si-score ${sf.trend==='up'?'up-text':'dn-text'}">${sf.score}</div>
+    </div>`;
+  }).join('');
+}
+
+/* 模块5: 北向资金折线图(Canvas手绘) */
+function renderNorthChart(){
+  const nf=FF_DATA.northFlow;
+  document.getElementById('northMain').innerHTML=
+    `<div class="nm-val ${nf.todayNet>=0?'up-text':'dn-text'}">${nf.todayNet>=0?'+':''}${nf.todayNet.toFixed(1)}</div>
+     <div class="nm-label">今日北向净买入（亿元）</div>
+     <div style="font-size:12px;color:#166534;margin-top:6px">
+       沪股通 ${nf.shNet>=0?'+':''}${nf.shNet.toFixed(1)} · 深股通 ${nf.szNet>=0?'+':''}${nf.szNet.toFixed(1)}
+     </div>`;
+
+  const cv=document.getElementById('northChart');
+  const ctx=cv.getContext('2d');
+  const W=cv.clientWidth||280, H=cv.clientHeight||180;
+  cv.width=W*(window.devicePixelRatio||1);
+  cv.height=H*(window.devicePixelRatio||1);
+  ctx.setTransform(window.devicePixelRatio||1,0,0,window.devicePixelRatio||1,0,0);
+
+  const data=nf.history;
+  const pad={t:20,r:20,b:36,l:46};
+  const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+
+  const vals=data.map(d=>d.net);
+  const vMin=Math.min(...vals)-10, vMax=Math.max(...vals)+10;
+  const x=i=>pad.l+(i/(data.length-1))*cw;
+  const y=v=>pad.t+ch-(v-vMax)/(vMax-vMin)*ch;
+
+  // 零线
+  ctx.strokeStyle='#e2e8f0';
+  ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(pad.l,y(0));ctx.lineTo(W-pad.r,y(0));ctx.stroke();
+
+  // 折线
+  ctx.strokeStyle='#2563eb';
+  ctx.lineWidth=2.5;
+  ctx.lineJoin='round';
+  ctx.beginPath();
+  data.forEach((d,i)=>{const px=x(i),py=y(d.net); i===0?ctx.moveTo(px,py):ctx.lineTo(px,py)});
+  ctx.stroke();
+
+  // 填充渐变区域
+  const grad=ctx.createLinearGradient(0,pad.t,0,H-pad.b);
+  grad.addColorStop(0,'rgba(37,99,235,.18)');
+  grad.addColorStop(1,'rgba(37,99,235,0)');
+  ctx.fillStyle=grad;
+  ctx.lineTo(x(data.length-1),y(0));
+  ctx.lineTo(pad.l,y(0));
+  ctx.closePath();
+  ctx.fill();
+
+  // 数据点 + 标签
+  ctx.textAlign='center';
+  data.forEach((d,i)=>{
+    const px=x(i), py=y(d.net);
+    ctx.beginPath();ctx.arc(px,py,3.5,0,Math.PI*2);
+    ctx.fillStyle=d.net>=0?'#dc2626':'#16a34a';ctx.fill();
+    // X轴日期标签
+    ctx.fillStyle='#94a3b8';ctx.font='11px sans-serif';
+    ctx.fillText(d.d,px,H-pad.b+16);
+  });
+  // Y轴标题
+  ctx.save();ctx.translate(14,(H-pad.t)/2+pad.t);ctx.rotate(-Math.PI/2);
+  ctx.fillStyle='#64748b';ctx.font='11px sans-serif';ctx.fillText('净买入(亿)',0,0);ctx.restore();
+}
+
+/* 模块6: 研判建议 */
+function renderRecList(){
+  const el=document.getElementById('recList');
+  el.innerHTML=FF_DATA.recommendations.map(r=>`<div class="rec-item ${r.type}">
+    <span class="rec-tag">${r.tag}</span>
+    <div class="rec-title">${r.title}</div>
+    <div class="rec-reason">${r.reason}</div>
+  </div>`).join('');
+}
+
+/* 统一入口 */
+function renderFundFlow(){
+  renderIndices();
+  renderHeatGrid();
+  renderFundBar();
+  renderStyleGrid();
+  renderNorthChart();
+  renderRecList();
+}
+
 /* ============ 初始化 ============ */
 // 模式切换按钮绑定
 document.getElementById('btnHighFreq').addEventListener('click',()=>switchMode('highFreq'));
 document.getElementById('btnMidFreq').addEventListener('click',()=>switchMode('midFreq'));
 // 应用已保存的模式（默认高频）
 if(currentMode !== 'highFreq') { switchMode(currentMode); }  // 仅非默认时触发 UI 更新
-load(); syncCfgInputs(); refreshCand(); renderTrades(); renderDash(); renderChangelog();
+load(); syncCfgInputs(); refreshCand(); renderTrades(); renderDash(); renderChangelog(); renderFundFlow();
 if(location.protocol.indexOf("http")===0){ importToday(); loadBuySignal(); loadWinRate(); loadBriefings(); }   // 通过预览/本地服务器打开时，加载即自动合并当日自动选股、买入信号、交易胜率与每日简报
 window.addEventListener("resize",()=>{ for(const id in charts){ charts[id]._resize(); } });
 </script>
