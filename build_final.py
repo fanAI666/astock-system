@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
 """
 盘后定稿引擎：读取 选股结果/import_pre.json（07-10 预选，K线已结束于 2026-07-10），
-用复拉的 15:00 收盘/板块强度修正入场价与板块维度，按系统 scoreCandidate 引擎重算 6 维评分与胜率，
-筛选 win>=70% 达标标的（star->kcb 修正），内嵌 day(70)/min5(245) K线，输出定稿 MD + import_final.json。
+用复拉的 15:00 收盘/板块强度修正入场价与板块维度，按系统 scoreCandidate 引擎重算 6 维评分与综合强度分，
+筛选 strength>=70 达标标的（star->kcb 修正），内嵌 day(70)/min5(245) K线，输出定稿 MD + import_final.json。
+
+v1.2 改进项：
+- P1: "胜率"→"综合强度分"(strength)，消除标签欺诈；win 字段留给 recalibrate_win.py 回填真实回测胜率。
+- P2: ATR 止损适配从硬门槛改为池内百分位打分(0-10)，复活已死的 ATR 维度。
+- P3: 新增同日涨幅过滤：pct>9.5% 硬拒绝；pct>6% 扣 10 分+追高警告。
+- P4: RSI>72 超买硬约束，无论综合分多高都不放行。
 """
 import os, json, datetime
 
@@ -96,14 +102,34 @@ def metrics(day, q):
                 ma60="up" if ma60_up else "down", rsi=round(r, 1), atr=round(a, 2),
                 vol=vol, struct=struct, sector=sector)
 
-# ---------- 评分引擎（严格复刻 stock-selection-system.html scoreCandidate） ----------
+# ---------- 评分引擎（P1-P4 改进版，严格与 stock-selection-system.html scoreCandidate 同步） ----------
 def board_params(board):
     if board == "main":
         return dict(loss=2.0, profit=6.0)
     return dict(loss=3.0, profit=9.0)  # cyb / kcb 放宽 50%
 
-def score_candidate(c):
+# P4 硬约束：RSI 超买线
+RSI_OVERBOUGHT = 72
+
+# P3 涨幅过滤阈值
+PCT_HARD_REJECT = 9.5   # % 同日涨幅超此值硬拒绝
+PCT_WARNING = 6.0       # % 超此值扣分+警告
+
+def score_candidate(c, pool_atrs=None):
+    """返回 (total_score, formula_strength, atr_fit, bp, reasons, reject_info)
+       - total_score: 6 维原始总分
+       - formula_strength: P1 综合强度分 = min(88, 50 + total*0.35)，非真实胜率
+       - atr_fit: P2 ATR 百分位得分(0-10)
+       - reject_info: P3/P4 拒绝原因字符串，None 表示未拒绝
+    """
     s = 0; reasons = []
+
+    # ---- P4: RSI 超买硬约束（最优先检查）----
+    if c["rsi"] > RSI_OVERBOUGHT:
+        return (0, 0, 0, board_params(c["board"]), reasons,
+                f"P4硬拒: RSI={c['rsi']:.1f}>{RSI_OVERBOUGHT} 超买区，不参与评分")
+
+    # 趋势 25
     t = 0
     if c["ma20"] == "up": t += 10
     if c["priceMa"] == "above": t += 8
@@ -120,17 +146,57 @@ def score_candidate(c):
     elif (30 <= rs < 40) or (60 < rs <= 70): r = 8
     else: r = 3
     s += r; reasons.append(f"RSI {r}/15")
+
+    # P2: ATR 分位打分（池内百分位）
     bp = board_params(c["board"])
-    if c["atr"] <= bp["loss"] * 1.2: fit = 10
-    elif c["atr"] <= bp["loss"] * 1.8: fit = 5
-    else: fit = 0
-    s += fit; reasons.append(f"止损适配 {fit}/10")
-    win = min(88, 50 + s * 0.35)
-    return s, round(win, 1), fit, bp, reasons
+    if pool_atrs is not None and len(pool_atrs) >= 2:
+        # 百分位排名：ATR 越小 → 排名越靠前 → fit 越高
+        sorted_atrs = sorted(pool_atrs)
+        rank = sorted_atrs.index(c["atr"]) if c["atr"] in sorted_atrs else 0
+        pct_rank = rank / (len(sorted_atrs) - 1)  # 0 = 最小ATR(最好), 1 = 最大ATR(最差)
+        fit = max(0, round(10 * (1 - pct_rank)))
+    else:
+        # 无池信息时退化到连续衰减（比原硬门槛更宽容）
+        fit = max(0, round(10 * max(0, 1 - c["atr"] / (bp["loss"] * 3))))
+    s += fit; reasons.append(f"ATR适配 {fit}/10")
+
+    strength = min(88, 50 + s * 0.35)  # P1: 这是综合强度分，不是胜率
+
+    # P3: 涨幅过滤（由调用方传入 c.get("pct")）
+    reject = None
+    if "pct" in c:
+        pct_val = c["pct"]
+        if pct_val > PCT_HARD_REJECT:
+            reject = f"P3硬拒: 同日涨幅{pct_val:.1f}%>{PCT_HARD_REJECT}% 追高风险，拒绝"
+            s -= 999  # 确保不达标
+            reasons.append(f"<b>⛔ 追高拒绝: 日涨+{pct_val:.1f}%</b>")
+        elif pct_val > PCT_WARNING:
+            s -= 10
+            reasons.append(f"⚠️ 追高惩罚-10: 日涨+{pct_val:.1f}%>{PCT_WARNING}%")
+
+    return (s, round(strength, 1), fit, bp, reasons, reject)
 
 # ---------- 主流程 ----------
 pre = json.load(open(PRE, encoding="utf-8"))
 pre_items = pre["items"]
+
+# 先做第一遍 metrics（仅提取 ATR 用于 P2 百分位打分）
+raw_metrics = []
+for it in pre_items:
+    name_full = it["name"]
+    code = name_full.strip().split()[-1]
+    q = QUOTES.get(code)
+    if not q: continue
+    board = it.get("board")
+    if board == "star": board = "kcb"
+    day = [list(b) for b in it["kline"]["day"]]
+    final_close = q["now"]
+    if day: day[-1][2] = final_close
+    day_t = day[-70:] if len(day) >= 70 else day
+    m = metrics(day_t, q)
+    raw_metrics.append((code, m["atr"]))
+
+pool_atrs = [a for _, a in raw_metrics]
 
 all_rows = []
 final_items = []
@@ -160,37 +226,51 @@ for it in pre_items:
     m = metrics(day_t, q)
     entry = round(final_close, 2)
     c = dict(board=board, ma20=m["ma20"], priceMa=m["priceMa"], ma60=m["ma60"],
-             rsi=m["rsi"], vol=m["vol"], struct=m["struct"], sector=m["sector"], atr=m["atr"])
-    total, win, fit, bp, reasons = score_candidate(c)
+             rsi=m["rsi"], vol=m["vol"], struct=m["struct"], sector=m["sector"],
+             atr=m["atr"])
+    # P3: 注入同日涨幅
+    c["pct"] = q.get("pct", 0)
+
+    total, strength, fit, bp, reasons, reject_info = score_candidate(c, pool_atrs=pool_atrs)
     stop = round(entry * (1 - bp["loss"]/100), 2)
     target = round(entry * (1 + bp["profit"]/100), 2)
-    pass_ = win >= 70
 
-    row = dict(code=code, name=name_full, board=board, q=q, m=m, total=total, win=win,
-               fit=fit, reasons=reasons, entry=entry, stop=stop, target=target, pass_=pass_,
-               day=day_t, min5=min5_t, bp=bp)
+    # P3/P4 拒决判定
+    hard_rejected = reject_info is not None
+    pass_ = (strength >= 70) and (not hard_rejected)
+
+    row = dict(code=code, name=name_full, board=board, q=q, m=m,
+               total=total, strength=strength, fit=fit, bp=bp,
+               reasons=reasons, entry=entry, stop=stop, target=target,
+               pass_=pass_, rejected=hard_rejected, reject_reason=reject_info or "",
+               pct=c.get("pct",0),
+               day=day_t, min5=min5_t)
     all_rows.append(row)
 
     if pass_:
         item = dict(name=name_full, code=code, setcode=setcode_of(code), board=board,
                     ma20=m["ma20"], priceMa=m["priceMa"], ma60=m["ma60"], rsi=m["rsi"],
                     vol=m["vol"], struct=m["struct"], sector=m["sector"], atr=m["atr"],
-                    win=win, entry=entry, category="final", date=DATA_DATE,
+                    score=total, win=strength,          # P1: score=原始总分, strength=综合强度分(公式), win待recalibrate覆盖
+                    category="final", date=DATA_DATE,
                     stopPrice=stop, targetPrice=target,
                     kline=dict(day=day_t, min5=min5_t))
         final_items.append(item)
 
-# 排序：胜率降序，同胜率综合分降序
-all_rows.sort(key=lambda x: (-x["win"], -x["total"]))
+# 排序：综合强度分降序，同分综合分降序
+all_rows.sort(key=lambda x: (-x["strength"], -x["total"]))
 final_items.sort(key=lambda x: -x["win"])
 
-print("=== 全候选 6 维评分（11 只，按胜率降序）===")
-print(f"{'code':6} {'name':8} {'board':4} {'ma20':4} {'pMA':5} {'ma60':4} {'rsi':5} {'atr%':6} {'struct':9} {'vol':6} {'sector':6} {'fit':3} {'tot':3} {'win%':5} {'pass':4}")
+print("=== 全候选 6 维评分（P1-P4 改进版，11 只，按综合强度分降序）===")
+print(f"{'code':6} {'name':8} {'board':4} {'ma20':4} {'pMA':5} {'ma60':4} {'rsi':5} {'atr%':6} {'pct%':5} {'struct':9} {'vol':6} {'sector':6} {'fit':3} {'tot':3} {'str%':5} {'pass':4} {'reject'}")
 for r in all_rows:
     m = r["m"]
-    print(f"{r['code']:6} {r['name'].split()[-1] if False else r['q']['name']:8} {r['board']:4} {m['ma20']:4} {m['priceMa']:5} {m['ma60']:4} {m['rsi']:<5} {m['atr']:<6} {m['struct']:9} {m['vol']:6} {m['sector']:6} {r['fit']:<3} {r['total']:<3} {r['win']:<5} {'Y' if r['pass_'] else 'N':<4}")
+    rej = r["reject_reason"][:20] if r["rejected"] else ""
+    print(f"{r['code']:6} {r['q']['name']:8} {r['board']:4} {m['ma20']:4} {m['priceMa']:5} {m['ma60']:4} {m['rsi']:<5} {m['atr']:<6} {r['pct']:<5.1f} {m['struct']:9} {m['vol']:6} {m['sector']:6} {r['fit']:<3} {r['total']:<3} {r['strength']:<5} {'Y' if r['pass_'] else 'N':<4} {rej}")
 
-print(f"\n达标数(胜率>=70%): {len(final_items)} / 候选 {len(all_rows)}")
+rejected_count = sum(1 for r in all_rows if r["rejected"])
+print(f"\nP3/P4 硬拒绝: {rejected_count} 只")
+print(f"达标数(综合强度分>=70): {len(final_items)} / 候选 {len(all_rows)}")
 
 # ---------- 写 import_final.json ----------
 updated = datetime.datetime.now().astimezone().isoformat()
@@ -200,6 +280,6 @@ print("wrote", OUT_JSON, "items=", len(final_items), "size~", os.path.getsize(OU
 
 # 把全量明细存一份供生成 MD 用
 json.dump(dict(all_rows=[{k:v for k,v in r.items() if k not in ('day','min5')} for r in all_rows],
-               final_count=len(final_items), updated=updated),
+               final_count=len(final_items), rejected_count=rejected_count, updated=updated),
           open(os.path.join(BASE, "_final_summary.json"), "w", encoding="utf-8"), ensure_ascii=False)
 print("wrote _final_summary.json")

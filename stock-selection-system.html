@@ -285,14 +285,14 @@
 
   <header class="top">
     <h1>稳健选股交易系统</h1>
-    <p>本金 10 万元 · 每周交易 3–5 次 · 盈亏比 3:1 · 主板止损 2% / 止盈 6%，创业板·科创板放宽 50%（止损 3% / 止盈 9%）· 目标胜率 ≥ 70%。</p>
+    <p>本金 10 万元 · 每周交易 3–5 次 · 盈亏比 3:1 · 主板止损 2% / 止盈 6%，创业板·科创板放宽 50%（止损 3% / 止盈 9%）· 综合强度分 ≥ 70。</p>
     <div class="badges">
       <span class="badge">💰 本金 ¥100,000</span>
       <span class="badge">📅 周 3–5 笔</span>
       <span class="badge">⚖️ 盈亏比 3:1</span>
       <span class="badge">🛡️ 止损 2% / 3%</span>
       <span class="badge">🎯 止盈 6% / 9%</span>
-      <span class="badge">✅ 胜率 ≥ 70%</span>
+      <span class="badge">✅ 强度 ≥ 70%</span>
     </div>
   </header>
 
@@ -350,7 +350,7 @@
       <p class="hint">系统默认按你的要求设置；如想调整本金或风控比例，可在此修改，所有模块实时联动。</p>
       <div class="grid g3">
         <div><label class="fld">本金（元）</label><input id="cfgCapital" type="number" value="100000" min="100"></div>
-        <div><label class="fld">目标胜率（%）</label><input id="cfgWin" type="number" value="70" min="40" max="95"></div>
+        <div><label class="fld">达标门槛（%）</label><input id="cfgWin" type="number" value="70" min="40" max="95"></div>
         <div><label class="fld">期望盈亏比</label><input id="cfgRR" type="number" value="3" min="1" step="0.1"></div>
         <div><label class="fld">主板 止损 %</label><input id="cfgLossMain" type="number" value="2" step="0.1" min="0.5"></div>
         <div><label class="fld">主板 止盈 %</label><input id="cfgProfitMain" type="number" value="6" step="0.1" min="0.5"></div>
@@ -365,8 +365,8 @@
     </div>
 
     <div class="card">
-      <h2><span class="dot"></span>选股逻辑（如何逼近 70% 胜率）</h2>
-      <p class="hint">系统用 6 个维度给候选股打分，分数映射到“胜率估算”。仅推荐达到 70% 阈值的标的，杜绝情绪化交易。</p>
+      <h2><span class="dot"></span>选股评分规则（6维打分 → 综合强度分）</h2>
+      <p class="hint">系统用 6 个维度给候选股打分，分数映射到"综合强度分"。仅推荐达到 70 分阈值的标的，杜绝情绪化交易。</p>
       <div class="grid g2">
         <div>
           <div class="meter"><span style="width:120px;font-size:12.5px">趋势（MA20↑·价在MA20上·MA60↑）</span><div class="bar"><i style="width:25%"></i></div><span class="num">25</span></div>
@@ -379,7 +379,7 @@
           <div class="meter" style="margin-top:8px"><span style="width:120px;font-size:12.5px">止损适配（ATR≤止损×1.2）</span><div class="bar"><i style="width:10%"></i></div><span class="num">10</span></div>
         </div>
       </div>
-      <div class="note">胜率估算 = 50% + 总分 × 0.35（上限 88%）。总分 ≥ 57 即胜率 ≥ 70%。ATR 过大（波动超过止损）会被扣分并提示“止损过紧”，这是实盘被扫损的主因。</div>
+      <div class="note">综合强度分 = 50 + 总分 × 0.35（上限 88）。总分 ≥ 57 即强度 ≥ 70。ATR 过大（波动超过止损）会被扣分并提示"波动剧烈"，这是实盘被扫损的主因。<b>P3/P4 新增：同日涨幅>9.5%硬拒绝追高；RSI>72超买硬约束直接淘汰。</b></div>
     </div>
 
     <div class="card">
@@ -389,7 +389,7 @@
         <div class="stat"><div class="k">单笔最大亏损</div><div class="v" id="ovRisk">¥200 <small>(主板2%)</small></div></div>
         <div class="stat"><div class="k">单笔目标盈利</div><div class="v" id="ovProfit">¥600 <small>(主板6%)</small></div></div>
       </div>
-      <div class="note">数学期望：若胜率 70%、盈亏比 3:1，每笔期望收益 ≈ 本金 × (0.7×6% − 0.3×2%) = 本金 × 3.6%。10 笔交易（约 2–3 周）正期望极高，关键在于严格止损、不超额交易。</div>
+      <div class="note">数学期望：若综合强度分达标(≥70)、盈亏比 3:1，每笔期望收益 ≈ 本金 × (0.7×6% − 0.3×2%) = 本金 × 3.6%。10 笔交易（约 2–3 周）正期望极高，关键在于严格止损、不超额交易。注意：综合强度分≠真实胜率，回测标定后以"成功概率(回测标定)"为准。</div>
     </div>
 
     <div class="card">
@@ -453,7 +453,7 @@
   <section class="panel" id="screen">
     <div class="card">
       <h2><span class="dot"></span>候选股评分</h2>
-      <p class="hint">填写技术面指标（可来自你的看盘软件/通达信）。系统实时打分并判断是否达到 70% 胜率门槛。</p>
+      <p class="hint">填写技术面指标（可来自你的看盘软件/通达信）。系统实时打分并判断是否达到 70 强度门槛。P4：RSI>72 直接淘汰；P3：同日涨超9.5%追高拒绝。</p>
       <div class="grid g2">
         <div><label class="fld">股票名称 / 代码</label><input id="cName" placeholder="如：宁德时代 300750"></div>
         <div><label class="fld">板块</label>
@@ -505,6 +505,7 @@
           </div>
         </div>
         <div><label class="fld">近期波动率 ATR(%)</label><input id="cAtr" type="number" value="1.6" step="0.1" min="0.1"></div>
+        <div><label class="fld">同日涨幅%(P3)</label><input id="cPct" type="number" value="0" step="0.1" min="-20" max="20" placeholder="可选，>9.5%硬拒"></div>
       </div>
       <div class="row-actions">
         <button class="btn btn-primary" id="scoreBtn">评分并加入候选</button>
@@ -513,8 +514,8 @@
     </div>
 
     <div class="card">
-      <h2><span class="dot"></span>候选排名（按胜率估算）</h2>
-      <p class="hint">绿色=达标（≥70%），红色=未达标。带「盘后」徽章的为自动选股导入；点「加入交易」可送入日志。</p>
+      <h2><span class="dot"></span>候选排名（按综合强度分）</h2>
+      <p class="hint">绿色=达标（≥70），红色=未达标。带「盘后」徽章的为自动选股导入；点「加入交易」可送入日志。</p>
       <div class="seg" style="margin-bottom:12px">
         <input type="radio" name="candView" id="cvRank" value="rank" checked><label for="cvRank">排名</label>
         <input type="radio" name="candView" id="cvHist" value="hist"><label for="cvHist">选股历史</label>
@@ -652,7 +653,7 @@
     </div>
   </section>
 
-  <div class="foot">⚠️ 本系统为交易辅助工具，所有评分与胜率为基于技术面的估算模型，不构成投资建议。请结合自身风险承受能力审慎决策。</div>
+  <div class="foot">⚠️ 本系统为交易辅助工具，所有评分为基于技术面的估算模型，不构成投资建议。请结合自身风险承受能力审慎决策。"综合强度分"≠真实胜率，仅作筛选参考。</div>
 </div>
 
 <script>
@@ -668,8 +669,8 @@ const MODE_CONFIG = {
     tagClass: 'mode-tag-hf',
     tagText: '⚡ 高频 · 日内短线',
     title: '稳健选股交易系统',
-    desc: '本金 10 万元 · 每周交易 3–5 次 · 盈亏比 3:1 · 主板止损 2% / 止盈 6%，创业板·科创板放宽 50%（止损 3% / 止盈 9%）· 目标胜率 ≥ 70%。',
-    badges: ['💰 本金 ¥100,000','📅 周 3–5 笔','⚖️ 盈亏比 3:1','🛡️ 止损 2% / 3%','🎯 止盈 6% / 9%','✅ 胜率 ≥ 70%'],
+    desc: '本金 10 万元 · 每周交易 3–5 次 · 盈亏比 3:1 · 主板止损 2% / 止盈 6%，创业板·科创板放宽 50%（止损 3% / 止盈 9%）· 综合强度分 ≥ 70。',
+    badges: ['💰 本金 ¥100,000','📅 周 3–5 笔','⚖️ 盈亏比 3:1','🛡️ 止损 2% / 3%','🎯 止盈 6% / 9%','✅ 强度 ≥ 70'],
     dataFile: 'backtest_winrate.json',
     lossMain: 2, profitMain: 6,
     kAtr: 1.05, holdMain: 10, holdDyn: 5,
@@ -744,15 +745,26 @@ function boardParams(board){
   return {loss:+(cfg.lossMain*cfg.relax).toFixed(2), profit:+(cfg.profitMain*cfg.relax).toFixed(2)};
 }
 
-/* ============ 评分引擎 ============ */
+/* ============ 评分引擎（P1-P4 改进版） ============ */
+const RSI_OVERBOUGHT = 72;   // P4: RSI超买硬约束线
+const PCT_HARD_REJECT = 9.5; // P3: 同日涨幅硬拒绝阈值(%)
+const PCT_WARNING = 6.0;     // P3: 涨幅警告阈值(%)
 function scoreCandidate(c){
   let s=0, reasons=[];
+
+  // ---- P4: RSI 超买硬约束（最优先）----
+  if(c.rsi > RSI_OVERBOUGHT){
+    return {score:0, strength:0, winRate:0, pass:false, grade:"F", isCalibrated:false,
+            reasons:[`<b style="color:var(--bad)">⛔ P4硬拒：RSI=${c.rsi}>${RSI_OVERBOUGHT} 超买区，不参与评分</b>`],
+            rejected:true, rejectType:"RSI_OVERBOUGHT"};
+  }
+
   // 趋势 25
   let t=0;
   if(c.ma20==="up") t+=10;
   if(c.priceMa==="above") t+=8;
   if(c.ma60==="up") t+=7;
-  s+=t; reasons.push(`趋势 ${t}/25（MA20${c.ma20==="up"?"↗":c.ma20==="flat"?"→":"↘"}、价${c.priceMa==="above"?"在MA20上":"在MA20下"}、MA60${c.ma60==="up"?"↗":"↘"}）`);
+  s+=t; reasons.push(`趋势 ${t}/25（MA20${c.ma20==="up"?"↗":c.ma20==="flat"?"→":"↘"}、价${c.priceMa==="above"?"在MA20上":"在MA20下"}、MA60${c.ma60==="up"?"↘":"↗"}）`);
   // 结构 20
   let st = c.struct==="breakout"?20:(c.struct==="pullback"?16:4);
   s+=st; reasons.push(`结构 ${st}/20（${c.struct==="breakout"?"突破":c.struct==="pullback"?"回踩支撑":"无"}）`);
@@ -766,25 +778,41 @@ function scoreCandidate(c){
   let r;
   if(c.rsi>=40&&c.rsi<=60) r=15; else if((c.rsi>=30&&c.rsi<40)||(c.rsi>60&&c.rsi<=70)) r=8; else r=3;
   s+=r; reasons.push(`RSI ${r}/15（RSI=${c.rsi}，健康区间40-60）`);
-  // 止损适配 10
+  // P2: ATR 连续衰减（替代原硬门槛，使低波动股得分更高）
   const bp=boardParams(c.board);
   let fit;
-  if(c.atr<=bp.loss*1.2) fit=10; else if(c.atr<=bp.loss*1.8) fit=5; else fit=0;
+  fit = Math.max(0, Math.round(10 * Math.max(0, 1 - c.atr / (bp.loss * 3))));
   s+=fit;
-  if(fit<10) reasons.push(`<b style="color:var(--bad)">止损适配 ${fit}/10：ATR=${c.atr}% 偏大，止损${bp.loss}%可能过紧易被扫损</b>`);
-  else reasons.push(`止损适配 ${fit}/10（ATR=${c.atr}% ≤ 止损×1.2，松紧合适）`);
+  if(fit<5) reasons.push(`<b style="color:var(--bad)">ATR适配 ${fit}/10：ATR=${c.atr}% 偏大，波动剧烈</b>`);
+  else reasons.push(`ATR适配 ${fit}/10（ATR=${c.atr}%，波动适中）`);
 
-  // v1.0.7 重标定：import_final 经 recalibrate_win.py 处理后已带真实回测胜率(win)与综合强度分(score)。
-  // 已标定票直接采用真实胜率作"成功概率"展示；达标门槛仍用综合强度分(score)，选股规则不变。
+  // P3: 涨幅过滤
+  let pctVal = c.pct != null ? +c.pct : null;  // 可选字段，手动输入或从import_final传入
+  let rejectType=null;
+  if(pctVal!=null && pctVal > PCT_HARD_REJECT){
+    s -= 999;  // 确保不达标
+    rejectType="CHASE_REJECT";
+    reasons.push(`<b style="color:#dc2626">⛔ P3硬拒：同日涨幅+${pctVal.toFixed(1)}%>${PCT_HARD_REJECT}% 追高风险</b>`);
+  }else if(pctVal!=null && pctVal > PCT_WARNING){
+    s -= 10;
+    reasons.push(`<span style="color:var(--warn,#d97706)">⚠️ P3追高惩罚-10：日涨+${pctVal.toFixed(1)}%>${PCT_WARNING}%</span>`);
+  }
+
+  const strength = Math.min(88, 50 + s*0.35);  // P1: 综合强度分（非胜率）
+  let grade = s>=80?"A+":s>=70?"A":s>=60?"B":s>=45?"C":"D";
+
+  // ---- P1: 已标定票用回测真实胜率；未标定用综合强度分 ----
   if(c.win != null && c.win !== undefined){
     const _wr = Math.round(c.win*10)/10;
     const _sc = (c.score!=null && c.score!==undefined) ? c.score : s;
     const _g = _sc>=80?"A+":_sc>=70?"A":_sc>=60?"B":_sc>=45?"C":"D";
-    return {score:Math.round(_sc), winRate:_wr, pass:_sc>=cfg.win, grade:_g, reasons:['成功概率=回测标定真实胜率（偏差已归零）']};
+    return {score:Math.round(_sc), strength:_sc, winRate:_wr, pass:_sc>=cfg.win, grade:_g,
+            isCalibrated:true, reasons:['成功概率=回测标定真实胜率（偏差已归零）'], rejected:false};
   }
-  let winRate = Math.min(88, 50 + s*0.35);
-  let grade = s>=80?"A+":s>=70?"A":s>=60?"B":s>=45?"C":"D";
-  return {score:s, winRate:Math.round(winRate*10)/10, pass:winRate>=cfg.win, grade, reasons};
+  // 未标定（手动评分）：winRate 显示为综合强度分，标签区分
+  return {score:s, strength:Math.round(strength*10)/10, winRate:Math.round(strength*10)/10,
+          pass:strength>=cfg.win && !rejectType, grade,
+          isCalibrated:false, reasons, rejected:!!rejectType, rejectType:rejectType||null};
 }
 
 /* ============ 渲染候选 ============ */
@@ -1007,8 +1035,9 @@ function scoreCardHTML(c,pfx){
       <div class="grade" style="color:${r.pass?'var(--ok)':'var(--bad)'}">${r.grade}</div>
     </div>
     <div class="meter"><span style="width:90px;font-size:12.5px">综合分</span><div class="bar"><i style="width:${r.score}%"></i></div><span class="num">${r.score}</span></div>
-    <div class="meter" style="margin-top:6px"><span style="width:90px;font-size:12.5px">成功概率(回测标定)</span><div class="bar"><i style="width:${r.winRate/88*100}%"></i></div><span class="num">${r.winRate}%</span></div>
-    <div style="margin-top:6px">${r.pass?'<span class="pill ok">达标 ≥'+cfg.win+'%</span>':'<span class="pill bad">未达标 <'+cfg.win+'%</span>'}
+    <div class="meter" style="margin-top:6px"><span style="width:90px;font-size:12.5px">${r.isCalibrated?'成功概率(回测标定)':'综合强度分(模型)'}</span><div class="bar"><i style="width:${r.winRate/88*100}%"></i></div><span class="num">${r.winRate}%</span></div>
+    ${r.rejected?'<div class="note" style="border-color:#dc2626;background:#fef5f5;margin-top:6px">⛔ 已被硬约束拒绝：'+r.rejectType+'</div>':''}
+    <div style="margin-top:6px">${r.pass?'<span class="pill ok">达标 ≥'+cfg.win+'</span>':'<span class="pill bad">'+(r.rejected?'已拒绝':'未达标 <')+cfg.win+'</span>'}
       <span class="pill warn">止损${bp.loss}% / 止盈${bp.profit}%</span></div>
     <div class="reason">${r.reasons.map(x=>"· "+x).join("<br>")}</div>
     ${kl}
@@ -1106,7 +1135,8 @@ document.getElementById("scoreBtn").addEventListener("click",()=>{
     board:get("cBoard"), ma20:get("cMa20"), priceMa:get("cPriceMa"),
     ma60:get("cMa60"), rsi:+document.getElementById("cRsi").value,
     vol:get("cVol"), struct:get("cStruct"), sector:get("cSector"),
-    atr:+document.getElementById("cAtr").value
+    atr:+document.getElementById("cAtr").value,
+    pct:+document.getElementById("cPct").value   // P3: 同日涨幅
   };
   c._r=scoreCandidate(c);
   c.id="manual_"+Date.now()+"_"+Math.random().toString(36).slice(2,6);
@@ -1227,9 +1257,9 @@ function renderDash(){
     <div class="stat"><div class="k">累计盈亏</div><div class="v ${cumPnl>=0?'up':'down'}">${cumPnl>=0?'+':''}${cumPnl.toFixed(0)}<small> 元</small></div></div>
     <div class="stat"><div class="k">总笔数 / 平均盈亏比</div><div class="v">${total}<small> 笔</small></div><div style="font-size:12px;color:var(--sub)">均值 ${avgRR.toFixed(2)} : 1</div></div>`;
 
-  let hint=`当前策略要求每周 3–5 笔、胜率 ≥ ${cfg.win}%。`;
+  let hint=`当前策略要求每周 3–5 笔、综合强度分 ≥ ${cfg.win}。`;
   if(wkTrades.length>5) hint+=" ⚠️ 本周已超 5 笔，请停止开新仓，避免频繁交易侵蚀胜率。";
-  else if(wkTrades.length===0) hint+=" 新的一周，等待高胜率（≥70%）信号出现再出手。";
+  else if(wkTrades.length===0) hint+=" 新的一周，等待高综合强度（≥"+cfg.win+"）信号出现再出手。";
   else if(wkTrades.length<3) hint+=" 本周节奏偏慢，可在达标候选中择优补充，但勿为凑数降低标准。";
   else hint+=" 节奏良好，保持纪律。";
   document.getElementById("dashHint").textContent=hint;
