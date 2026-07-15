@@ -77,6 +77,14 @@ for (const f of ['briefing_pre.json', 'briefing_final.json']) {
     console.log(f + ' 不存在（跳过，请先运行 build_briefings.js）');
   }
 }
+// 3.8) 复制单文件离线版（数据内嵌，供站点下载）
+const offSrc = path.join('D:/WorkBuddy', '选股系统_离线版.html');
+if (fs.existsSync(offSrc)) {
+  fs.copyFileSync(offSrc, path.join(OUT_DIR, '选股系统_离线版.html'));
+  console.log('选股系统_离线版.html copied');
+} else {
+  console.log('选股系统_离线版.html 不存在（跳过，请先运行 package_singlefile.js）');
+}
 
 console.log('build done. 替换选股结果/ 次数 =', before);
 console.log('deploy/index.html size =', fs.statSync(path.join(OUT_DIR,'index.html')).size);

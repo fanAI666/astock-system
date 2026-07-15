@@ -29,6 +29,12 @@ function copyDir(src, dst) {
 }
 copyDir(path.join(DEPLOY, 'data'), path.join(PAGES, 'data'));
 fs.copyFileSync(path.join(DEPLOY, 'index.html'), path.join(PAGES, 'index.html'));
+// 同步单文件离线版（若存在）
+const offDeploy = path.join(DEPLOY, '选股系统_离线版.html');
+if (fs.existsSync(offDeploy)) {
+  fs.copyFileSync(offDeploy, path.join(PAGES, '选股系统_离线版.html'));
+  console.log('选股系统_离线版.html synced to pages/');
+}
 
 // 4) 提交并推送 gh-pages
 const git = (...args) => spawnSync('git', args, { cwd: PAGES, stdio: 'inherit' });
