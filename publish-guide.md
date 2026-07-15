@@ -93,3 +93,42 @@ New-NetFirewallRule -DisplayName "选股系统8080" -Direction Inbound -LocalPor
 4. 建配置文件指向 `http://localhost:8080` 后运行 `cloudflared.exe tunnel run stock`
 
 完成后公网地址固定为 `https://stock.你的域名.com`，不再随重启变化。
+
+---
+
+## 七、正式发布（固定公网地址）：GitHub Pages ⭐
+
+> 这是当前**首选**的持久托管方式，地址**永久不变**，每天自动刷新。
+
+**固定访问地址（直接用）：**
+```
+https://fanai666.github.io/astock-system/
+```
+首次打开输入访问口令 **`stock2026`**。
+
+### 关键说明（你已确认的选择）
+- **仓库设为「公开」**：GitHub 免费计划**不支持私有仓库启用 Pages**（报错 "Your current plan does not support GitHub Pages for this repository"），故把 `fanAI666/astock-system` 设为公开，Pages 即免费可用。
+- **数据对外可见的代价**：因为仓库公开，`/data/import_final.json`、`/data/import_pre.json`（你的选股结果）任何人可直接抓。前端访问口令**只遮挡界面**，不保护原始 JSON。这正是你选的「公开仓库 + GitHub Pages」方案的取舍。
+- 若以后想要「数据也保密 + 固定地址」，需改用 Cloudflare Pages + Access（需 Cloudflare 账号），见附录或另行告知。
+
+### 仓库与分支
+- 代码备份：`main` 分支
+- 站点源：`gh-pages` 分支（Pages 源设为该分支、公开站点）
+- 仓库地址：https://github.com/fanAI666/astock-system
+
+### 每日自动同步（已配置自动化）
+- 自动化「选股系统云端同步」：交易日下午 **18:30** 自动运行 `node sync_pages.js`
+  → 重跑 `build_deploy.js` 生成 `deploy/` → 复制到 `pages/` → 推送到 `gh-pages` 分支 → Pages 自动重新构建
+- **地址不变**，无需每次记新链接。自动化跑完会在回复里写出固定地址。
+
+### 手动更新
+```bash
+cd D:\WorkBuddy && node sync_pages.js
+```
+
+### 推送凭据（重要）
+- 令牌保存在 **`.github_remote`**（已被 `.gitignore` 忽略，**不会进公开仓库**），`sync_pages.js` 每次运行读取它来推送 `gh-pages`。
+- 该令牌也残留在本机 `pages/.git/config` 与 `D:\WorkBuddy\.git/config` 的 origin 地址中（均为本地文件，不上传 GitHub）。
+- 如需吊销：去 GitHub → Settings → Developer settings → Personal access tokens 撤销该 `ghp_...` 令牌；之后同步需重新生成并写入 `.github_remote`。
+
+> 注：`serve.js`（局域网 / Cloudflare Tunnel）与 CloudStudio 部署仍可用，但本方案地址固定、无需本机常开，推荐日常使用本 GitHub Pages 地址。

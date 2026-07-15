@@ -10,7 +10,7 @@ const path = require("path");
 const crypto = require("crypto");
 const os = require("os");
 
-const ROOT = "D:\\WorkBuddy";
+const ROOT = "D:/WorkBuddy"; // 注意: 必须用正斜杠, 反斜杠会让 path.join 吞掉 D:\ 根路径
 const PORT = parseInt(process.env.PORT || "8080", 10);
 const HOST = "0.0.0.0"; // 绑定所有网卡, 接受局域网/公网入站
 
@@ -97,8 +97,8 @@ const server = http.createServer((req, res) => {
   // 静态文件服务
   let p = decodeURIComponent(req.url.split("?")[0]);
   if (p === "/") p = "/stock-selection-system.html";
-  const fp = path.normalize(path.join(ROOT, p));
-  if (!fp.startsWith(ROOT)) {
+  const fp = path.normalize(path.join(ROOT, p.replace(/^\/+/, "")));
+  if (!fp.startsWith(path.normalize(ROOT))) {
     res.writeHead(403);
     res.end("forbidden");
     return;

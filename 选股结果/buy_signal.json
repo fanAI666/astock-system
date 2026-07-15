@@ -1,0 +1,15 @@
+{
+  "date": "2026-07-15",
+  "baselineDate": "2026-07-15",
+  "top3": [],
+  "trade": false,
+  "reason": "大盘空头(上证<MA20)",
+  "index": {
+    "code": "000001",
+    "name": "上证指数",
+    "close": 3967.13,
+    "ma20": 4054.37,
+    "lastBarDate": "20260714",
+    "trend": "bearish"
+  }
+}

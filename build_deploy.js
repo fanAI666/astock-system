@@ -1,6 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
+// 部署前先从最新简报 markdown 重新生成 briefing_*.json（若不存在则跳过）
+try { require('./build_briefings.js'); } catch (e) { console.log('build_briefings 跳过:', e.message); }
+
 const SRC = 'D:/WorkBuddy/stock-selection-system.html';
 const OUT_DIR = 'D:/WorkBuddy/deploy';
 const DATA_DIR = path.join(OUT_DIR, 'data');
@@ -45,6 +48,34 @@ fs.writeFileSync(path.join(OUT_DIR, 'index.html'), html, 'utf8');
 // 3) 复制数据快照
 for (const f of ['import_pre.json', 'import_final.json']) {
   fs.copyFileSync(path.join('D:/WorkBuddy/选股结果', f), path.join(DATA_DIR, f));
+}
+// 3.5) 复制买入信号（若存在）
+const sigSrc = path.join('D:/WorkBuddy/选股结果', 'buy_signal.json');
+if (fs.existsSync(sigSrc)) {
+  fs.copyFileSync(sigSrc, path.join(DATA_DIR, 'buy_signal.json'));
+  console.log('buy_signal.json copied');
+} else {
+  console.log('buy_signal.json 不存在（跳过）');
+}
+// 3.6) 复制交易胜率回测结果（高频 + 中频，若存在）
+for (const f of ['backtest_winrate.json', 'backtest_midfreq.json']) {
+  const wrSrc = path.join('D:/WorkBuddy/选股结果', f);
+  if (fs.existsSync(wrSrc)) {
+    fs.copyFileSync(wrSrc, path.join(DATA_DIR, f));
+    console.log(f + ' copied');
+  } else {
+    console.log(f + ' 不存在（跳过）');
+  }
+}
+// 3.7) 复制每日简报（预选 + 盘后，若存在）
+for (const f of ['briefing_pre.json', 'briefing_final.json']) {
+  const src = path.join('D:/WorkBuddy/选股结果', f);
+  if (fs.existsSync(src)) {
+    fs.copyFileSync(src, path.join(DATA_DIR, f));
+    console.log(f + ' copied');
+  } else {
+    console.log(f + ' 不存在（跳过，请先运行 build_briefings.js）');
+  }
 }
 
 console.log('build done. 替换选股结果/ 次数 =', before);

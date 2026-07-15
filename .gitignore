@@ -19,3 +19,10 @@ __pycache__/
 # ===== 构建产物 / 部署生成物（由 build_deploy.js 生成）=====
 deploy/
 Claw/dist/
+
+# ===== 本地临时 / 密钥（切勿提交）=====
+_me.json
+_repo.json
+_repo_body.json
+pages/
+.github_remote

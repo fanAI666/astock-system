@@ -94,6 +94,8 @@
   .result .line b{font-weight:700}
   .up{color:var(--up);font-weight:700}.down{color:var(--down);font-weight:700}
   canvas{width:100%;display:block}
+  #equityChart{height:220px}
+  #winChart{height:200px}
   .empty{text-align:center;color:var(--sub);padding:26px;font-size:13px}
   .kline{font-variant-numeric:tabular-nums}
   .foot{text-align:center;color:#9aa5b1;font-size:11.5px;margin-top:24px}
@@ -103,7 +105,6 @@
     padding:2px 8px;border-radius:6px;margin-left:6px}
   .cat{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-left:6px;vertical-align:middle}
   .cat-manual{background:#eef2f7;color:#6b7280}
-  .cat-pre{background:#fff4e0;color:#b9770a}
   .cat-final{background:#e7f7ec;color:#16a34a}
   /* ---- K线 ---- */
   .klwrap{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:8px;background:#fcfdff}
@@ -124,6 +125,83 @@
 .hist-detail{padding:0 12px 12px;}
 .hist-detail .scorecard{margin-top:4px;}
 .hist-empty{color:var(--mut);font-size:13px;padding:8px 2px;}
+/* 买入触发面板 */
+#trigList .trig-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:11px 0;border-bottom:1px dashed #e2e8f0}
+#trigList .trig-row:last-child{border-bottom:0}
+#trigList .tname{font-weight:600;min-width:120px}
+#trigList .tprob{color:var(--ok);font-weight:600}
+#trigList .tband{font-size:12px;color:#64748b}
+#trigList .topen{font-size:12.5px}
+#trigList .dev{font-size:12.5px}
+.trig-buy{background:var(--ok);color:#fff;padding:2px 9px;border-radius:6px;font-size:12px;font-weight:600}
+.trig-no{background:#f1f5f9;color:#64748b;padding:2px 9px;border-radius:6px;font-size:12px}
+/* =========== 买入信号（开盘抓取）面板 =========== */
+.bs-banner{padding:16px 18px;border-radius:14px;display:flex;align-items:center;gap:12px;font-weight:700;font-size:18px;margin:4px 0 10px}
+.bs-banner.bs-ok{background:linear-gradient(135deg,#dcfce7,#bbf7d0);color:#166534;border:1px solid #86efac}
+.bs-banner.bs-no{background:linear-gradient(135deg,#fee2e2,#fecaca);color:#991b1b;border:1px solid #fca5a5}
+.bs-banner .bs-icon{font-size:26px;line-height:1}
+.bs-banner .bs-title{letter-spacing:.3px}
+.bs-banner .bs-wait{font-weight:500;font-size:14px;color:#64748b}
+.bs-meta{font-size:13px;color:#475569;margin-bottom:8px}
+.bs-reason{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px 12px;border-radius:10px;font-size:13.5px;line-height:1.6;margin-bottom:14px}
+.bs-sub{font-size:14px;margin:4px 0 8px;color:#334155}
+/* =========== 交易胜率 置顶 =========== */
+.winrate-top{padding:0;margin-bottom:14px}
+.wr-card{display:flex;flex-wrap:wrap;align-items:center;gap:16px 30px;background:linear-gradient(135deg,#0f172a,#1e293b);color:#e2e8f0;border-radius:16px;padding:18px 24px;box-shadow:0 12px 34px rgba(15,23,42,.35);border:1px solid rgba(148,163,184,.18)}
+.wr-main{flex:0 0 auto;min-width:210px}
+.wr-label{font-size:13px;color:#94a3b8;letter-spacing:.6px}
+.wr-label .wr-sub{margin-left:9px;font-size:11px;background:#334155;color:#cbd5e1;padding:2px 9px;border-radius:999px;letter-spacing:0}
+.wr-big{font-size:48px;font-weight:800;line-height:1.02;margin:3px 0 2px;font-variant-numeric:tabular-nums}
+.wr-period{font-size:12px;color:#94a3b8}
+.wr-stats{flex:1 1 auto;display:flex;flex-wrap:wrap;gap:10px 28px}
+.wr-stat{display:flex;flex-direction:column}
+.wr-stat .k{font-size:11.5px;color:#94a3b8;margin-bottom:3px}
+.wr-stat b{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+.wr-rule{flex:1 1 100%;font-size:11.5px;color:#64748b;border-top:1px solid rgba(148,163,184,.18);padding-top:10px;margin-top:2px;line-height:1.5}
+.wr-good{color:#22c55e}.wr-mid{color:#f59e0b}.wr-bad{color:#ef4444}
+@media(max-width:560px){.wr-big{font-size:38px}.wr-main{min-width:160px}}
+/* =========== 每日简报 / Markdown =========== */
+.brief-card .br-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:4px}
+.brief-card .br-date{font-size:12px;color:var(--sub);font-weight:600}
+.brief-card .br-tag{font-size:11px;font-weight:700;padding:2px 9px;border-radius:6px;background:#eef4ff;color:var(--brand)}
+.brief-card.is-final .br-tag{background:#e7f7ec;color:#16a34a}
+.brief-empty{color:var(--sub);font-size:13px;padding:18px 4px}
+.md{margin-top:6px}
+.md-h{font-size:15px;font-weight:700;margin:14px 0 8px;color:var(--ink);border-left:3px solid var(--brand);padding-left:9px}
+.md-h:first-child{margin-top:2px}
+.md-p{font-size:13px;color:#334155;margin:8px 0;line-height:1.65}
+.md-ul,.md-ol{margin:8px 0 8px 20px;font-size:13px;color:#334155}
+.md-ul li,.md-ol li{margin:3px 0}
+.md-quote{border-left:3px solid var(--warn);background:#fff8e8;padding:10px 14px;border-radius:0 8px 8px 0;margin:10px 0;font-size:12.5px;color:#7a5a00;line-height:1.6}
+.md-quote.warn{border-left-color:var(--bad);background:#fdeeee;color:#8a1f1f}
+.md-code{background:#eef2f7;padding:1px 6px;border-radius:5px;font-size:12px;font-family:ui-monospace,Menlo,Consolas,monospace;color:#b9452a}
+.md-table-wrap{overflow-x:auto;margin:10px 0;border:1px solid var(--line);border-radius:10px}
+.md-table-wrap table{font-size:12.5px;margin:0}
+.md-table-wrap th{background:#f3f7ff;white-space:nowrap}
+.md-table-wrap td{white-space:nowrap}
+.md hr{border:0;border-top:1px dashed var(--line);margin:12px 0}
+.brief-note{font-size:11.5px;color:#9aa5b1;margin-top:10px}
+/* =========== 高频/中频 模式切换 =========== */
+.mode-bar{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 16px;margin-bottom:14px;box-shadow:var(--shadow)}
+.mode-bar .mode-label{font-size:12.5px;color:var(--sub);font-weight:600;white-space:nowrap}
+.mode-switch{display:inline-flex;background:#eef2f7;border-radius:9px;padding:3px;gap:2px}
+.mode-switch button{border:0;background:transparent;color:var(--sub);padding:6px 14px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;transition:.18s;white-space:nowrap}
+.mode-switch button.active{background:#fff;color:var(--brand);box-shadow:0 1px 4px rgba(37,99,235,.15)}
+.mode-switch button:hover:not(.active){color:var(--ink)}
+.mode-tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-left:auto}
+.mode-tag-hf{background:#eef4ff;color:var(--brand)}
+.mode-tag-mf{background:#f0fdf4;color:#16a34a}
+/* =========== 版本更新日志 =========== */
+.cl-item{border-left:3px solid var(--line);padding:8px 0 8px 16px;margin:6px 0;cursor:pointer;transition:.15s;position:relative}
+.cl-item:hover{border-left-color:var(--brand2)}
+.cl-item.cl-latest{border-left-color:var(--brand)}
+.cl-item.cl-latest::before{content:"";position:absolute;left:-6px;top:12px;width:9px;height:9px;border-radius:50%;background:var(--brand)}
+.cl-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cl-ver{font-weight:700;font-size:14px;color:var(--ink)}
+.cl-date{font-size:12px;color:var(--sub)}
+.cl-desc{font-size:13px;color:#334155;margin-top:5px;line-height:1.5}
+.cl-item.cl-collapsed .cl-desc{display:none}
+.cl-toggle{font-size:11px;color:var(--brand);margin-left:auto}
 </style>
 </head>
 <body>
@@ -142,16 +220,54 @@
     </div>
   </header>
 
+  <!-- 高频/中频 模式切换 -->
+  <div class="mode-bar" id="modeBar">
+    <span class="mode-label">交易模式</span>
+    <div class="mode-switch" id="modeSwitch">
+      <button class="active" data-mode="highFreq" id="btnHighFreq">⚡ 高频</button>
+      <button data-mode="midFreq" id="btnMidFreq">📊 中频（验证）</button>
+    </div>
+    <span class="mode-tag mode-tag-hf" id="modeTag">⚡ 高频 · 日内短线</span>
+  </div>
+
   <nav class="tabs">
     <button class="active" data-tab="overview">📋 策略概览</button>
     <button data-tab="screen">🔍 选股评分</button>
+    <button data-tab="buysig">📈 买入信号</button>
     <button data-tab="calc">🧮 仓位计算</button>
+    <button data-tab="brief">📑 每日简报</button>
     <button data-tab="journal">📓 交易日志</button>
     <button data-tab="dash">📊 风控看板</button>
   </nav>
 
   <!-- ===================== 策略概览 ===================== -->
   <section class="panel active" id="overview">
+    <!-- 交易胜率（系统回测，改为概览页内展示，不再置顶） -->
+    <div class="winrate-top" id="winrate" style="margin:0 0 16px">
+      <div class="wr-card">
+        <div class="wr-main">
+          <div class="wr-label">交易胜率<span class="wr-sub">系统回测</span></div>
+          <div class="wr-big" id="wrValue">—</div>
+          <div class="wr-period" id="wrPeriod">回测周期 2025.7.1 – 2026.6.30</div>
+          <div class="wr-period" id="wrDataNote" style="color:#f59e0b"></div>
+        </div>
+        <div class="wr-stats">
+          <div class="wr-stat"><span class="k">触发交易</span><b id="wrTrades">—</b></div>
+          <div class="wr-stat"><span class="k">盈利 / 亏损</span><b id="wrWL">—</b></div>
+          <div class="wr-stat"><span class="k">盈亏比</span><b id="wrPF">—</b></div>
+          <div class="wr-stat"><span class="k">每笔期望</span><b id="wrExp">—</b></div>
+        </div>
+        <div class="wr-rule" id="wrRule">主板：强制止损−2%/止盈+6%（固定3:1），持有≤10日</div>
+        <div class="wr-rule" id="wrDynRule" style="color:#6366f1">创业板·科创板：先过趋势(站上MA20+MA5>MA20+MA20上行)+量能(≥1.2×20日均量)+缺口(±4%~6%) 过滤，再走动态止损(1.05×ATR14)、止盈×3保持3:1、封顶1周+跟踪≤6%</div>
+        <div class="wr-rule" id="wrFilterAll" style="color:#0ea5e9">全市场（主板+双创）：触发前均需过 趋势+量能+缺口 过滤（v1.0.3 起）</div>
+        <div class="wr-rule" id="wrRulePortfolio" style="color:#10b981">⑤ 组合层：大盘硬过滤 + 同日上限 + 回撤上限（v1.0.6 起）</div>
+        <div class="wr-period" id="wrByBoard"></div>
+        <div class="wr-period" id="wrByTier" style="color:#8b5cf6"></div>
+        <div class="wr-period" id="wrDynFilter" style="color:#3b82f6"></div>
+        <div class="wr-period" id="wrCalib" style="color:#f59e0b"></div>
+        <div class="wr-period" id="wrPortfolio" style="color:#10b981;font-weight:600"></div>
+      </div>
+    </div>
     <div class="card">
       <h2><span class="dot"></span>策略核心参数（可微调）</h2>
       <p class="hint">系统默认按你的要求设置；如想调整本金或风控比例，可在此修改，所有模块实时联动。</p>
@@ -197,6 +313,12 @@
         <div class="stat"><div class="k">单笔目标盈利</div><div class="v" id="ovProfit">¥600 <small>(主板6%)</small></div></div>
       </div>
       <div class="note">数学期望：若胜率 70%、盈亏比 3:1，每笔期望收益 ≈ 本金 × (0.7×6% − 0.3×2%) = 本金 × 3.6%。10 笔交易（约 2–3 周）正期望极高，关键在于严格止损、不超额交易。</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="dot"></span>版本更新日志 <span class="tagboard" id="curVer">v—</span></h2>
+      <p class="hint">系统迭代记录，点击条目可展开详情。</p>
+      <div id="changelog"></div>
     </div>
   </section>
 
@@ -265,7 +387,7 @@
 
     <div class="card">
       <h2><span class="dot"></span>候选排名（按胜率估算）</h2>
-      <p class="hint">绿色=达标（≥70%），红色=未达标。带「预选/盘后」徽章的为自动选股导入；点「加入交易」可送入日志。</p>
+      <p class="hint">绿色=达标（≥70%），红色=未达标。带「盘后」徽章的为自动选股导入；点「加入交易」可送入日志。</p>
       <div class="seg" style="margin-bottom:12px">
         <input type="radio" name="candView" id="cvRank" value="rank" checked><label for="cvRank">排名</label>
         <input type="radio" name="candView" id="cvHist" value="hist"><label for="cvHist">选股历史</label>
@@ -279,7 +401,6 @@
           <div class="seg" style="max-width:380px">
             <input type="radio" name="filt" id="fAll" value="all" checked><label for="fAll">全部</label>
             <input type="radio" name="filt" id="fM" value="manual"><label for="fM">手动</label>
-            <input type="radio" name="filt" id="fP" value="pre"><label for="fP">预选</label>
             <input type="radio" name="filt" id="fF" value="final"><label for="fF">盘后</label>
           </div>
         </div>
@@ -287,6 +408,41 @@
       </div>
       <div id="histView" style="display:none"></div>
     </div>
+  </section>
+
+  <!-- ===================== 买入信号（开盘抓取自动化） ===================== -->
+  <section class="panel" id="buysig">
+    <div class="card">
+      <h2><span class="dot"></span>买入信号 · 开盘抓取</h2>
+      <p class="hint">由「买入信号·开盘抓取」自动化（交易日 09:30 触发）生成：取盘后定稿候选 → 大盘硬过滤（上证 &lt; MA20 当日不交易）→ 次日开盘价相对基准 ±2%/±3% 判定。数据来自 <code>选股结果/buy_signal.json</code>。</p>
+      <div id="bsBanner" class="bs-banner"><span class="bs-wait">等待买入信号数据…</span></div>
+      <div class="bs-meta" id="bsMeta"></div>
+      <div class="bs-reason" id="bsReason" style="display:none"></div>
+      <h3 class="bs-sub">Top3 信号明细</h3>
+      <div id="bsTop3"><div class="empty">暂无明细。</div></div>
+    </div>
+  </section>
+
+  <!-- ===================== 每日简报（盘后 + 买入触发） ===================== -->
+  <section class="panel" id="brief">
+
+    <div class="card brief-card is-final">
+      <div class="br-head">
+        <h2 style="margin-bottom:0"><span class="dot"></span>盘后简报</h2>
+        <span class="br-tag" id="finalTag">盘后定稿</span>
+        <span class="br-date" id="finalDate"></span>
+      </div>
+      <p class="hint" id="finalMeta"></p>
+      <div class="md" id="finalBrief"><div class="brief-empty">等待简报数据…</div></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="dot"></span>买入触发（成功概率 Top3）</h2>
+      <p class="hint">以选股成功率最高的 3 支票<b>昨日收盘价</b>为基准；次日开盘价相对基准波动 ≤ 2%（创业板 / 科创板放宽至 3%）即进入候选。其中<b>创业板 / 科创板须再过趋势 + 量能过滤</b>（站上 MA20、MA5&gt;MA20、MA20 上行，且量 ≥ 1.2×20 日均量）才触发买入；主板不受此过滤约束。不满足则当日不交易。</p>
+      <div id="trigList"><div class="empty">等待候选数据…</div></div>
+      <div class="note" id="trigSummary"></div>
+    </div>
+
   </section>
 
   <!-- ===================== 仓位计算 ===================== -->
@@ -378,6 +534,62 @@ const LS_CFG="ss_cfg_v1", LS_CAND="ss_cand_v1", LS_TRADE="ss_trade_v1";
 let cfg={capital:100000,win:70,rr:3,lossMain:2,profitMain:6,relax:1.5};
 let candidates=[]; let trades=[];
 
+/* ============ 高频/中频 模式切换 ============ */
+const MODE_CONFIG = {
+  highFreq: {
+    label: '⚡ 高频',
+    tagClass: 'mode-tag-hf',
+    tagText: '⚡ 高频 · 日内短线',
+    title: '稳健选股交易系统',
+    desc: '本金 10 万元 · 每周交易 3–5 次 · 盈亏比 3:1 · 主板止损 2% / 止盈 6%，创业板·科创板放宽 50%（止损 3% / 止盈 9%）· 目标胜率 ≥ 70%。',
+    badges: ['💰 本金 ¥100,000','📅 周 3–5 笔','⚖️ 盈亏比 3:1','🛡️ 止损 2% / 3%','🎯 止盈 6% / 9%','✅ 胜率 ≥ 70%'],
+    dataFile: 'backtest_winrate.json',
+    lossMain: 2, profitMain: 6,
+    kAtr: 1.05, holdMain: 10, holdDyn: 5,
+    trailPct: 0.03, trailCap: 0.06
+  },
+  midFreq: {
+    label: '📊 中频（验证）',
+    tagClass: 'mode-tag-mf',
+    tagText: '📊 中频 · 波段验证',
+    title: '选股交易系统（中频波段）',
+    desc: '本金 10 万元 · 每周 1–3 次 · 盈亏比 ~2.86:1 · 主板止损 3.5% / 止盈 10%，双创 ATR×1.8 动态止盈×3 · 持有≤20日(主)/≤12日(创) · 含 MACD 趋势确认。',
+    badges: ['💰 本金 ¥100,000','📅 周 1–3 笔','⚖️ 盈亏比 ~2.9:1','🛡️ 止损 3.5% / ATR×1.8','🎯 止盈 10% / ×3','✅ MACD(DIF>0)'],
+    dataFile: 'backtest_midfreq.json',
+    lossMain: 3.5, profitMain: 10,
+    kAtr: 1.8, holdMain: 20, holdDyn: 12,
+    trailPct: 0.04, trailCap: 0.10
+  }
+};
+let currentMode = localStorage.getItem('ss_mode') || 'highFreq';
+
+function switchMode(mode) {
+  if (currentMode === mode) return;
+  currentMode = mode;
+  localStorage.setItem('ss_mode', mode);
+  const mc = MODE_CONFIG[mode];
+  // 切换按钮状态
+  document.querySelectorAll('#modeSwitch button').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+  // 更新标签
+  const tag = document.getElementById('modeTag');
+  if (tag) { tag.className = 'mode-tag ' + mc.tagClass; tag.textContent = mc.tagText; }
+  // 更新 header
+  const h1 = document.querySelector('header.top h1');
+  if (h1) h1.textContent = mc.title;
+  const hp = document.querySelector('header.top p');
+  if (hp) hp.textContent = mc.desc;
+  // 更新 badges
+  const badgeBox = document.querySelector('header.top .badges');
+  if (badgeBox) badgeBox.innerHTML = mc.badges.map(b => '<span class="badge">'+b+'</span>').join('');
+  // 更新参数面板默认值
+  document.getElementById('cfgLossMain').value = mc.lossMain;
+  document.getElementById('cfgProfitMain').value = mc.profitMain;
+  // 重新加载回测数据
+  loadWinRate();
+}
+
 function load(){
   try{
     const saved=JSON.parse(localStorage.getItem(LS_CFG)||"{}");
@@ -435,6 +647,14 @@ function scoreCandidate(c){
   if(fit<10) reasons.push(`<b style="color:var(--bad)">止损适配 ${fit}/10：ATR=${c.atr}% 偏大，止损${bp.loss}%可能过紧易被扫损</b>`);
   else reasons.push(`止损适配 ${fit}/10（ATR=${c.atr}% ≤ 止损×1.2，松紧合适）`);
 
+  // v1.0.7 重标定：import_final 经 recalibrate_win.py 处理后已带真实回测胜率(win)与综合强度分(score)。
+  // 已标定票直接采用真实胜率作"成功概率"展示；达标门槛仍用综合强度分(score)，选股规则不变。
+  if(c.win != null && c.win !== undefined){
+    const _wr = Math.round(c.win*10)/10;
+    const _sc = (c.score!=null && c.score!==undefined) ? c.score : s;
+    const _g = _sc>=80?"A+":_sc>=70?"A":_sc>=60?"B":_sc>=45?"C":"D";
+    return {score:Math.round(_sc), winRate:_wr, pass:_sc>=cfg.win, grade:_g, reasons:['成功概率=回测标定真实胜率（偏差已归零）']};
+  }
   let winRate = Math.min(88, 50 + s*0.35);
   let grade = s>=80?"A+":s>=70?"A":s>=60?"B":s>=45?"C":"D";
   return {score:s, winRate:Math.round(winRate*10)/10, pass:winRate>=cfg.win, grade, reasons};
@@ -504,7 +724,7 @@ class CandChart{
     this.views={};                         // kind -> {start,count}
     this.cv=document.getElementById("klc_"+cid);
     this.ctx=this.cv.getContext("2d");
-    this.dpr=Math.min(window.devicePixelRatio||1,2);
+    this.dpr=Math.min(window.devicePixelRatio||1,3);
     this._padR=54;
     this.hover=null;                        // {x,y} CSS px
     this.drag=null;
@@ -552,7 +772,8 @@ class CandChart{
   }
   _request(){ if(this._raf) return; this._raf=requestAnimationFrame(()=>{this._raf=null;this.draw();}); }
   _resize(){
-    const w=this.cv.clientWidth||this.cv.width, h=this.cv.clientHeight||280;
+    const w=this.cv.clientWidth||this.cv.parentElement?.clientWidth||800, h=this.cv.clientHeight||280;
+    if(w<2) return; // 面板隐藏时跳过，等切Tab时再resize
     this._W=w; this._H=h; this.cv.width=w*this.dpr; this.cv.height=h*this.dpr;
     this.ctx.setTransform(this.dpr,0,0,this.dpr,0,0); this._request();
   }
@@ -641,7 +862,6 @@ function scoreCardHTML(c,pfx){
   pfx=pfx||'';
   const r=c._r; const bp=boardParams(c.board); const src=c.src||"manual";
   const badge = src==="manual"?'<span class="cat cat-manual">手动</span>'
-    : src==="pre"?'<span class="cat cat-pre">'+(c.cat&&c.cat.indexOf("观察")>=0?"预选·观察":"预选·达标")+'</span>'
     : '<span class="cat cat-final">盘后·定稿</span>';
   const kl = c.kline ? `<div class="klwrap" id="klwrap_${pfx}${c.id}">
       <div class="kltabs">
@@ -660,7 +880,7 @@ function scoreCardHTML(c,pfx){
       <div class="grade" style="color:${r.pass?'var(--ok)':'var(--bad)'}">${r.grade}</div>
     </div>
     <div class="meter"><span style="width:90px;font-size:12.5px">综合分</span><div class="bar"><i style="width:${r.score}%"></i></div><span class="num">${r.score}</span></div>
-    <div class="meter" style="margin-top:6px"><span style="width:90px;font-size:12.5px">胜率估算</span><div class="bar"><i style="width:${r.winRate/88*100}%"></i></div><span class="num">${r.winRate}%</span></div>
+    <div class="meter" style="margin-top:6px"><span style="width:90px;font-size:12.5px">成功概率(回测标定)</span><div class="bar"><i style="width:${r.winRate/88*100}%"></i></div><span class="num">${r.winRate}%</span></div>
     <div style="margin-top:6px">${r.pass?'<span class="pill ok">达标 ≥'+cfg.win+'%</span>':'<span class="pill bad">未达标 <'+cfg.win+'%</span>'}
       <span class="pill warn">止损${bp.loss}% / 止盈${bp.profit}%</span></div>
     <div class="reason">${r.reasons.map(x=>"· "+x).join("<br>")}</div>
@@ -679,10 +899,10 @@ function klTab(pfx,cid,kind){
 }
 function renderCandidates(){
   const box=document.getElementById("candList");
-  const groups={manual:"手动",pre:"预选",final:"盘后定稿"};
+  const groups={manual:"手动",final:"盘后定稿"};
   charts={};
   if(!candidates.length){box.innerHTML='<div class="empty">还没有候选股。可在上方「评分并加入候选」，或点「📥 导入今日自动选股」。</div>';return;}
-  let list=candidates.filter(c=>curFilter==="all"?true:(c.src||"manual")===curFilter);
+  let list=candidates.filter(c=>(curFilter==="all"?true:(c.src||"manual")===curFilter) && (c.src||"manual")!=="pre");
   if(!list.length){box.innerHTML='<div class="empty">当前筛选「'+(curFilter==="all"?"全部":groups[curFilter])+'」下没有候选。</div>';return;}
   list.sort((a,b)=>b._r.winRate - a._r.winRate);
   box.innerHTML=list.map(c=>scoreCardHTML(c,'')).join("");
@@ -691,13 +911,13 @@ function renderCandidates(){
 function renderHistory(){
   const box=document.getElementById("histView");
   if(!candidates.length){box.innerHTML='<div class="hist-empty">还没有任何选股记录。导入或评分后，这里会按「选中日期」归档。</div>';return;}
-  // 预选/盘后只保留最近交易日
+  // 盘后只保留最近交易日
   const datesOf=src=>candidates.filter(c=>c.src===src&&c.date).map(c=>c.date);
   const latestPre=datesOf("pre").sort().pop();
   const latestFinal=datesOf("final").sort().pop();
   const inc=c=>{
     if(c.src==="manual") return true;                       // 手动：全部保留（构成历史）
-    if(c.src==="pre")   return c.date&&c.date===latestPre;   // 预选：仅最近交易日
+    if(c.src==="pre")   return false;                       // pre 候选已停用，屏蔽不展示
     if(c.src==="final") return c.date&&c.date===latestFinal; // 盘后：仅最近交易日
     return !!c.date;                                        // 其它带日期的也纳入
   };
@@ -711,7 +931,7 @@ function renderHistory(){
   box.innerHTML=keys.map(k=>{
     const arr=groups[k].slice().sort((a,b)=>b._r.winRate-a._r.winRate);
     const cnt={manual:0,pre:0,final:0}; arr.forEach(c=>{cnt[c.src]=(cnt[c.src]||0)+1;});
-    const tag=[cnt.manual?("手动 "+cnt.manual):"",cnt.pre?("预选 "+cnt.pre):"",cnt.final?("盘后 "+cnt.final):""].filter(Boolean).join(" · ");
+    const tag=[cnt.manual?("手动 "+cnt.manual):"",cnt.final?("盘后 "+cnt.final):""].filter(Boolean).join(" · ");
     const head=k?("📅 "+k):"📋 未标注日期";
     return `<div class="hist-group">
       <div class="hist-date">${head}<span class="pill">${tag}</span></div>
@@ -722,7 +942,6 @@ function renderHistory(){
 function histRowHTML(c){
   const r=c._r;
   const badge = c.src==="manual"?'<span class="cat cat-manual">手动</span>'
-    : c.src==="pre"?'<span class="cat cat-pre">'+(c.cat&&c.cat.indexOf("观察")>=0?"预选·观察":"预选·达标")+'</span>'
     : '<span class="cat cat-final">盘后·定稿</span>';
   return `<div class="hist-row">
     <button class="hist-exp" onclick="toggleHist('${c.id}')">${c.name} <span class="tagboard">${c.board==="main"?"主板":c.board==="cyb"?"创业板":"科创板"}</span>${badge}
@@ -891,10 +1110,20 @@ function renderDash(){
   drawEquity(); drawWin();
 }
 
-/* 简易 Canvas 绘图（无依赖） */
+/* 简易 Canvas 绘图（无依赖，DPR 高清） */
+function setupCanvas(cv){
+  const dpr=Math.min(window.devicePixelRatio||1,3);
+  const W=cv.clientWidth||cv.parentElement?.clientWidth||400, H=cv.clientHeight||cv.height||200;
+  if(W<2) return null;
+  cv.width=W*dpr; cv.height=H*dpr;
+  const ctx=cv.getContext("2d");
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx,W,H};
+}
 function drawEquity(){
-  const cv=document.getElementById("equityChart"); const ctx=cv.getContext("2d");
-  const W=cv.clientWidth, H=cv.height; cv.width=W;
+  const cv=document.getElementById("equityChart");
+  const r=setupCanvas(cv); if(!r) return;
+  const {ctx,W,H}=r;
   ctx.clearRect(0,0,W,H);
   if(!trades.length){ctx.fillStyle="#9aa5b1";ctx.font="13px sans-serif";ctx.fillText("暂无数据",W/2-26,H/2);return;}
   const pts=trades.slice().reverse();
@@ -914,20 +1143,21 @@ function drawEquity(){
   ctx.fillText(("累计 "+cum.toFixed(0)+"元"),W-90,Y(data[data.length-1])-8);
 }
 function drawWin(){
-  const cv=document.getElementById("winChart"); const ctx=cv.getContext("2d");
-  const W=cv.clientWidth, H=cv.height; cv.width=W;
+  const cv=document.getElementById("winChart");
+  const r=setupCanvas(cv); if(!r) return;
+  const {ctx,W,H}=r;
   ctx.clearRect(0,0,W,H);
   const w=trades.filter(t=>t.result==="win").length;
   const l=trades.filter(t=>t.result==="loss").length;
   const tot=w+l; if(!tot){ctx.fillStyle="#9aa5b1";ctx.font="13px sans-serif";ctx.fillText("暂无数据",W/2-26,H/2);return;}
   const winAng=w/tot*Math.PI*2;
-  const cx=W/2, cy=H/2, r=Math.min(W,H)/2-20;
-  ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,0,winAng);ctx.closePath();ctx.fillStyle="#16a34a";ctx.fill();
-  ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,winAng,Math.PI*2);ctx.closePath();ctx.fillStyle="#dc2626";ctx.fill();
+  const cx=W/2, cy=H/2, r2=Math.min(W,H)/2-20;
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r2,0,winAng);ctx.closePath();ctx.fillStyle="#16a34a";ctx.fill();
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r2,winAng,Math.PI*2);ctx.closePath();ctx.fillStyle="#dc2626";ctx.fill();
   ctx.fillStyle="#fff";ctx.font="bold 15px sans-serif";ctx.textAlign="center";
   ctx.fillText(w+" 胜",cx,cy-4);ctx.fillText(l+" 负",cx,cy+16);ctx.textAlign="left";
-  ctx.fillStyle="#16a34a";ctx.fillText("● 止盈 "+w,cx+r+10,cy-6);
-  ctx.fillStyle="#dc2626";ctx.fillText("● 止损 "+l,cx+r+10,cy+10);
+  ctx.fillStyle="#16a34a";ctx.fillText("● 止盈 "+w,cx+r2+10,cy-6);
+  ctx.fillStyle="#dc2626";ctx.fillText("● 止损 "+l,cx+r2+10,cy+10);
 }
 
 /* ============ 配置面板 ============ */
@@ -961,6 +1191,20 @@ function switchTab(id){
   document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("active",b.dataset.tab===id));
   document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id===id));
   if(id==="dash") renderDash();
+  // 切到可见面板后，重新调整该面板内所有canvas尺寸（修复隐藏时clientWidth=0的问题）
+  requestAnimationFrame(()=>{
+    const panel=document.getElementById(id);
+    if(panel){
+      panel.querySelectorAll("canvas").forEach(cv=>{
+        // K线图：通过charts对象找到实例并resize
+        for(const k in charts){
+          if(charts[k].cv===cv){ charts[k]._resize(); break; }
+        }
+        // 权益曲线/胜率饼图：直接重绘
+        if(cv.id==="equityChart"||cv.id==="winChart") renderDash();
+      });
+    }
+  });
 }
 document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
 
@@ -972,7 +1216,7 @@ function mergeItems(items){
     const c=Object.assign({},it);
     c.id="auto_"+Date.now()+"_"+(added++);
     c.src = it.category==="final"?"final":((it.category==="preok"||it.category==="preobs")?"pre":"manual");
-    c.cat = it.category==="final"?"盘后·定稿":(it.category==="preobs"?"预选·观察":"预选·达标");
+    c.cat = "盘后·定稿";
     c._r=scoreCandidate(c);
     candidates.push(c);
   });
@@ -980,14 +1224,14 @@ function mergeItems(items){
 }
 function showImportMsg(added){
   const m=document.getElementById("importMsg");
-  if(added){ save(); refreshCand();
+  if(added){ save(); refreshCand(); renderTrigger();
     m.style.display="inline-block"; m.className="pill ok";
-    m.textContent="已导入 "+added+" 只（预选/盘后）";
+    m.textContent="已导入 "+added+" 只（盘后）";
   } else { m.style.display="inline-block"; m.className="pill warn"; m.textContent="暂无新的自动选股可导入"; }
   setTimeout(()=>m.style.display="none",3000);
 }
 async function importToday(){
-  const files=["选股结果/import_pre.json","选股结果/import_final.json"];
+  const files=["选股结果/import_final.json"];
   let added=0;
   for(const f of files){
     try{ const res=await fetch(f,{cache:"no-store"}); if(!res.ok) continue;
@@ -1020,11 +1264,291 @@ document.querySelectorAll('input[name="candView"]').forEach(r=>r.addEventListene
   refreshCand();
 }));
 function refreshCand(){ if(curView==="hist") renderHistory(); else renderCandidates(); }
+/* =========== 买入触发（成功概率 Top3） =========== */
+function tolFor(board){
+  // 主板 2%；创业板(cyb)/科创板(kcb,kc) 放宽 50% → 3%
+  if(board==="cyb"||board==="kcb"||board==="kc") return 0.03;
+  return 0.02;
+}
+function baselineClose(c){
+  const d=(c.kline&&c.kline.day)||[];
+  return d.length? d[d.length-1][2] : null;   // [日期,开,收,高,低,量]
+}
+function boardCn(board){
+  return board==="cyb"?"创业板":(board==="kcb"||board==="kc")?"科创板":"主板";
+}
+function renderTrigger(){
+  const box=document.getElementById("trigList");
+  const sum=document.getElementById("trigSummary");
+  if(!box) return;
+  const sig=window.buySignal;
+  const sigToday = sig && sig.date===todayStr();
+  let rows="";
+  if(sigToday && sig.top3 && sig.top3.length){
+    // 以开盘抓取自动化算出的 Top3 为权威（与生成信号一致）
+    sig.top3.forEach(s=>{
+      const tol=s.tol, base=s.baseline;
+      const lo=(base*(1-tol)), hi=(base*(1+tol));
+      const dev=s.dev, dec=s.decision;
+      const badge = dec==="buy" ? '<span class="trig-buy">建议买入</span>' : '<span class="trig-no">不触发</span>';
+      rows += `<div class="trig-row">`+
+        `<span class="tname">${s.name}</span>`+
+        `<span class="tband">${boardCn(s.board)}</span>`+
+        `<span class="tprob">成功概率 ${s.win}%</span>`+
+        `<span class="tband">基准收盘 ${base.toFixed(2)} · 容差 ±${(tol*100).toFixed(0)}%</span>`+
+        `<span class="tband">触发区间 ${lo.toFixed(2)}–${hi.toFixed(2)}</span>`+
+        `<span class="topen">次日开盘 <b>${s.open}</b></span>`+
+        `<span class="dev" style="color:${Math.abs(dev)<=tol?'var(--ok)':'var(--bad)'}">偏离 ${(dev*100).toFixed(2)}%</span>`+
+        badge+
+      `</div>`;
+    });
+  } else {
+    // 回退：尚未抓取开盘价，用本地候选 Top3 估算基准与区间
+    const pool=candidates.filter(c=>baselineClose(c)!==null);
+    const top=pool.slice().sort((a,b)=>b._r.winRate-a._r.winRate).slice(0,3);
+    if(!top.length){ box.innerHTML='<div class="empty">还没有带行情的候选股，先导入自动选股。</div>'; if(sum)sum.textContent=""; return; }
+    top.forEach(c=>{
+      const base=baselineClose(c); const tol=tolFor(c.board);
+      const lo=(base*(1-tol)), hi=(base*(1+tol));
+      rows += `<div class="trig-row">`+
+        `<span class="tname">${c.name}</span>`+
+        `<span class="tband">${boardCn(c.board)}</span>`+
+        `<span class="tprob">成功概率 ${c._r.winRate}%</span>`+
+        `<span class="tband">基准收盘 ${base.toFixed(2)} · 容差 ±${(tol*100).toFixed(0)}%</span>`+
+        `<span class="tband">触发区间 ${lo.toFixed(2)}–${hi.toFixed(2)}</span>`+
+        (sigToday ? '<span class="trig-no">未入选 Top3</span>' : '<span class="tband">待次日 09:30 开盘抓取判定</span>')+
+      `</div>`;
+    });
+  }
+  box.innerHTML=rows;
+  if(sum){
+    if(sigToday){
+      const anyBuy=(sig.top3||[]).some(x=>x.decision==="buy");
+      sum.innerHTML = anyBuy
+        ? '<b style="color:var(--ok)">✓ 今日满足买入条件，已生成买入信号（见上，按信号手动下单）。</b>'
+        : '<b style="color:var(--bad)">✗ 今日不满足买入条件，不做买卖交易。</b>';
+    } else {
+      sum.textContent="等待次日 09:30 自动化抓取开盘价后判定（创业板/科创板容差 ±3%，主板 ±2%）。";
+    }
+  }
+}
+async function loadBuySignal(){
+  window.buySignal=null;
+  if(location.protocol.indexOf("http")!==0){ renderTrigger(); renderBuySignal(); return; }
+  try{
+    const res=await fetch("选股结果/buy_signal.json",{cache:"no-store"});
+    if(res.ok) window.buySignal=await res.json();
+  }catch(e){}
+  renderTrigger();
+  renderBuySignal();
+}
+
+function renderBuySignal(){
+  const banner=document.getElementById("bsBanner");
+  const meta=document.getElementById("bsMeta");
+  const reason=document.getElementById("bsReason");
+  const top3=document.getElementById("bsTop3");
+  if(!banner) return;
+  const sig=window.buySignal;
+  if(!sig){
+    banner.className="bs-banner";
+    banner.innerHTML='<span class="bs-wait">等待买入信号数据…（请通过预览 / 本地服务器打开，或先运行开盘抓取自动化）</span>';
+    if(meta) meta.textContent="";
+    if(reason){ reason.style.display="none"; reason.textContent=""; }
+    if(top3) top3.innerHTML='<div class="empty">暂无明细。</div>';
+    return;
+  }
+  const trade=sig.trade===true;
+  banner.className="bs-banner "+(trade?"bs-ok":"bs-no");
+  banner.innerHTML = trade
+    ? '<span class="bs-icon">✅</span><span class="bs-title">今日满足买入条件，可交易</span>'
+    : '<span class="bs-icon">⛔</span><span class="bs-title">今日不交易</span>';
+  if(meta){
+    let m="信号日 "+(sig.date||"—");
+    if(sig.baselineDate) m+=" ｜ 基准日 "+sig.baselineDate;
+    meta.textContent=m;
+  }
+  if(reason){
+    if(sig.reason){ reason.style.display=""; reason.textContent="判定依据："+sig.reason; }
+    else { reason.style.display="none"; reason.textContent=""; }
+  }
+  if(top3){
+    const list=sig.top3||[];
+    if(!list.length){ top3.innerHTML='<div class="empty">无入选标的（Top3 为空）。</div>'; }
+    else{
+      top3.innerHTML=list.map(s=>{
+        const tol=s.tol, base=s.baseline;
+        const lo=base*(1-tol), hi=base*(1+tol);
+        const dev=s.dev, dec=s.decision;
+        const badge = dec==="buy" ? '<span class="trig-buy">建议买入</span>' : '<span class="trig-no">不触发</span>';
+        return '<div class="trig-row">'+
+          '<span class="tname">'+s.name+'</span>'+
+          '<span class="tband">'+boardCn(s.board)+'</span>'+
+          '<span class="tprob">成功概率 '+s.win+'%</span>'+
+          '<span class="tband">基准收盘 '+base.toFixed(2)+' · 容差 ±'+(tol*100).toFixed(0)+'%</span>'+
+          '<span class="tband">触发区间 '+lo.toFixed(2)+'–'+hi.toFixed(2)+'</span>'+
+          '<span class="topen">次日开盘 <b>'+s.open+'</b></span>'+
+          '<span class="dev" style="color:'+(Math.abs(dev)<=tol?'var(--ok)':'var(--bad)')+'">偏离 '+(dev*100).toFixed(2)+'%</span>'+
+          badge+
+        '</div>';
+      }).join("");
+    }
+  }
+}
+
+function renderWinRate(j){
+  const wr=document.getElementById('wrValue'); if(!wr) return;
+  const pct=j.winRate*100;
+  wr.textContent=pct.toFixed(1)+'%';
+  wr.className='wr-big '+(pct>=70?'wr-good':(pct>=40?'wr-mid':'wr-bad'));
+  const set=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
+  set('wrTrades',(j.trades||0)+' 笔');
+  set('wrWL',(j.wins||0)+' / '+(j.losses||0));
+  set('wrPF', j.profitFactor? j.profitFactor+'×' : '—');
+  set('wrExp', (j.expectancy!=null&&j.expectancy!=undefined)? (j.expectancy*100).toFixed(2)+'%' : '—');
+  if(j.period&&j.period.from){
+    const f=j.period.from.replace(/-/g,'.'), t=j.period.to.replace(/-/g,'.');
+    set('wrPeriod','回测周期 '+f+' – '+t);
+  }
+  // 诚实标注：实际 K 线数据覆盖区间（可能短于设定周期）
+  if(j.dataRange&&j.dataRange.from){
+    const df=j.dataRange.from.replace(/-/g,'.'), dt=j.dataRange.to.replace(/-/g,'.');
+    const note=document.getElementById('wrDataNote');
+    if(note){
+      if(df!==j.period.from.replace(/-/g,'.')||dt!==j.period.to.replace(/-/g,'.')){
+        note.textContent='实际数据 '+df+' – '+dt+'（不足设定周期，按现有数据回测）';
+      } else { note.textContent=''; }
+    }
+  }
+  if(j.ruleMain){ const r=document.getElementById('wrRule'); if(r) r.textContent=j.ruleMain; }
+  if(j.ruleDyn){ const r=document.getElementById('wrDynRule'); if(r) r.textContent=j.ruleDyn; }
+  if(j.ruleFilterAll){ const r=document.getElementById('wrFilterAll'); if(r) r.textContent=j.ruleFilterAll; }
+  if(j.rulePortfolio){ const r=document.getElementById('wrRulePortfolio'); if(r) r.textContent=j.rulePortfolio; }
+  if(j.byBoard){ const el=document.getElementById('wrByBoard'); if(el){ const cn={main:'主板',cyb:'创业板',kcb:'科创板',kc:'科创板'}; el.textContent='分市场胜率：'+Object.entries(j.byBoard).map(([b,o])=>`${cn[b]||b} ${(o.winRate*100).toFixed(1)}%(${o.wins}/${o.trades})`).join('  ·  '); } }
+  if(j.byWinTier){ const el=document.getElementById('wrByTier'); if(el){ const t=j.byWinTier; el.textContent='分层校验：预测≥70 → '+((t.high.winRate||0)*100).toFixed(1)+`%(${t.high.wins}/${t.high.trades})`+'  ·  预测<70 → '+((t.low.winRate||0)*100).toFixed(1)+`%(${t.low.wins}/${t.low.trades})`; } }
+  if(j.preFilter){ const f=j.preFilter; const el=document.getElementById('wrDynFilter'); if(el){ el.textContent=`全市场过滤：候选 ${f.total} · 通过 ${f.pass} · 趋势未过 ${f.skipTrend} · 量能未过 ${f.skipVol} · 缺口未过 ${f.skipGap}`; } }
+  if(j.calibration){ const c=j.calibration; const el=document.getElementById('wrCalib'); if(el){ const sign=c.bias>=0?'+':''; el.textContent=`①标定：预测均值 ${(c.predMean*100).toFixed(1)}% vs 实现 ${(c.realized*100).toFixed(1)}%（偏差 ${sign}${(c.bias*100).toFixed(1)}pp）`; } }
+  if(j.portfolio){ const p=j.portfolio; const el=document.getElementById('wrPortfolio'); if(el){ el.textContent=`⑤ 组合层：大盘剔除 ${p.indexFilter.dropped}笔(${p.indexFilter.bearishDays}天空头) · 同日≤${p.perDayCap.max}笔剔除${p.perDayCap.dropped} · 回撤>${(p.drawdownPause.threshold*100).toFixed(0)}%暂停剔除${p.drawdownPause.dropped} · 组合后 ${p.finalTrades}笔`; } }
+}
+async function loadWinRate(){
+  if(location.protocol.indexOf('http')!==0){ return; } // file:// 下无 fetch，留占位
+  try{
+    const dataFile = MODE_CONFIG[currentMode].dataFile;
+    const res=await fetch('选股结果/'+dataFile,{cache:'no-store'});
+    if(res.ok) renderWinRate(await res.json());
+  }catch(e){}
+}
+/* ============ 版本更新日志 ============ */
+const VERSION_HISTORY = [
+  {v:"1.1.0",d:"2026-07-14",desc:"⑥ 双模式：高频/中频模式切换（Plan B共存方案），Header加模式切换栏+loadWinRate按模式加载对应JSON+参数面板/徽章/规则描述随模式联动+build_deploy复制中频回测数据+localStorage记忆模式选择"},
+  {v:"1.0.9",d:"2026-07-13",desc:"取消尾盘预选：删除预选简报卡片+屏蔽选股预选过滤标签+停用预选简报生成(build_briefings仅盘后)+从导入入口移除import_pre.json"},
+  {v:"1.0.8",d:"2026-07-13",desc:"新增「买入信号·开盘抓取」专属Tab：位于选股评分与仓位计算之间，渲染 buy_signal.json 的交易判定横幅/判定依据/Top3信号明细"},
+  {v:"1.0.7",d:"2026-07-12",desc:"⑦ 重标定 winRate：展示字段从主观公式(50+score*0.35)回填回测真实胜率，标定偏差 48.5pp→-2.9pp；公式分保留为综合强度分(达标门槛不变)"},
+  {v:"1.0.6",d:"2026-07-11",desc:"⑤ 组合：大盘硬过滤(上证<MA20当日不交易)+同日上限(≤3笔)+回撤上限(>8%暂停次日) 组合层风控约束"},
+  {v:"1.0.5",d:"2026-07-11",desc:"④ 稳健：拉长历史至320根真实日线(2025-03起)+扩大候选池(全7支非仅Top3)+分市场回测(byBoard+标定偏差)"},
+  {v:"1.0.4",d:"2026-07-11",desc:"③ 提效：趋势+量能+缺口过滤应用到全市场(不仅双创)；缺口过滤拒向下≥4%/向上≥6%跳空"},
+  {v:"1.0.3",d:"2026-07-11",desc:"① 地基：winRate 用回测真实胜率标定(预测均值vs实现)+分层校验(按板块/按预测胜率档≥70)"},
+  {v:"1.0.2",d:"2026-07-11",desc:"双创加趋势(站上MA20+MA5>MA20+MA20上行)+量能(≥1.2×20日均量)过滤再触发；动态止损倍数K_ATR由1.5收窄至1.05"},
+  {v:"1.0.1",d:"2026-07-11",desc:"分市场止损：创业板/科创板 ATR 动态止损（时间封顶1周、跟踪止损封顶6%、止盈×3放大），主板维持固定2%/6%强制止损"},
+  {v:"1.0.0",d:"2026-07-11",desc:"基准版本：选股系统完整功能（选股评分/成功概率/买入触发/交易胜率回测/每日简报/仓位计算/风控看板/口令保护/自动化抓取与部署）"}
+];
+function renderChangelog(){
+  const box=document.getElementById("changelog");
+  if(!box) return;
+  const cur=document.getElementById("curVer");
+  if(cur) cur.textContent="v"+VERSION_HISTORY[0].v;
+  box.innerHTML=VERSION_HISTORY.map((h,i)=>`<div class="cl-item ${i===0?'cl-latest':''} cl-collapsed" onclick="this.classList.toggle('cl-collapsed')">
+    <div class="cl-head"><span class="cl-ver">v${h.v}</span><span class="cl-date">${h.d}</span><span class="cl-toggle">${i===0?'最新 ▼':'展开 ▼'}</span></div>
+    <div class="cl-desc">${h.desc}</div>
+  </div>`).join("");
+}
+
+/* ============ 简报 Markdown 渲染 ============ */
+function mdInline(s){
+  s = String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  s = s.replace(/`([^`]+)`/g,'<code class="md-code">$1</code>');
+  s = s.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');
+  s = s.replace(/\*([^*]+)\*/g,'<i>$1</i>');
+  return s;
+}
+function mdSplitRow(line){ return line.trim().replace(/^\|/,"").replace(/\|$/,"").split("|").map(x=>x.trim()); }
+function renderMarkdown(md){
+  if(!md) return '<div class="brief-empty">简报内容为空。</div>';
+  const lines = md.split(/\r?\n/);
+  let html="", i=0;
+  while(i<lines.length && lines[i].trim()==="") i++;
+  while(i<lines.length){
+    const line = lines[i];
+    if(/^\s*---+\s*$/.test(line)){ html+='<hr>'; i++; continue; }
+    const h = line.match(/^(#{1,4})\s+(.*)$/);
+    if(h){ const lvl=Math.min(h[1].length+2,6); html+=`<h${lvl} class="md-h">${mdInline(h[2])}</h${lvl}>`; i++; continue; }
+    if(/^>\s?/.test(line)){
+      const buf=[];
+      while(i<lines.length && /^>\s?/.test(lines[i])){ buf.push(lines[i].replace(/^>\s?/,"")); i++; }
+      const joined=buf.join(" ");
+      const cls = /[⚠❗]|警示/.test(joined) ? "md-quote warn" : "md-quote";
+      html+=`<blockquote class="${cls}">${mdInline(joined)}</blockquote>`;
+      continue;
+    }
+    if(/^\s*\|.*\|\s*$/.test(line) && i+1<lines.length && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i+1])){
+      const head=mdSplitRow(line); i+=2; const rows=[];
+      while(i<lines.length && /^\s*\|.*\|\s*$/.test(lines[i])){ rows.push(mdSplitRow(lines[i])); i++; }
+      html+='<div class="md-table-wrap"><table><thead><tr>'+head.map(c=>`<th>${mdInline(c)}</th>`).join("")+
+        '</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>`<td>${mdInline(c)}</td>`).join("")+'</tr>').join("")+'</tbody></table></div>';
+      continue;
+    }
+    if(/^\s*[-*]\s+/.test(line)){
+      const buf=[]; while(i<lines.length && /^\s*[-*]\s+/.test(lines[i])){ buf.push(lines[i].replace(/^\s*[-*]\s+/,"")); i++; }
+      html+='<ul class="md-ul">'+buf.map(b=>`<li>${mdInline(b)}</li>`).join("")+'</ul>'; continue;
+    }
+    if(/^\s*\d+\.\s+/.test(line)){
+      const buf=[]; while(i<lines.length && /^\s*\d+\.\s+/.test(lines[i])){ buf.push(lines[i].replace(/^\s*\d+\.\s+/,"")); i++; }
+      html+='<ol class="md-ol">'+buf.map(b=>`<li>${mdInline(b)}</li>`).join("")+'</ol>'; continue;
+    }
+    if(line.trim()===""){ i++; continue; }
+    const buf=[line]; i++;
+    while(i<lines.length && lines[i].trim()!=="" &&
+      !/^\s*(#{1,4}\s|>\s?|[-*]\s|\d+\.\s|\|.*\|\s*$|---+\s*$)/.test(lines[i])){ buf.push(lines[i]); i++; }
+    html+='<p class="md-p">'+mdInline(buf.join("<br>"))+'</p>';
+  }
+  return html;
+}
+function renderBriefCard(type, obj){
+  if(!obj) return;
+  const tag=document.getElementById("finalTag");
+  const date=document.getElementById("finalDate");
+  const meta=document.getElementById("finalMeta");
+  const box=document.getElementById("finalBrief");
+  if(tag) tag.textContent = obj.title ? "盘后定稿" : "";
+  if(date){
+    let t = obj.date ? ("报告日 "+obj.date) : "";
+    if(obj.dataDate) t += (t?" ｜ ":"") + "数据日 "+obj.dataDate;
+    date.textContent = t;
+  }
+  if(meta){
+    let m = obj.generatedAt ? ("生成时间："+obj.generatedAt) : "";
+    if(obj.warning) m += (m?" ｜ ":"") + "⚠ 已触发风控提醒";
+    meta.textContent = m;
+  }
+  if(box) box.innerHTML = renderMarkdown(obj.md);
+}
+async function loadBriefings(){
+  if(location.protocol.indexOf("http")!==0) return; // file:// 下无 fetch，留占位
+  const map=[["final","选股结果/briefing_final.json"]];
+  for(const [type,file] of map){
+    try{ const res=await fetch(file,{cache:"no-store"}); if(res.ok) renderBriefCard(type, await res.json()); }catch(e){}
+  }
+}
 function todayStr(){ const d=new Date(),p=n=>(""+n).padStart(2,"0"); return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate()); }
 
 /* ============ 初始化 ============ */
-load(); syncCfgInputs(); refreshCand(); renderTrades(); renderDash();
-if(location.protocol.indexOf("http")===0) importToday();   // 通过预览/本地服务器打开时，加载即自动合并当日自动选股
+// 模式切换按钮绑定
+document.getElementById('btnHighFreq').addEventListener('click',()=>switchMode('highFreq'));
+document.getElementById('btnMidFreq').addEventListener('click',()=>switchMode('midFreq'));
+// 应用已保存的模式（默认高频）
+if(currentMode !== 'highFreq') { switchMode(currentMode); }  // 仅非默认时触发 UI 更新
+load(); syncCfgInputs(); refreshCand(); renderTrades(); renderDash(); renderChangelog();
+if(location.protocol.indexOf("http")===0){ importToday(); loadBuySignal(); loadWinRate(); loadBriefings(); }   // 通过预览/本地服务器打开时，加载即自动合并当日自动选股、买入信号、交易胜率与每日简报
 window.addEventListener("resize",()=>{ for(const id in charts){ charts[id]._resize(); } });
 </script>
 </body>
