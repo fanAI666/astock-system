@@ -1612,6 +1612,7 @@ async function loadWinRate(){
 }
 /* ============ 版本更新日志 ============ */
 const VERSION_HISTORY = [
+  {v:"1.1.9",d:"2026-07-17",desc:"资金动态接入盘后真实数据：腾讯行情(指数/风格)+东方财富(行业主力净流入/北向)，由 16:30 自动化抓取、跟随 17:00 云端同步自动上线；离线/限流时回退示意数据并标注数据时间"},
   {v:"1.1.0",d:"2026-07-14",desc:"⑥ 双模式：高频/中频模式切换（Plan B共存方案），Header加模式切换栏+loadWinRate按模式加载对应JSON+参数面板/徽章/规则描述随模式联动+build_deploy复制中频回测数据+localStorage记忆模式选择"},
   {v:"1.0.9",d:"2026-07-13",desc:"取消尾盘预选：删除预选简报卡片+屏蔽选股预选过滤标签+停用预选简报生成(build_briefings仅盘后)+从导入入口移除import_pre.json"},
   {v:"1.0.8",d:"2026-07-13",desc:"新增「买入信号·开盘抓取」专属Tab：位于选股评分与仓位计算之间，渲染 buy_signal.json 的交易判定横幅/判定依据/Top3信号明细"},
@@ -1811,12 +1812,12 @@ function renderIndices(){
       '<div class="n">'+ix.name+'</div>'+
       '<div class="v '+c+'">'+ix.val.toLocaleString()+'</div>'+
       '<div class="p '+c+'">'+fmtPct(ix.pct)+'</div>'+
-      '<div class="vol">成交额 '+(ix.vol/100).toFixed(0)+' 亿</div>'+
+      '<div class="vol">成交额 '+((typeof ix.vol==="number"&&!isNaN(ix.vol))?ix.vol.toFixed(0)+' 亿':'—')+'</div>'+
     '</div>';
   }).join('');
   document.getElementById('fundThread').innerHTML = FF_DATA.fundThread;
-  const n=new Date(), z=m=>String(m).padStart(2,'0');
-  document.getElementById('ffTime').textContent = n.getFullYear()+'-'+z(n.getMonth()+1)+'-'+z(n.getDate())+' '+z(n.getHours())+':'+z(n.getMinutes());
+  const up = FF_DATA.updatedAt;
+  document.getElementById('ffTime').textContent = up ? ('数据时间 '+up) : '（示意数据）';
 }
 
 /* 模块二：行业热力网格 */
@@ -1867,10 +1868,12 @@ function renderStyleGrid(){
 /* 模块五：北向资金（Canvas 手绘双线：沪股通蓝 / 深股通橙） */
 function renderNorthChart(){
   const nf=FF_DATA.northFlow;
+  const fmtAmt2 = v => (v==null)?'--':((v>=0?'+':'')+v.toFixed(1));
+  const cls2 = v => (v==null?'':(v>=0?'up':'dn'));
   document.getElementById('northMain').innerHTML =
     '<div class="nmt">今日北向净买入（亿元）</div>'+
-    '<div class="nmv '+(nf.todayNet>=0?'up':'dn')+'">'+(nf.todayNet>=0?'+':'')+nf.todayNet.toFixed(1)+'</div>'+
-    '<div class="nms">沪股通 '+(nf.shNet>=0?'+':'')+nf.shNet.toFixed(1)+' · 深股通 '+(nf.szNet>=0?'+':'')+nf.szNet.toFixed(1)+'</div>';
+    '<div class="nmv '+cls2(nf.todayNet)+'">'+fmtAmt2(nf.todayNet)+'</div>'+
+    '<div class="nms">沪股通 '+fmtAmt2(nf.shNet)+' · 深股通 '+fmtAmt2(nf.szNet)+'</div>';
 
   const cv=document.getElementById('northChart');
   const ctx=cv.getContext('2d');
@@ -1880,7 +1883,12 @@ function renderNorthChart(){
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.clearRect(0,0,W,H);
 
-  const data=nf.history, N=data.length;
+  const data=nf.history||[], N=data.length;
+  if(N<2){
+    ctx.fillStyle='#94a3b8'; ctx.font='13px sans-serif'; ctx.textAlign='center';
+    ctx.fillText(nf.note||'近20日历史序列暂未获取', W/2, H/2);
+    return;
+  }
   const pad={t:18,r:16,b:34,l:42};
   const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
   const shV=data.map(d=>d.sh), szV=data.map(d=>d.sz);
@@ -1926,13 +1934,26 @@ function renderFundFlow(){
   renderStyleGrid(); renderNorthChart(); renderRecList();
 }
 
+/* 盘后真实数据加载：http 下拉取 fundflow.json 覆盖示意数据；失败/离线回退 FF_DATA */
+async function loadFundFlow(){
+  if(location.protocol.indexOf('http')!==0) return;
+  try{
+    const res=await fetch('选股结果/fundflow.json',{cache:'no-store'});
+    if(!res.ok) return;
+    const data=await res.json();
+    Object.assign(FF_DATA, data);
+    renderFundFlow();
+    console.log('[fundflow] 已加载真实盘后资金数据，更新时间', data.updatedAt);
+  }catch(e){ console.warn('[fundflow] 加载失败，保留示意数据', e); }
+}
+
 // 模式切换按钮绑定
 document.getElementById('btnHighFreq').addEventListener('click',()=>switchMode('highFreq'));
 document.getElementById('btnMidFreq').addEventListener('click',()=>switchMode('midFreq'));
 // 应用已保存的模式（默认高频）
 if(currentMode !== 'highFreq') { switchMode(currentMode); }  // 仅非默认时触发 UI 更新
 load(); syncCfgInputs(); refreshCand(); renderTrades(); renderDash(); renderChangelog(); renderFundFlow();
-if(location.protocol.indexOf("http")===0){ importToday(); loadBuySignal(); loadWinRate(); loadBriefings(); }   // 通过预览/本地服务器打开时，加载即自动合并当日自动选股、买入信号、交易胜率与每日简报
+if(location.protocol.indexOf("http")===0){ importToday(); loadBuySignal(); loadWinRate(); loadBriefings(); loadFundFlow(); }   // 通过预览/本地服务器打开时，加载即自动合并当日自动选股、买入信号、交易胜率、每日简报与盘后真实资金流向
 window.addEventListener("resize",()=>{ for(const id in charts){ charts[id]._resize(); } });
 </script>
 </body>

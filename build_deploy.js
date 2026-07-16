@@ -77,6 +77,14 @@ for (const f of ['briefing_pre.json', 'briefing_final.json']) {
     console.log(f + ' 不存在（跳过，请先运行 build_briefings.js）');
   }
 }
+// 3.75) 复制盘后真实资金流向（若存在）
+const ffSrc = path.join('D:/WorkBuddy/选股结果', 'fundflow.json');
+if (fs.existsSync(ffSrc)) {
+  fs.copyFileSync(ffSrc, path.join(DATA_DIR, 'fundflow.json'));
+  console.log('fundflow.json copied');
+} else {
+  console.log('fundflow.json 不存在（跳过，请先运行 fetch_fundflow.py）');
+}
 // 3.8) 复制单文件离线版（数据内嵌，供站点下载）
 const offSrc = path.join('D:/WorkBuddy', '选股系统_离线版.html');
 if (fs.existsSync(offSrc)) {
