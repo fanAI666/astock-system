@@ -659,7 +659,9 @@
 <script>
 /* ============ 全局配置与状态 ============ */
 const LS_CFG="ss_cfg_v1", LS_CAND="ss_cand_v1", LS_TRADE="ss_trade_v1";
-let cfg={capital:100000,win:70,rr:3,lossMain:2,profitMain:6,relax:1.5};
+let cfg={capital:100000,win:70,rr:3,lossMain:2,profitMain:6,relax:1.5,
+        // 科创板独立规则（P8 回测 0/7 胜率暴露 K_ATR=1.05 过紧，放宽至 2.5）
+        lossKcb:5, profitKcb:15, relaxKcb:2.5};
 let candidates=[]; let trades=[];
 
 /* ============ 高频/中频 模式切换 ============ */
@@ -741,8 +743,9 @@ function save(){
 
 /* 板块对应的止损/止盈% */
 function boardParams(board){
-  if(board==="main") return {loss:cfg.lossMain, profit:cfg.profitMain};
-  return {loss:+(cfg.lossMain*cfg.relax).toFixed(2), profit:+(cfg.profitMain*cfg.relax).toFixed(2)};
+  // 双规则：主板/创业板共用现行（relax=1.5）；科创板独立一套（K_ATR=2.5、止损5%/止盈15%）
+  if(board==="main"||board==="cyb") return {loss:cfg.lossMain, profit:cfg.profitMain, kAtr:cfg.relax};
+  return {loss:cfg.lossKcb, profit:cfg.profitKcb, kAtr:cfg.relaxKcb};
 }
 
 /* ============ 评分引擎（P1-P4 改进版） ============ */
@@ -759,6 +762,13 @@ function scoreCandidate(c){
             rejected:true, rejectType:"RSI_OVERBOUGHT"};
   }
 
+  // ---- P7: MA60 硬约束（趋势根基）----
+  if(c.ma60 !== "up"){
+    return {score:0, strength:0, winRate:0, pass:false, grade:"F", isCalibrated:false,
+            reasons:[`<b style="color:var(--bad)">⛔ P7硬拒：MA60=${c.ma60} 未向上，中长期趋势根基不稳</b>`],
+            rejected:true, rejectType:"MA60_DOWN"};
+  }
+
   // 趋势 25
   let t=0;
   if(c.ma20==="up") t+=10;
@@ -771,19 +781,20 @@ function scoreCandidate(c){
   // 量能 15
   let v = c.vol==="high"?15:(c.vol==="normal"?8:2);
   s+=v; reasons.push(`量能 ${v}/15（${c.vol==="high"?"放量":c.vol==="normal"?"平量":"缩量"}）`);
-  // 板块 15
+  // 板块 15（P5: 板块RPS分位，由 build_final 池内排名决定 strong/mid/weak）
   let sec = c.sector==="strong"?15:(c.sector==="mid"?9:3);
-  s+=sec; reasons.push(`板块 ${sec}/15（${c.sector==="strong"?"强":c.sector==="mid"?"中":"弱"}）`);
+  s+=sec; reasons.push(`板块RPS ${sec}/15（${c.sector==="strong"?"行业内相对强度前1/3":c.sector==="mid"?"中1/3":"后1/3"}）`);
   // RSI 15
   let r;
   if(c.rsi>=40&&c.rsi<=60) r=15; else if((c.rsi>=30&&c.rsi<40)||(c.rsi>60&&c.rsi<=70)) r=8; else r=3;
   s+=r; reasons.push(`RSI ${r}/15（RSI=${c.rsi}，健康区间40-60）`);
   // P2: ATR 连续衰减（替代原硬门槛，使低波动股得分更高）
+  // 波动适配阈值 = kAtr × 止损（科创板 kAtr=2.5 更宽容，主板/创业板=1.5）
   const bp=boardParams(c.board);
   let fit;
-  fit = Math.max(0, Math.round(10 * Math.max(0, 1 - c.atr / (bp.loss * 3))));
+  fit = Math.max(0, Math.round(10 * Math.max(0, 1 - c.atr / (bp.loss * bp.kAtr))));
   s+=fit;
-  if(fit<5) reasons.push(`<b style="color:var(--bad)">ATR适配 ${fit}/10：ATR=${c.atr}% 偏大，波动剧烈</b>`);
+  if(fit<5) reasons.push(`<b style="color:var(--bad)">ATR适配 ${fit}/10：ATR=${c.atr}% 偏大，波动剧烈（${c.board==="kcb"?"科创板K=2.5":"K=1.5"}）</b>`);
   else reasons.push(`ATR适配 ${fit}/10（ATR=${c.atr}%，波动适中）`);
 
   // P3: 涨幅过滤
@@ -1031,7 +1042,7 @@ function scoreCardHTML(c,pfx){
     </div>` : '';
   return `<div class="scorecard ${r.pass?'pass':'fail'}" id="card_${pfx}${c.id}">
     <div class="head">
-      <div class="name">${c.name} <span class="tagboard">${c.board==="main"?"主板":c.board==="cyb"?"创业板":"科创板"}</span>${badge}</div>
+      <div class="name">${c.name} <span class="tagboard">${c.board==="main"?"主板":c.board==="cyb"?"创业板":"科创板"}</span>${c.industry?`<span class="tagboard" style="background:#ecfdf5;color:#047857">${c.industry}</span>`:''}${badge}</div>
       <div class="grade" style="color:${r.pass?'var(--ok)':'var(--bad)'}">${r.grade}</div>
     </div>
     <div class="meter"><span style="width:90px;font-size:12.5px">综合分</span><div class="bar"><i style="width:${r.score}%"></i></div><span class="num">${r.score}</span></div>
@@ -1165,7 +1176,7 @@ document.getElementById("calcBtn").addEventListener("click",()=>{
   const box=document.getElementById("calcResult");
   box.style.display="block";
   box.innerHTML=`
-    <div class="line"><span>板块</span><b>${board==="main"?"主板（标准）":board==="cyb"?"创业板（放宽50%）":"科创板（放宽50%）"}</b></div>
+    <div class="line"><span>板块</span><b>${board==="main"?"主板（标准）":board==="cyb"?"创业板（放宽50%）":"科创板（独立规则 止损5%/止盈15%/K=2.5）"}</b></div>
     <div class="line"><span>入场价</span><b class="kline">¥${entry.toFixed(2)}</b></div>
     <div class="line"><span>止损价（-${bp.loss}%）</span><b class="down kline">¥${stopPrice.toFixed(2)}</b></div>
     <div class="line"><span>止盈价（+${bp.profit}%）</span><b class="up kline">¥${targetPrice.toFixed(2)}</b></div>
@@ -1375,7 +1386,7 @@ function mergeItems(items){
     const c=Object.assign({},it);
     c.id="auto_"+Date.now()+"_"+(added++);
     c.src = it.category==="final"?"final":((it.category==="preok"||it.category==="preobs")?"pre":"manual");
-    c.cat = "盘后·定稿";
+    c.cat = it.category==="watch" ? "盘后·观察" : "盘后·定稿";
     c._r=scoreCandidate(c);
     candidates.push(c);
   });
@@ -1394,7 +1405,9 @@ async function importToday(){
   let added=0;
   for(const f of files){
     try{ const res=await fetch(f,{cache:"no-store"}); if(!res.ok) continue;
-      const data=await res.json(); added+=mergeItems(data.items);
+      const data=await res.json();
+      added+=mergeItems(data.items||[]);
+      added+=mergeItems(data.watch||[]);   // P6: 观察池（超行业上限降级）
     }catch(e){}
   }
   showImportMsg(added);
@@ -1405,7 +1418,7 @@ document.getElementById("importFile").addEventListener("change",e=>{
   let pending=fs.length, added=0;
   for(const file of fs){
     const reader=new FileReader();
-    reader.onload=ev=>{ try{ const d=JSON.parse(ev.target.result); added+=mergeItems(d.items); }catch(_){}
+    reader.onload=ev=>{ try{ const d=JSON.parse(ev.target.result); added+=mergeItems(d.items||[]); added+=mergeItems(d.watch||[]); }catch(_){}
       if(--pending===0) showImportMsg(added); };
     reader.readAsText(file,"utf-8");
   }

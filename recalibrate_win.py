@@ -14,11 +14,28 @@ import os, json
 BASE = r"D:/WorkBuddy"
 FINAL = os.path.join(BASE, "选股结果", "import_final.json")
 BW = os.path.join(BASE, "选股结果", "backtest_winrate.json")
+WF = os.path.join(BASE, "选股结果", "walkforward_calib.json")
 
 final = json.load(open(FINAL, encoding="utf-8"))
-bw = json.load(open(BW, encoding="utf-8"))
-per = {p["code"]: p for p in bw.get("calibration", {}).get("perStock", [])}
-overall = bw.get("winRate", 0.272)
+
+# P8 双轨标定：优先 walk-forward perStock 多笔真实胜率，回退旧单笔标定
+per = {}
+overall = 0.272
+if os.path.exists(WF):
+    try:
+        wf = json.load(open(WF, encoding="utf-8"))
+        for p in wf.get("calibration", {}).get("perStock", []):
+            per[p["code"]] = p
+        overall = wf.get("winRate", overall)
+        print("[P8] 采用 walk-forward 标定源（perStock 多笔）")
+    except Exception as e:
+        print("⚠ walk-forward 载入失败:", e)
+if not per and os.path.exists(BW):
+    bw = json.load(open(BW, encoding="utf-8"))
+    for p in bw.get("calibration", {}).get("perStock", []):
+        per[p["code"]] = p
+    overall = bw.get("winRate", overall)
+    print("[回退] 采用旧 backtest_winrate 标定源")
 
 print("=== v1.0.7 重标定：主观公式分 -> 回测真实胜率 ===")
 changed = []

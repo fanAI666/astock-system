@@ -33,6 +33,24 @@ QUOTES = {
     "002841": dict(name="视源股份", now=52.45, pct=0.61,  lb=1.9938, hyzaf=-3.1252),
 }
 
+# P6: 静态行业映射（本地演示用；生产环境由 16:00 自动化接真实申万一级行业替换）
+# 仅覆盖本批 11 只候选，键=代码，值=行业名
+INDUSTRY_OF = {
+    "000779": "建筑装饰",   # 甘咨询
+    "600288": "计算机",     # 大恒科技
+    "603137": "建筑装饰",   # 恒尚节能
+    "688722": "电子",        # 同益中
+    "300918": "纺织服饰",   # 南山智尚
+    "688101": "基础化工",   # 三达膜
+    "301367": "机械设备",   # 瑞迈特
+    "002414": "国防军工",   # 高德红外
+    "002144": "纺织服饰",   # 宏达高科
+    "600718": "计算机",     # 东软集团
+    "002841": "电子",        # 视源股份
+}
+# P6: 单行业最多入选数量（超出按综合强度分降序保留前 N）
+MAX_PER_INDUSTRY = 2
+
 def setcode_of(code):
     return "1" if code[0] == "6" else "0"
 
@@ -67,7 +85,7 @@ def atr_pct(bars, n=14):
     a = sma(trs, n)
     return a / bars[-1][2] * 100
 
-def metrics(day, q):
+def metrics(day, q, pool_hyzaf=None):
     closes = [b[2] for b in day]
     vols = [b[5] for b in day]
     ma20 = sma(closes, 20); ma20_5 = sma(closes[:-5], 20) if len(closes) > 25 else ma20
@@ -95,18 +113,31 @@ def metrics(day, q):
     else:
         struct = "neutral"
     hz = q["hyzaf"]
-    if hz >= 1.0: sector = "strong"
-    elif hz >= 0.0: sector = "mid"
-    else: sector = "weak"
+    # P5: 板块 RPS 分位打分（替代原强/中/弱三档粗分）
+    # 用池内 hyzaf（板块当日涨跌幅）做分位排名：排名前1/3→15、中1/3→9、后1/3→3
+    if pool_hyzaf is not None and len(pool_hyzaf) >= 3:
+        srt = sorted(pool_hyzaf)
+        n = len(srt)
+        idx = srt.index(hz) if hz in srt else 0
+        rank_frac = idx / (n - 1) if n > 1 else 0.0
+        if rank_frac <= 1/3:   sector = "strong"   # 前1/3：行业内相对强度高
+        elif rank_frac <= 2/3: sector = "mid"
+        else:                 sector = "weak"
+    else:
+        # 无池信息时退化到绝对值阈值（保持向后兼容）
+        if hz >= 1.0: sector = "strong"
+        elif hz >= 0.0: sector = "mid"
+        else: sector = "weak"
     return dict(ma20="up" if ma20_up else "down", priceMa="above" if price_above else "below",
                 ma60="up" if ma60_up else "down", rsi=round(r, 1), atr=round(a, 2),
                 vol=vol, struct=struct, sector=sector)
 
 # ---------- 评分引擎（P1-P4 改进版，严格与 stock-selection-system.html scoreCandidate 同步） ----------
 def board_params(board):
-    if board == "main":
-        return dict(loss=2.0, profit=6.0)
-    return dict(loss=3.0, profit=9.0)  # cyb / kcb 放宽 50%
+    # 双规则：主板/创业板共用（relax=1.5）；科创板独立一套（止损5%/止盈15%/K_ATR=2.5）
+    if board in ("main", "cyb"):
+        return dict(loss=2.0, profit=6.0, k_atr=1.5)
+    return dict(loss=5.0, profit=15.0, k_atr=2.5)  # kcb 科创板独立规则
 
 # P4 硬约束：RSI 超买线
 RSI_OVERBOUGHT = 72
@@ -128,6 +159,11 @@ def score_candidate(c, pool_atrs=None):
     if c["rsi"] > RSI_OVERBOUGHT:
         return (0, 0, 0, board_params(c["board"]), reasons,
                 f"P4硬拒: RSI={c['rsi']:.1f}>{RSI_OVERBOUGHT} 超买区，不参与评分")
+
+    # ---- P7: MA60 硬约束（趋势根基）----
+    if c["ma60"] != "up":
+        return (0, 0, 0, board_params(c["board"]), reasons,
+                f"P7硬拒: MA60={c['ma60']} 未向上，中长期趋势根基不稳，不参与评分")
 
     # 趋势 25
     t = 0
@@ -156,8 +192,8 @@ def score_candidate(c, pool_atrs=None):
         pct_rank = rank / (len(sorted_atrs) - 1)  # 0 = 最小ATR(最好), 1 = 最大ATR(最差)
         fit = max(0, round(10 * (1 - pct_rank)))
     else:
-        # 无池信息时退化到连续衰减（比原硬门槛更宽容）
-        fit = max(0, round(10 * max(0, 1 - c["atr"] / (bp["loss"] * 3))))
+        # 无池信息时退化到连续衰减（阈值 = k_atr × 止损，科创板更宽容）
+        fit = max(0, round(10 * max(0, 1 - c["atr"] / (bp["loss"] * bp["k_atr"]))))
     s += fit; reasons.append(f"ATR适配 {fit}/10")
 
     strength = min(88, 50 + s * 0.35)  # P1: 这是综合强度分，不是胜率
@@ -198,6 +234,9 @@ for it in pre_items:
 
 pool_atrs = [a for _, a in raw_metrics]
 
+# P5: 池内 hyzaf 列表（板块当日涨跌幅），供 metrics 做 RPS 分位
+pool_hyzaf = [QUOTES.get(code, {}).get("hyzaf", 0.0) for code, _ in raw_metrics]
+
 all_rows = []
 final_items = []
 
@@ -223,13 +262,15 @@ for it in pre_items:
     day_t = day[-70:] if len(day) >= 70 else day
     min5_t = min5[-245:] if len(min5) >= 245 else min5
 
-    m = metrics(day_t, q)
+    m = metrics(day_t, q, pool_hyzaf=pool_hyzaf)
     entry = round(final_close, 2)
     c = dict(board=board, ma20=m["ma20"], priceMa=m["priceMa"], ma60=m["ma60"],
              rsi=m["rsi"], vol=m["vol"], struct=m["struct"], sector=m["sector"],
              atr=m["atr"])
     # P3: 注入同日涨幅
     c["pct"] = q.get("pct", 0)
+    # P6: 行业归属（静态映射，生产接真实行业）
+    c["industry"] = INDUSTRY_OF.get(code, "其他")
 
     total, strength, fit, bp, reasons, reject_info = score_candidate(c, pool_atrs=pool_atrs)
     stop = round(entry * (1 - bp["loss"]/100), 2)
@@ -243,40 +284,82 @@ for it in pre_items:
                total=total, strength=strength, fit=fit, bp=bp,
                reasons=reasons, entry=entry, stop=stop, target=target,
                pass_=pass_, rejected=hard_rejected, reject_reason=reject_info or "",
-               pct=c.get("pct",0),
+               pct=c.get("pct",0), industry=c.get("industry","其他"),
                day=day_t, min5=min5_t)
     all_rows.append(row)
 
-    if pass_:
-        item = dict(name=name_full, code=code, setcode=setcode_of(code), board=board,
-                    ma20=m["ma20"], priceMa=m["priceMa"], ma60=m["ma60"], rsi=m["rsi"],
-                    vol=m["vol"], struct=m["struct"], sector=m["sector"], atr=m["atr"],
-                    score=total, win=strength,          # P1: score=原始总分, strength=综合强度分(公式), win待recalibrate覆盖
-                    category="final", date=DATA_DATE,
-                    stopPrice=stop, targetPrice=target,
-                    kline=dict(day=day_t, min5=min5_t))
-        final_items.append(item)
-
 # 排序：综合强度分降序，同分综合分降序
 all_rows.sort(key=lambda x: (-x["strength"], -x["total"]))
-final_items.sort(key=lambda x: -x["win"])
 
-print("=== 全候选 6 维评分（P1-P4 改进版，11 只，按综合强度分降序）===")
-print(f"{'code':6} {'name':8} {'board':4} {'ma20':4} {'pMA':5} {'ma60':4} {'rsi':5} {'atr%':6} {'pct%':5} {'struct':9} {'vol':6} {'sector':6} {'fit':3} {'tot':3} {'str%':5} {'pass':4} {'reject'}")
+# P6: 行业上限裁决——先取所有 pass_ 候选，按综合强度分降序，
+# 对每个行业计数，超过 MAX_PER_INDUSTRY 的降级为"观察"(进 watch_items，不进 final_items)
+watch_items = []
+industry_count = {}
+for r in all_rows:
+    if not r["pass_"]:
+        continue
+    ind = r["industry"]
+    cnt = industry_count.get(ind, 0)
+    item = dict(name=r["name"], code=r["code"], setcode=setcode_of(r["code"]), board=r["board"],
+                ma20=r["m"]["ma20"], priceMa=r["m"]["priceMa"], ma60=r["m"]["ma60"], rsi=r["m"]["rsi"],
+                vol=r["m"]["vol"], struct=r["m"]["struct"], sector=r["m"]["sector"], atr=r["m"]["atr"],
+                score=r["total"], win=r["strength"],
+                category="final", date=DATA_DATE,
+                stopPrice=r["stop"], targetPrice=r["target"],
+                kline=dict(day=r["day"], min5=r["min5"]))
+    if cnt < MAX_PER_INDUSTRY:
+        final_items.append(item)
+        industry_count[ind] = cnt + 1
+    else:
+        # 超行业上限 → 降级为观察
+        item["category"] = "watch"
+        watch_items.append(item)
+
+final_items.sort(key=lambda x: -x["win"])
+watch_items.sort(key=lambda x: -x["win"])
+
+print("=== 全候选 6 维评分（P1-P7 改进版，11 只，按综合强度分降序）===")
+print(f"{'code':6} {'name':8} {'indu':8} {'board':4} {'ma20':4} {'pMA':5} {'ma60':4} {'rsi':5} {'atr%':6} {'pct%':5} {'struct':9} {'vol':6} {'sector':6} {'fit':3} {'tot':3} {'str%':5} {'pass':4} {'reject'}")
 for r in all_rows:
     m = r["m"]
-    rej = r["reject_reason"][:20] if r["rejected"] else ""
-    print(f"{r['code']:6} {r['q']['name']:8} {r['board']:4} {m['ma20']:4} {m['priceMa']:5} {m['ma60']:4} {m['rsi']:<5} {m['atr']:<6} {r['pct']:<5.1f} {m['struct']:9} {m['vol']:6} {m['sector']:6} {r['fit']:<3} {r['total']:<3} {r['strength']:<5} {'Y' if r['pass_'] else 'N':<4} {rej}")
+    rej = r["reject_reason"][:18] if r["rejected"] else ""
+    print(f"{r['code']:6} {r['q']['name']:8} {r['industry']:8} {r['board']:4} {m['ma20']:4} {m['priceMa']:5} {m['ma60']:4} {m['rsi']:<5} {m['atr']:<6} {r['pct']:<5.1f} {m['struct']:9} {m['vol']:6} {m['sector']:6} {r['fit']:<3} {r['total']:<3} {r['strength']:<5} {'Y' if r['pass_'] else 'N':<4} {rej}")
 
 rejected_count = sum(1 for r in all_rows if r["rejected"])
-print(f"\nP3/P4 硬拒绝: {rejected_count} 只")
-print(f"达标数(综合强度分>=70): {len(final_items)} / 候选 {len(all_rows)}")
+print(f"\nP3/P4/P7 硬拒绝: {rejected_count} 只")
+print(f"达标数(综合强度分>=70 且过行业上限): {len(final_items)} / 候选 {len(all_rows)}")
+print(f"观察数(超行业上限降级): {len(watch_items)} 只 -> " + ", ".join(f"{w['name']}({w['industry']})" for w in watch_items))
+
+# ---------- P8：walk-forward 标定回填 ----------
+# 读取 backtest_walkforward.py 产出的 perStock 多笔真实胜率，
+# 替代"全池平均"粗暴标定，使面板"成功概率(回测标定)"基于每票自身样本。
+WF_CALIB = os.path.join(BASE, "选股结果", "walkforward_calib.json")
+wf_per = {}
+if os.path.exists(WF_CALIB):
+    try:
+        _wf = json.load(open(WF_CALIB, encoding="utf-8"))
+        for p in _wf.get("calibration", {}).get("perStock", []):
+            wf_per[p["code"]] = p.get("realized")
+        print(f"[P8] 载入 walk-forward 标定: {len(wf_per)} 只（perStock 多笔真实胜率）")
+    except Exception as e:
+        print(f"[P8] 标定载入失败，回退公式分: {e}")
+
+# 用 walk-forward 真实胜率覆盖 win 字段（保留 score=原始总分作达标门槛）
+for _bucket in (final_items, watch_items):
+    for _it in _bucket:
+        _code = _it["code"]
+        if _code in wf_per:
+            _it["win"] = round(wf_per[_code] * 100, 1)   # 真实胜率(%)
+            _it["winSource"] = "walkforward"
+        else:
+            _it["win"] = round(_it.get("score", 0), 1)     # 无回测样本→回退综合强度分
+            _it["winSource"] = "formula"
 
 # ---------- 写 import_final.json ----------
 updated = datetime.datetime.now().astimezone().isoformat()
-out = dict(updated=updated, items=final_items)
+out = dict(updated=updated, items=final_items, watch=watch_items)
 json.dump(out, open(OUT_JSON, "w", encoding="utf-8"), ensure_ascii=False)
-print("wrote", OUT_JSON, "items=", len(final_items), "size~", os.path.getsize(OUT_JSON)//1024, "KB")
+print("wrote", OUT_JSON, "final=", len(final_items), "watch=", len(watch_items), "size~", os.path.getsize(OUT_JSON)//1024, "KB")
 
 # 把全量明细存一份供生成 MD 用
 json.dump(dict(all_rows=[{k:v for k,v in r.items() if k not in ('day','min5')} for r in all_rows],
