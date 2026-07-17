@@ -1663,9 +1663,8 @@ async function loadWinRate(){
   }catch(e){}
 }
 /* ============ 版本更新日志 ============ */
-const VERSION_HISTORY = [
+const VERSION_HISTORY = [  {v:"1.2.0",d:"2026-07-17",desc:"皮肤切换(浅色/深色)：:root[data-theme] token 覆盖层+红涨绿跌语义保留，Header 加切换按钮+LocalStorage 持久化，三图表(K线/胜率/北向)接入 themeColors() 主题色随切换重绘"},
   {v:"1.1.9",d:"2026-07-17",desc:"资金动态接入盘后真实数据：腾讯行情(指数/风格)+东方财富(行业主力净流入/北向)，由 16:00 选股任务内抓取(已合并原独立资金抓取任务)、跟随 17:00 云端同步自动上线；离线/限流时回退示意数据并标注数据时间"},
-  {v:"1.2.0",d:"2026-07-17",desc:"皮肤切换(浅色/深色)：:root[data-theme] token 覆盖层+红涨绿跌语义保留，Header 加切换按钮+LocalStorage 持久化，三图表(K线/胜率/北向)接入 themeColors() 主题色随切换重绘"},
   {v:"1.1.0",d:"2026-07-14",desc:"⑥ 双模式：高频/中频模式切换（Plan B共存方案），Header加模式切换栏+loadWinRate按模式加载对应JSON+参数面板/徽章/规则描述随模式联动+build_deploy复制中频回测数据+localStorage记忆模式选择"},
   {v:"1.0.9",d:"2026-07-13",desc:"取消尾盘预选：删除预选简报卡片+屏蔽选股预选过滤标签+停用预选简报生成(build_briefings仅盘后)+从导入入口移除import_pre.json"},
   {v:"1.0.8",d:"2026-07-13",desc:"新增「买入信号·开盘抓取」专属Tab：位于选股评分与仓位计算之间，渲染 buy_signal.json 的交易判定横幅/判定依据/Top3信号明细"},
