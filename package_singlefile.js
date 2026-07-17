@@ -88,8 +88,8 @@ const patches = [
   },
   {
     name: 'init',
-    from: 'if(location.protocol.indexOf("http")===0){ importToday(); loadBuySignal(); loadWinRate(); loadBriefings(); }',
-    to:   'importToday(); loadBuySignal(); loadWinRate(); loadBriefings();',
+    from: 'if(location.protocol.indexOf("http")===0){ importToday(); loadBuySignal(); loadWinRate(); loadBriefings(); loadFundFlow(); }',
+    to:   'importToday(); loadBuySignal(); loadWinRate(); loadBriefings(); loadFundFlow();',
   },
 ];
 
