@@ -85,6 +85,14 @@ if (fs.existsSync(ffSrc)) {
 } else {
   console.log('fundflow.json 不存在（跳过，请先运行 fetch_fundflow.py）');
 }
+// 3.85) 复制版本状态文件（机器可读，供站点/监控读取当前版本）
+const verSrc = path.join('D:/WorkBuddy', 'VERSION.json');
+if (fs.existsSync(verSrc)) {
+  fs.copyFileSync(verSrc, path.join(DATA_DIR, 'VERSION.json'));
+  console.log('VERSION.json copied');
+} else {
+  console.log('VERSION.json 不存在（跳过）');
+}
 // 3.8) 复制单文件离线版（数据内嵌，供站点下载）
 const offSrc = path.join('D:/WorkBuddy', '选股系统_离线版.html');
 if (fs.existsSync(offSrc)) {
