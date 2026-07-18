@@ -468,6 +468,30 @@
   <!-- ===================== 选股评分 ===================== -->
   <section class="panel" id="screen">
     <div class="card">
+      <h2><span class="dot"></span>候选排名（按综合强度分）</h2>
+      <p class="hint">绿色=达标（≥70），红色=未达标。带「盘后」徽章的为自动选股导入；点「加入交易」可送入日志。</p>
+      <div class="seg" style="margin-bottom:12px">
+        <input type="radio" name="candView" id="cvRank" value="rank" checked><label for="cvRank">排名</label>
+        <input type="radio" name="candView" id="cvHist" value="hist"><label for="cvHist">选股历史</label>
+      </div>
+      <div id="rankView">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px">
+          <button class="btn btn-ghost" id="importBtn">📥 导入今日自动选股</button>
+          <input type="file" id="importFile" accept=".json" multiple style="display:none">
+          <span id="importMsg" class="pill ok" style="display:none"></span>
+          <span style="flex:1"></span>
+          <div class="seg" style="max-width:380px">
+            <input type="radio" name="filt" id="fAll" value="all" checked><label for="fAll">全部</label>
+            <input type="radio" name="filt" id="fM" value="manual"><label for="fM">手动</label>
+            <input type="radio" name="filt" id="fF" value="final"><label for="fF">盘后</label>
+          </div>
+        </div>
+        <div id="candList"><div class="empty">还没有候选股，可在下方评分，或点「📥 导入今日自动选股」。</div></div>
+      </div>
+      <div id="histView" style="display:none"></div>
+    </div>
+
+    <div class="card">
       <h2><span class="dot"></span>候选股评分</h2>
       <p class="hint">填写技术面指标（可来自你的看盘软件/通达信）。系统实时打分并判断是否达到 70 强度门槛。P4：RSI>72 直接淘汰；P3：同日涨超9.5%追高拒绝。</p>
       <div class="grid g2">
@@ -527,30 +551,6 @@
         <button class="btn btn-primary" id="scoreBtn">评分并加入候选</button>
         <button class="btn btn-ghost" id="clearCand">清空候选</button>
       </div>
-    </div>
-
-    <div class="card">
-      <h2><span class="dot"></span>候选排名（按综合强度分）</h2>
-      <p class="hint">绿色=达标（≥70），红色=未达标。带「盘后」徽章的为自动选股导入；点「加入交易」可送入日志。</p>
-      <div class="seg" style="margin-bottom:12px">
-        <input type="radio" name="candView" id="cvRank" value="rank" checked><label for="cvRank">排名</label>
-        <input type="radio" name="candView" id="cvHist" value="hist"><label for="cvHist">选股历史</label>
-      </div>
-      <div id="rankView">
-        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px">
-          <button class="btn btn-ghost" id="importBtn">📥 导入今日自动选股</button>
-          <input type="file" id="importFile" accept=".json" multiple style="display:none">
-          <span id="importMsg" class="pill ok" style="display:none"></span>
-          <span style="flex:1"></span>
-          <div class="seg" style="max-width:380px">
-            <input type="radio" name="filt" id="fAll" value="all" checked><label for="fAll">全部</label>
-            <input type="radio" name="filt" id="fM" value="manual"><label for="fM">手动</label>
-            <input type="radio" name="filt" id="fF" value="final"><label for="fF">盘后</label>
-          </div>
-        </div>
-        <div id="candList"><div class="empty">还没有候选股，先在上方评分吧。</div></div>
-      </div>
-      <div id="histView" style="display:none"></div>
     </div>
   </section>
 
