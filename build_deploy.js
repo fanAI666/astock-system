@@ -4,8 +4,9 @@ const path = require('path');
 // 部署前先从最新简报 markdown 重新生成 briefing_*.json（若不存在则跳过）
 try { require('./build_briefings.js'); } catch (e) { console.log('build_briefings 跳过:', e.message); }
 
-const SRC = 'D:/WorkBuddy/stock-selection-system.html';
-const OUT_DIR = 'D:/WorkBuddy/deploy';
+// 路径改为相对仓库根(__dirname)，使本地与 GitHub Actions(Linux) 均可运行
+const SRC = path.join(__dirname, 'stock-selection-system.html');
+const OUT_DIR = path.join(__dirname, 'deploy');
 const DATA_DIR = path.join(OUT_DIR, 'data');
 
 const GATE_CSS = `
@@ -32,6 +33,8 @@ const GATE_JS = `<script>
 <\/script>`;
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
+// 写入 .nojekyll，确保 GitHub Pages 以纯静态方式托管（不启用 Jekyll）
+fs.writeFileSync(path.join(OUT_DIR, '.nojekyll'), '');
 let html = fs.readFileSync(SRC, 'utf8');
 
 // 1) 数据路径：选股结果/ -> data/
@@ -47,10 +50,10 @@ fs.writeFileSync(path.join(OUT_DIR, 'index.html'), html, 'utf8');
 
 // 3) 复制数据快照
 for (const f of ['import_pre.json', 'import_final.json']) {
-  fs.copyFileSync(path.join('D:/WorkBuddy/选股结果', f), path.join(DATA_DIR, f));
+  fs.copyFileSync(path.join(__dirname, '选股结果', f), path.join(DATA_DIR, f));
 }
 // 3.5) 复制买入信号（若存在）
-const sigSrc = path.join('D:/WorkBuddy/选股结果', 'buy_signal.json');
+const sigSrc = path.join(__dirname, '选股结果', 'buy_signal.json');
 if (fs.existsSync(sigSrc)) {
   fs.copyFileSync(sigSrc, path.join(DATA_DIR, 'buy_signal.json'));
   console.log('buy_signal.json copied');
@@ -59,7 +62,7 @@ if (fs.existsSync(sigSrc)) {
 }
 // 3.6) 复制交易胜率回测结果（高频 + 中频，若存在）
 for (const f of ['backtest_winrate.json', 'backtest_midfreq.json']) {
-  const wrSrc = path.join('D:/WorkBuddy/选股结果', f);
+  const wrSrc = path.join(__dirname, '选股结果', f);
   if (fs.existsSync(wrSrc)) {
     fs.copyFileSync(wrSrc, path.join(DATA_DIR, f));
     console.log(f + ' copied');
@@ -69,7 +72,7 @@ for (const f of ['backtest_winrate.json', 'backtest_midfreq.json']) {
 }
 // 3.7) 复制每日简报（预选 + 盘后，若存在）
 for (const f of ['briefing_pre.json', 'briefing_final.json']) {
-  const src = path.join('D:/WorkBuddy/选股结果', f);
+  const src = path.join(__dirname, '选股结果', f);
   if (fs.existsSync(src)) {
     fs.copyFileSync(src, path.join(DATA_DIR, f));
     console.log(f + ' copied');
@@ -78,7 +81,7 @@ for (const f of ['briefing_pre.json', 'briefing_final.json']) {
   }
 }
 // 3.75) 复制盘后真实资金流向（若存在）
-const ffSrc = path.join('D:/WorkBuddy/选股结果', 'fundflow.json');
+const ffSrc = path.join(__dirname, '选股结果', 'fundflow.json');
 if (fs.existsSync(ffSrc)) {
   fs.copyFileSync(ffSrc, path.join(DATA_DIR, 'fundflow.json'));
   console.log('fundflow.json copied');
@@ -86,7 +89,7 @@ if (fs.existsSync(ffSrc)) {
   console.log('fundflow.json 不存在（跳过，请先运行 fetch_fundflow.py）');
 }
 // 3.85) 复制版本状态文件（机器可读，供站点/监控读取当前版本）
-const verSrc = path.join('D:/WorkBuddy', 'VERSION.json');
+const verSrc = path.join(__dirname, 'VERSION.json');
 if (fs.existsSync(verSrc)) {
   fs.copyFileSync(verSrc, path.join(DATA_DIR, 'VERSION.json'));
   console.log('VERSION.json copied');
@@ -94,7 +97,7 @@ if (fs.existsSync(verSrc)) {
   console.log('VERSION.json 不存在（跳过）');
 }
 // 3.8) 复制单文件离线版（数据内嵌，供站点下载）
-const offSrc = path.join('D:/WorkBuddy', '选股系统_离线版.html');
+const offSrc = path.join(__dirname, '选股系统_离线版.html');
 if (fs.existsSync(offSrc)) {
   fs.copyFileSync(offSrc, path.join(OUT_DIR, '选股系统_离线版.html'));
   console.log('选股系统_离线版.html copied');
