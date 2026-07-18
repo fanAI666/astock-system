@@ -3,6 +3,10 @@ cloudflared.exe
 cloudflared.log
 *.log
 
+# ===== 便携版 Git（本地下载，非项目文件，勿提交）=====
+PortableGit/
+PortableGit-*.7z.exe
+
 # ===== 临时 / 中间产物 =====
 _final_summary.json
 _intermediate.json
