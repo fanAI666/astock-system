@@ -92,9 +92,19 @@ if (fs.existsSync(ffSrc)) {
 const verSrc = path.join(__dirname, 'VERSION.json');
 if (fs.existsSync(verSrc)) {
   fs.copyFileSync(verSrc, path.join(DATA_DIR, 'VERSION.json'));
-  console.log('VERSION.json copied');
+  console.log('VERSION.json copied -> data/');
 } else {
   console.log('VERSION.json 不存在（跳过）');
+}
+// 3.86) 复制项目文档到站点根目录（使 CHANGELOG.md / README.md / VERSION.json 在 GitHub Pages 站点根可直接访问）
+for (const f of ['VERSION.json', 'CHANGELOG.md', 'README.md']) {
+  const docSrc = path.join(__dirname, f);
+  if (fs.existsSync(docSrc)) {
+    fs.copyFileSync(docSrc, path.join(OUT_DIR, f));
+    console.log('站点根文档 copied -> ' + f);
+  } else {
+    console.log('站点根文档跳过（不存在）: ' + f);
+  }
 }
 // 3.8) 复制单文件离线版（数据内嵌，供站点下载）
 const offSrc = path.join(__dirname, '选股系统_离线版.html');

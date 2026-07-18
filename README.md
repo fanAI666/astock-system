@@ -1,4 +1,4 @@
-# A股量化选股系统（v1.2.0）
+# A股量化选股系统（v1.2.1）
 
 > 单文件、零后端依赖的 A 股量化选股与交易信号系统。基于已定交易规则（3:1 风险回报、主板 2% 止损 / 6% 止盈）做选股展示、成功概率（回测标定）评分、买入触发信号、系统回测胜率与每日简报、盘后资金动态与浅色/深色皮肤切换。**仅生成信号，不接券商、不真实下单。**
 
@@ -8,7 +8,7 @@
 
 | 项 | 值 |
 |---|---|
-| 当前版本 | **1.2.0**（基准 1.0.0 + 20 功能点） |
+| 当前版本 | **1.2.1**（基准 1.0.0 + 21 功能点） |
 | 基准日期 | 2026-07-11 |
 | 版本规则 | 以 1.0.0 为基准；每新增 **1 个功能点 +0.0.1**；满 **10 个点进 1**（0.0.9 → 0.1.0）；满 **10 个次版本进 1**（1.9.0 → 2.0.0） |
 
@@ -33,7 +33,7 @@
 
 ## 三、功能清单（v1.0.0 基准）
 
-1. **选股评分（🔍 选股评分）**：6 维评分 → 综合强度分（原"成功概率"展示已回填回测真实胜率）；Canvas 手绘 K 线五图引擎（当日 / 五日 / 日K / 周K / 月K）。
+1. **选股评分（🔍 选股评分）**：6 维评分 → 综合强度分（原"成功概率"展示已回填回测真实胜率）；Canvas 手绘 K 线五图引擎（当日 / 五日 / 日K / 周K / 月K），日K/周K/月K **右侧新增筹码分布带**（橙虚线=筹码峰、青虚线=筹码均价(量加权成本)），仅对带历史量价的候选股生效。
 2. **策略概览（📋 策略概览）**：策略核心参数、交易胜率（系统回测）卡片。
 3. **买入触发（📑 每日简报 内）**：以 Top3 基准 + 次日开盘容差判定「建议买入 / 不触发」。
 4. **交易胜率回测**：基于 `import_final.json` 真实 K 线（已拉长至约 320 根/支，2025-03 起），按既定规则回测（设定周期 2025.7.1–2026.6.30）：全候选池 243 笔、胜率 27.2%、每笔期望 +0.09%；⑤组合层后 81 笔、期望 −0.04%。标定偏差 −2.9pp（v1.0.7 重标定：预测均值 24.4% vs 实现 27.4%）。
@@ -66,6 +66,7 @@
 | v1.1.8 | 07-16 | P5 板块RPS分位 + P6 行业≤2 + P7 MA60向上硬拒 + P8 walk-forward；科创板独立规则(止损5%/止盈15%/K_ATR=2.5) |
 | v1.1.9 | 07-16 | 资金动态接入盘后真实数据（腾讯指数/风格 + 东方财富行业净流入/北向），跟随每日云端同步上线 |
 | v1.2.0 | 07-17 | 皮肤切换(浅色/深色)：token 覆盖层 + 红涨绿跌语义保留，Header 切换按钮 + LocalStorage 持久化，三图表随主题重绘 |
+| v1.2.1 | 07-18 | 候选排名 K 线右侧新增筹码峰(橙)/筹码均价(青)分布带；选股评分模块布局对调（候选排名上、评分下） |
 
 ---
 
@@ -121,15 +122,22 @@ SITE_TOKEN='stock2026' PORT=8080 node serve.js
 
 ## 七、部署到 GitHub Pages
 
-```bash
-node sync_pages.js
-```
+部署采用 **GitHub Actions 自动部署**（推送 `main` 即触发，无需手动 `sync_pages.js`）：
 
-该命令依次：① 跑 `build_briefings.js` 刷新简报 JSON → ② `build_deploy.js` 重建 `deploy/` 并注入口令 gate、复制数据 → ③ 同步到 `pages/` 仓库并提交推送 `gh-pages` 分支。
+- 工作流：`.github/workflows/deploy-pages.yml`（on push `main`，paths 命中 `stock-selection-system.html` / `build_deploy.js` / `build_briefings.js` / `选股结果/**` / 工作流自身）→ `setup-node@v4` → `node build_deploy.js` 生成 `deploy/` → `peaceiris/actions-gh-pages@v3` 推 `gh-pages` 分支。
+- `build_deploy.js` 负责：注入口令 gate、复制数据（`import_final.json` / `buy_signal.json` / `backtest_winrate.json` / `backtest_midfreq.json` / `briefing_*.json` / `fundflow.json` / `VERSION.json` 等到 `deploy/data/`）、并把 **`VERSION.json` / `CHANGELOG.md` / `README.md` 复制至 `deploy/` 根目录**（使站点根可直接访问这三类文档）。
+- 每日 **17:00**「选股系统云端同步」自动化仅执行 `git push origin main`，由 Actions 自动构建并发布。
+
+```bash
+# 本地手动触发等价流程（如需）
+node build_deploy.js          # 生成 deploy/
+git add -A && git commit -m "deploy" && git push origin main   # 触发 Actions 自动部署
+```
 
 - 固定公网地址：**https://fanai666.github.io/astock-system/**
 - 访问口令：**stock2026**
-- 资金动态数据由 16:00 选股自动化抓取，跟随每日 **17:00** 云端同步上线（沙箱环境连通 github.com 偶发需重试）。
+- 站点根文档：`https://fanai666.github.io/astock-system/VERSION.json` · [`CHANGELOG.md`](https://fanai666.github.io/astock-system/CHANGELOG.md) · [`README.md`](https://fanai666.github.io/astock-system/README.md)
+- 资金动态数据由 16:00 选股自动化抓取，跟随每日 17:00 云端同步上线（沙箱环境连通 github.com 偶发需重试）。
 
 ---
 
@@ -139,7 +147,7 @@ node sync_pages.js
 |---|---|---|---|
 | 买入信号·开盘抓取 | automation-1783746752370 | 交易日 09:30 | 读 import_final.json → 大盘硬过滤(上证<MA20不交易) → Top3 by 综合强度分 → tdx 抓次日开盘 → 全市场趋势+量能+缺口过滤 + 偏离(±2%/±3%) → 同日上限≤3 → 写 buy_signal.json |
 | 每日收盘后策略选股 | automation-1783576262542 | 每日 16:00 | 通达信筛选候选 → 6维评分定稿 → 写 import_final.json（含 K 线）；**末尾合并运行 fetch_fundflow.py 抓取资金动态写 fundflow.json** |
-| 选股系统云端同步 | automation-1783705955655 | 每日 17:00 | 跑 sync_pages.js 推送 GitHub Pages（含 import_final.json / fundflow.json / VERSION.json 等） |
+| 选股系统云端同步 | automation-1783705955655 | 每日 17:00 | `git push origin main`，由 GitHub Actions 自动部署（含 import_final.json / fundflow.json / VERSION.json / 站点根文档等） |
 
 ---
 
