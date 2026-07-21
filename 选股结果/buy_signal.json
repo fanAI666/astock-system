@@ -1,7 +1,15 @@
 {
-  "date": "2026-07-18",
+  "date": "2026-07-21",
   "baselineDate": "2026-07-17",
   "top3": [],
   "trade": false,
-  "reason": "tdx-connector 完全不可用（MCP 未连接，tdx 工具未注册，无法调用 tdx_kline/tdx_quotes）；且今日 2026-07-18 为周六非交易日，无次日开盘数据。步骤 2【⑤ 大盘硬过滤】无法执行，依据任务约束直接判定当日全市场不交易（trade=false），不评估个股。"
+  "reason": "大盘空头(上证<MA20)",
+  "market": {
+    "shIndex": "000001",
+    "lastCompletedDate": "20260720",
+    "lastCompletedClose": 3796.28,
+    "ma20": 4001.617,
+    "belowMa20": true,
+    "note": "按惯例剔除当日(20260721)盘中未完成棒；最新已完成收盘3796.28(20260720) < MA20≈4001.62 → 空头"
+  }
 }
