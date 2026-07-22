@@ -1718,6 +1718,7 @@ async function loadWinRate(){
 }
 /* ============ 版本更新日志 ============ */
 const VERSION_HISTORY = [
+  {v:"1.2.3",d:"2026-07-22",desc:"资金动态页面交易时段实时刷新：客户端直连腾讯行情(qt.gtimg.cn)刷新大盘指数、东方财富(push2.eastmoney.com)刷新申万一级行业热力图与主力净流入排行，交易时段(9:25-11:30/13:00-15:00)每5分钟自动拉取并重绘，无需后端或重新部署；北向资金/风格因子/配置研判文字保留盘后快照"},
   {v:"1.2.2",d:"2026-07-22",desc:"修正回测数据链三大 bug：① backtest_winrate 指数收盘未转 float 致 ⑤ 大盘过滤静默失效(修复+新增市况分层)；② index_sh.json 为错标脏数据(误拉平安银行/方向一致率仅40%)，改用 tdx setcode=1 重拉真实上证并重跑回测得可信空头日胜率 22.7%；③ 根治 extend_history.js 按 Setcode 精确识别上证+量纲守卫+glob 全 session；market_filter 加 float 校验与方向交叉校验"},
   {v:"1.2.1",d:"2026-07-18",desc:"选股排名 K 线右侧新增筹码峰(橙)与筹码均价(青)分布带"},
   {v:"1.2.0",d:"2026-07-17",desc:"皮肤切换(浅色/深色)：:root[data-theme] token 覆盖层+红涨绿跌语义保留，Header 加切换按钮+LocalStorage 持久化，三图表(K线/胜率/北向)接入 themeColors() 主题色随切换重绘"},
@@ -2056,13 +2057,111 @@ async function loadFundFlow(){
   }catch(e){ console.warn('[fundflow] 加载失败，保留示意数据', e); }
 }
 
+/* 交易时段内每 5 分钟客户端实时刷新资金动态（直连腾讯/东财公开接口，无需后端或重新部署） */
+let _ffTimer = null;
+function isTradingNow(){
+  const n = new Date();
+  const day = n.getDay();
+  if (day === 0 || day === 6) return false;                         // 周末
+  const t = n.getHours() * 60 + n.getMinutes();
+  return (t >= 9*60+25 && t <= 11*60+30) || (t >= 13*60 && t <= 15*60);
+}
+function setFFStatus(live, label){
+  const el = document.getElementById('ffTime');
+  if (!el) return;
+  el.textContent = live ? ('🔴 实时 · ' + label + '（每5分钟刷新）')
+                         : ('数据时间 ' + label + '（盘后快照）');
+}
+/* 腾讯行情：注入 <script> 后读取全局 window.v_code（天然无跨域问题） */
+function fetchTencent(codes){
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    const to = setTimeout(() => { s.remove(); rej(new Error('timeout')); }, 9000);
+    s.onload = () => { clearTimeout(to); s.remove();
+      const m = {}; codes.split(',').forEach(c => { const v = window['v_' + c]; if (v) m[c] = v; });
+      res(m);
+    };
+    s.onerror = () => { clearTimeout(to); s.remove(); rej(new Error('err')); };
+    s.src = 'https://qt.gtimg.cn/q=' + codes;
+    document.head.appendChild(s);
+  });
+}
+/* 东方财富 JSONP */
+function fetchEM(url){
+  return new Promise((res, rej) => {
+    const cb = '__ffem' + Date.now() + Math.floor(Math.random() * 1e4);
+    const s = document.createElement('script');
+    const to = setTimeout(() => { cleanup(); rej(new Error('timeout')); }, 9000);
+    function cleanup(){ clearTimeout(to); s.remove(); delete window[cb]; }
+    window[cb] = d => { cleanup(); res(d); };
+    s.src = url + (url.indexOf('cb=') >= 0 ? '&' : '?') + 'cb=' + cb;
+    document.head.appendChild(s);
+  });
+}
+const _TENCENT_IDX = { sh000001:'上证指数', sz399001:'深证成指', sz399006:'创业板指' };
+async function refreshFundFlowLive(){
+  /* 1) 大盘指数（腾讯行情） */
+  try {
+    const tm = await fetchTencent(Object.keys(_TENCENT_IDX).join(','));
+    Object.keys(_TENCENT_IDX).forEach(code => {
+      const raw = tm[code]; if (!raw) return;
+      const p = raw.split('~');
+      const val = parseFloat(p[3]); const pct = parseFloat(p[32]);
+      const t = FF_DATA.indices.find(x => x.name === _TENCENT_IDX[code]);
+      if (t) { t.val = val; if (!isNaN(pct)) t.pct = pct; }
+    });
+  } catch (e) { console.warn('[fundflow] 指数实时刷新失败', e); }
+
+  /* 2) 行业热力 + 主力净流入（东财行业板块 m:90 t:2） */
+  try {
+    const em = await fetchEM('https://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=100&po=1&np=1&fltt=2&invt=2&fs=m%3A90%2Bt%3A2&fields=f12,f14,f3,f62,f184');
+    const list = (em && em.data && em.data.diff) || [];
+    if (list.length) {
+      FF_DATA.heatSectors = list.map(x => ({ name: x.f14, pct: parseFloat(x.f3) || 0 }));
+      const flows = list.map(x => {
+        const net = (parseFloat(x.f62) || 0) / 1e8;            // 主力净流入（元→亿）
+        const ratio = Math.abs(parseFloat(x.f184) || 0) / 100; // 主力净占比（%）
+        let inflow, outflow;
+        if (ratio > 1e-4) {                                    // 由净额+净占比重建双边（流入≈流出，差为净额）
+          const T = Math.abs(net) / ratio;
+          inflow = (T + net) / 2;
+          outflow = -(T - net) / 2;
+        } else {                                               // 净占比缺失时退化为单栏
+          inflow = net >= 0 ? net : 0;
+          outflow = net >= 0 ? 0 : net;
+        }
+        return { sector: x.f14, inflow, outflow, net };
+      });
+      flows.sort((a, b) => Math.abs(b.net) - Math.abs(a.net));
+      FF_DATA.fundFlow = flows.slice(0, 12);
+    }
+  } catch (e) { console.warn('[fundflow] 行业实时刷新失败', e); }
+
+  renderFundFlow();
+  setFFStatus(true, new Date().toTimeString().slice(0, 8));
+}
+function startLiveFundFlow(){
+  if (location.protocol.indexOf('http') !== 0) return;
+  const tick = async () => {
+    if (!isTradingNow()) { setFFStatus(false, FF_DATA.updatedAt || '—'); return; }
+    try { await refreshFundFlowLive(); }
+    catch (e) { console.warn('[fundflow] 实时刷新异常', e); }
+  };
+  tick();                                                  // 进入交易时段立即拉一次
+  if (_ffTimer) clearInterval(_ffTimer);
+  _ffTimer = setInterval(() => { if (isTradingNow()) tick(); }, 5 * 60 * 1000);
+  document.addEventListener('visibilitychange', () => {     // 切回标签页且盘中则补拉
+    if (!document.hidden && isTradingNow()) tick();
+  });
+}
+
 // 模式切换按钮绑定
 document.getElementById('btnHighFreq').addEventListener('click',()=>switchMode('highFreq'));
 document.getElementById('btnMidFreq').addEventListener('click',()=>switchMode('midFreq'));
 // 应用已保存的模式（默认高频）
 if(currentMode !== 'highFreq') { switchMode(currentMode); }  // 仅非默认时触发 UI 更新
 load(); initTheme(); syncCfgInputs(); refreshCand(); renderTrades(); renderDash(); renderChangelog(); renderFundFlow();
-if(location.protocol.indexOf("http")===0){ importToday(); loadBuySignal(); loadWinRate(); loadBriefings(); loadFundFlow(); }   // 通过预览/本地服务器打开时，加载即自动合并当日自动选股、买入信号、交易胜率、每日简报与盘后真实资金流向
+if(location.protocol.indexOf("http")===0){ importToday(); loadBuySignal(); loadWinRate(); loadBriefings(); loadFundFlow().then(()=>{ startLiveFundFlow(); }); }   // 通过预览/本地服务器打开时，加载即自动合并当日自动选股、买入信号、交易胜率、每日简报与盘后真实资金流向；盘后数据到达后启动交易时段每5分钟实时刷新
 window.addEventListener("resize",()=>{ for(const id in charts){ charts[id]._resize(); } });
 </script>
 </body>

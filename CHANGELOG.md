@@ -15,6 +15,7 @@
 - **v1.2.0** (2026-07-17) +1 功能点：皮肤切换(浅色/深色主题)：token 覆盖层+红涨绿跌语义保留，Header 加切换按钮+LocalStorage 持久化，三图表(K线/胜率/北向)接入主题色
 - **v1.2.1** (2026-07-18) +1 功能点：选股排名K线右侧新增筹码峰(橙)与筹码均价(青)分布带
 - **v1.2.2** (2026-07-22) +1 功能点：修正回测数据链三大 bug：① backtest_winrate.js 加载 index_sh.json 时收盘值未转 float 致 ⑤ 大盘硬过滤静默失效(parseFloat 修复 + 新增 byMarketRegime 市况分层)；② index_sh.json 为错标脏数据(setcode=0 误拉平安银行、与真实上证方向一致率仅 40%)，改用 tdx setcode=1 重拉真实上证覆盖并重跑回测得可信空头日胜率 22.7%(旧误算 368 笔/23.4%)；③ 根治 extend_history.js 按 Setcode+Code 精确识别上证 + Name 兜底 + 量纲守卫(<1000 拒绝写出)，TOOL_DIR 改 glob 所有 session 的 tool-results，新增 ONLY_INDEX=1 开关仅刷指数不动个股 kline；market_filter.py 加 float 数值校验与方向交叉校验
+- **v1.2.3** (2026-07-22) +1 功能点：资金动态页面交易时段实时刷新：客户端直连腾讯行情(qt.gtimg.cn)刷新大盘指数、东方财富(push2.eastmoney.com)刷新申万一级行业热力图与主力净流入排行，交易时段(9:25-11:30/13:00-15:00)每5分钟自动拉取并重绘，无需后端或重新部署；北向资金/风格因子/配置研判文字保留盘后快照
 
 ## 历史
 
