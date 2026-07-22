@@ -10,6 +10,9 @@
     "lastCompletedClose": 3796.28,
     "ma20": 4001.617,
     "belowMa20": true,
-    "note": "按惯例剔除当日(20260721)盘中未完成棒；最新已完成收盘3796.28(20260720) < MA20≈4001.62 → 空头"
+    "note": "按惯例剔除当日(20260721)盘中未完成棒；最新已完成收盘3796.28(20260720) < MA20≈4001.62 → 空头。数值已强制float校验。",
+    "indexSource": "embedded(真实量纲快照)",
+    "numericValidated": true,
+    "crossCheck": "index_sh.json 方向=空头，✅与EMBEDDED一致"
   }
 }
