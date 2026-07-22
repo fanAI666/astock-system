@@ -1,7 +1,7 @@
 {
   "baseVersion": "1.0.0",
-  "version": "1.2.1",
-  "featurePoints": 21,
+  "version": "1.2.2",
+  "featurePoints": 22,
   "rule": "以 1.0.0 为基准；每新增 1 个功能点版本 +0.0.1；满 10 个点进 1（即 0.0.9 → 0.1.0，相对基准为 1.0.9 → 1.1.0）；满 10 个次版本进 1（1.9.0 → 2.0.0）。版本号 = 基准主版本 + 功能点数按 10 进 1 进位。",
   "history": [
     {
@@ -99,6 +99,12 @@
       "date": "2026-07-18",
       "points": 1,
       "desc": "选股排名K线右侧新增筹码峰(橙)与筹码均价(青)分布带"
+    },
+    {
+      "version": "1.2.2",
+      "date": "2026-07-22",
+      "points": 1,
+      "desc": "修正回测数据链三大 bug：① backtest_winrate.js 加载 index_sh.json 时收盘值未转 float 致 ⑤ 大盘硬过滤静默失效(parseFloat 修复 + 新增 byMarketRegime 市况分层)；② index_sh.json 为错标脏数据(setcode=0 误拉平安银行、与真实上证方向一致率仅 40%)，改用 tdx setcode=1 重拉真实上证覆盖并重跑回测得可信空头日胜率 22.7%(旧误算 368 笔/23.4%)；③ 根治 extend_history.js 按 Setcode+Code 精确识别上证 + Name 兜底 + 量纲守卫(<1000 拒绝写出)，TOOL_DIR 改 glob 所有 session 的 tool-results，新增 ONLY_INDEX=1 开关仅刷指数不动个股 kline；market_filter.py 加 float 数值校验与方向交叉校验"
     }
   ]
 }
