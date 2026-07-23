@@ -1,18 +1,17 @@
 {
-  "date": "2026-07-21",
-  "baselineDate": "2026-07-17",
+  "date": "2026-07-23",
+  "baselineDate": "2026-07-23",
   "top3": [],
   "trade": false,
   "reason": "大盘空头(上证<MA20)",
   "market": {
     "shIndex": "000001",
-    "lastCompletedDate": "20260720",
-    "lastCompletedClose": 3796.28,
-    "ma20": 4001.617,
+    "lastCompletedDate": "20260722",
+    "lastCompletedClose": 3867.03,
+    "ma20": 3977.33,
     "belowMa20": true,
-    "note": "按惯例剔除当日(20260721)盘中未完成棒；最新已完成收盘3796.28(20260720) < MA20≈4001.62 → 空头。数值已强制float校验。",
-    "indexSource": "embedded(真实量纲快照)",
-    "numericValidated": true,
-    "crossCheck": "index_sh.json 方向=空头，✅与EMBEDDED一致"
+    "note": "按惯例剔除当日(20260723)盘中未完成棒(Vol=0, Close与开盘齐平=3867.03)；最新已完成收盘3867.03(20260722) < MA20≈3977.33 → 空头(偏离≈-2.77%)。延续自07-13起的空头序列(今日为第9个交易日)。",
+    "indexSource": "tdx_kline(实时抓取, setcode=1, period=4, tqFlag=0)",
+    "numericValidated": true
   }
 }
