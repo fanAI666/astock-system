@@ -91,8 +91,8 @@ if (fs.existsSync(sigSrc)) {
 } else {
   console.log('buy_signal.json 不存在（跳过）');
 }
-// 3.6) 复制交易胜率回测结果（高频 + 中频，若存在）
-for (const f of ['backtest_winrate.json', 'backtest_midfreq.json']) {
+// 3.6) 复制交易胜率回测结果（主板 main_only + 双创独立体系，若存在）
+for (const f of ['backtest_phase12.json', 'backtest_chuang.json']) {
   const wrSrc = path.join(__dirname, '选股结果', f);
   if (fs.existsSync(wrSrc)) {
     fs.copyFileSync(wrSrc, path.join(DATA_DIR, f));

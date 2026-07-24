@@ -196,7 +196,7 @@
 .md-table-wrap td{white-space:nowrap}
 .md hr{border:0;border-top:1px dashed var(--line);margin:12px 0}
 .brief-note{font-size:11.5px;color:#9aa5b1;margin-top:10px}
-/* =========== 高频/中频 模式切换 =========== */
+/* =========== 高频 模式切换 =========== */
 .mode-bar{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 16px;margin-bottom:14px;box-shadow:var(--shadow)}
 .mode-bar .mode-label{font-size:12.5px;color:var(--sub);font-weight:600;white-space:nowrap}
 .mode-switch{display:inline-flex;background:#eef2f7;border-radius:9px;padding:3px;gap:2px}
@@ -311,12 +311,11 @@
     </div>
   </header>
 
-  <!-- 高频/中频 模式切换 -->
+  <!-- 高频 模式切换 -->
   <div class="mode-bar" id="modeBar">
     <span class="mode-label">交易模式</span>
     <div class="mode-switch" id="modeSwitch">
       <button class="active" data-mode="highFreq" id="btnHighFreq">⚡ 高频</button>
-      <button data-mode="midFreq" id="btnMidFreq">📊 中频（验证）</button>
     </div>
     <span class="mode-tag mode-tag-hf" id="modeTag">⚡ 高频 · 日内短线</span>
     <button class="btn btn-ghost theme-toggle" id="themeToggle" onclick="applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark')" title="切换深色 / 浅色">🌙 深色</button>
@@ -337,28 +336,46 @@
   <section class="panel active" id="overview">
     <!-- 交易胜率（系统回测，改为概览页内展示，不再置顶） -->
     <div class="winrate-top" id="winrate" style="margin:0 0 16px">
-      <div class="wr-card">
-        <div class="wr-main">
-          <div class="wr-label">交易胜率<span class="wr-sub">系统回测</span></div>
-          <div class="wr-big" id="wrValue">—</div>
-          <div class="wr-period" id="wrPeriod">回测周期 2025.7.1 – 2026.6.30</div>
-          <div class="wr-period" id="wrDataNote" style="color:#f59e0b"></div>
+      <div class="wr-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="wr-card">
+          <div class="wr-main">
+            <div class="wr-label">主板胜率<span class="wr-sub">main_only 体系</span></div>
+            <div class="wr-big" id="wrValue">—</div>
+            <div class="wr-period" id="wrPeriod">回测周期 2023.8.28 – 2026.6.30</div>
+            <div class="wr-period" id="wrDataNote" style="color:#f59e0b"></div>
+          </div>
+          <div class="wr-stats">
+            <div class="wr-stat"><span class="k">触发交易</span><b id="wrTrades">—</b></div>
+            <div class="wr-stat"><span class="k">盈利 / 亏损</span><b id="wrWL">—</b></div>
+            <div class="wr-stat"><span class="k">盈亏比</span><b id="wrPF">—</b></div>
+            <div class="wr-stat"><span class="k">每笔期望</span><b id="wrExp">—</b></div>
+          </div>
+          <div class="wr-rule" id="wrRule">主板 main_only：强制止损−2%/止盈+6%（固定3:1），持有≤20日，K_ATR=1.05</div>
+          <div class="wr-rule" id="wrFilterAll" style="color:#0ea5e9">触发前需过 趋势+量能+缺口 过滤（v1.0.3 起）</div>
+          <div class="wr-rule" id="wrRulePortfolio" style="color:#10b981">⑤ 组合层：大盘硬过滤 + 同日上限 + 回撤上限（v1.0.6 起）</div>
+          <div class="wr-period" id="wrByBoard"></div>
+          <div class="wr-period" id="wrCalib" style="color:#f59e0b"></div>
         </div>
-        <div class="wr-stats">
-          <div class="wr-stat"><span class="k">触发交易</span><b id="wrTrades">—</b></div>
-          <div class="wr-stat"><span class="k">盈利 / 亏损</span><b id="wrWL">—</b></div>
-          <div class="wr-stat"><span class="k">盈亏比</span><b id="wrPF">—</b></div>
-          <div class="wr-stat"><span class="k">每笔期望</span><b id="wrExp">—</b></div>
+        <div class="wr-card" style="border-color:#fca5a5">
+          <div class="wr-main">
+            <div class="wr-label">双创胜率<span class="wr-sub">独立加宽K_ATR体系</span></div>
+            <div class="wr-big" id="wrChuangValue">—</div>
+            <div class="wr-period" id="wrChuangPeriod">回测周期 2023.8.28 – 2026.6.30</div>
+          </div>
+          <div class="wr-stats">
+            <div class="wr-stat"><span class="k">触发交易</span><b id="wrChuangTrades">—</b></div>
+            <div class="wr-stat"><span class="k">盈利 / 亏损</span><b id="wrChuangWL">—</b></div>
+            <div class="wr-stat"><span class="k">盈亏比</span><b id="wrChuangPF">—</b></div>
+            <div class="wr-stat"><span class="k">每笔期望</span><b id="wrChuangExp">—</b></div>
+          </div>
+          <div class="wr-rule" id="wrChuangRule" style="color:#6366f1">创业板·科创板独立体系：K_ATR=2.0（复盘加宽）、止盈×3保持3:1、持有≤5日</div>
+          <div class="wr-rule" style="color:#dc2626">⚠️ 双创回测期望为负（−0.97%/笔），当前策略不可行，仅作研究/预警，不建议实盘</div>
+          <div class="wr-period" id="wrChuangByBoard"></div>
         </div>
-        <div class="wr-rule" id="wrRule">主板：强制止损−2%/止盈+6%（固定3:1），持有≤10日</div>
-        <div class="wr-rule" id="wrDynRule" style="color:#6366f1">创业板·科创板：先过趋势(站上MA20+MA5>MA20+MA20上行)+量能(≥1.2×20日均量)+缺口(±4%~6%) 过滤，再走动态止损(1.05×ATR14)、止盈×3保持3:1、封顶1周+跟踪≤6%</div>
-        <div class="wr-rule" id="wrFilterAll" style="color:#0ea5e9">全市场（主板+双创）：触发前均需过 趋势+量能+缺口 过滤（v1.0.3 起）</div>
-        <div class="wr-rule" id="wrRulePortfolio" style="color:#10b981">⑤ 组合层：大盘硬过滤 + 同日上限 + 回撤上限（v1.0.6 起）</div>
-        <div class="wr-period" id="wrByBoard"></div>
-        <div class="wr-period" id="wrByTier" style="color:#8b5cf6"></div>
-        <div class="wr-period" id="wrDynFilter" style="color:#3b82f6"></div>
-        <div class="wr-period" id="wrCalib" style="color:#f59e0b"></div>
-        <div class="wr-period" id="wrPortfolio" style="color:#10b981;font-weight:600"></div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <h3><span class="dot"></span>回测对比图（主板 vs 创业板 vs 科创板）</h3>
+        <div id="wrChart"></div>
       </div>
     </div>
     <div class="card">
@@ -370,7 +387,10 @@
         <div><label class="fld">期望盈亏比</label><input id="cfgRR" type="number" value="3" min="1" step="0.1"></div>
         <div><label class="fld">主板 止损 %</label><input id="cfgLossMain" type="number" value="2" step="0.1" min="0.5"></div>
         <div><label class="fld">主板 止盈 %</label><input id="cfgProfitMain" type="number" value="6" step="0.1" min="0.5"></div>
-        <div><label class="fld">创/科板放宽系数</label><input id="cfgRelax" type="number" value="1.5" step="0.1" min="1"></div>
+        <div><label class="fld">创业板 止损 %</label><input id="cfgLossCyb" type="number" value="3" step="0.1" min="0.5"></div>
+        <div><label class="fld">创业板 止盈 %</label><input id="cfgProfitCyb" type="number" value="9" step="0.1" min="0.5"></div>
+        <div><label class="fld">科创板 止损 %</label><input id="cfgLossKcb" type="number" value="5" step="0.1" min="0.5"></div>
+        <div><label class="fld">科创板 止盈 %</label><input id="cfgProfitKcb" type="number" value="15" step="0.1" min="0.5"></div>
       </div>
       <div class="row-actions">
         <button class="btn btn-primary" id="saveCfg">保存参数</button>
@@ -675,39 +695,31 @@
 <script>
 /* ============ 全局配置与状态 ============ */
 const LS_CFG="ss_cfg_v1", LS_CAND="ss_cand_v1", LS_TRADE="ss_trade_v1";
-let cfg={capital:100000,win:70,rr:3,lossMain:2,profitMain:6,relax:1.5,
-        // 科创板独立规则（P8 回测 0/7 胜率暴露 K_ATR=1.05 过紧，放宽至 2.5）
+let cfg={capital:100000,win:70,rr:3,
+        // 主板 main_only 体系（回测期望转正 +0.59%/笔）
+        lossMain:2, profitMain:6, relaxMain:1.05,
+        // 创业板 独立加宽体系（复盘 K_ATR 加宽至 2.0，回测期望 −0.82%/笔）
+        lossCyb:3, profitCyb:9, relaxCyb:1.0,
+        // 科创板 独立体系（K_ATR 2.0，回测期望 −2.05%/笔，保持原样）
         lossKcb:5, profitKcb:15, relaxKcb:2.5};
 let candidates=[]; let trades=[];
 
-/* ============ 高频/中频 模式切换 ============ */
+/* ============ 高频 模式切换 ============ */
 const MODE_CONFIG = {
   highFreq: {
     label: '⚡ 高频',
     tagClass: 'mode-tag-hf',
-    tagText: '⚡ 高频 · 日内短线',
-    title: '稳健选股交易系统',
-    desc: '本金 10 万元 · 每周交易 3–5 次 · 盈亏比 3:1 · 主板止损 2% / 止盈 6%，创业板·科创板放宽 50%（止损 3% / 止盈 9%）· 综合强度分 ≥ 70。',
-    badges: ['💰 本金 ¥100,000','📅 周 3–5 笔','⚖️ 盈亏比 3:1','🛡️ 止损 2% / 3%','🎯 止盈 6% / 9%','✅ 强度 ≥ 70'],
-    dataFile: 'backtest_winrate.json',
+    tagText: '⚡ 高频 · 双轨日内短线',
+    title: '稳健选股交易系统（双轨）',
+    desc: '本金 10 万元 · 周 3–5 笔 · 盈亏比 3:1 · 主板 main_only（止损 2% / 止盈 6%，回测期望 +0.59%/笔）· 创业板·科创板独立加宽体系（K_ATR=2.0，回测期望为负，仅供研究预警、不建议实盘）· 综合强度分 ≥ 70。',
+    badges: ['💰 本金 ¥100,000','📅 周 3–5 笔','⚖️ 盈亏比 3:1','🛡️ 主板 2% / 3%','🎯 主板 6% / 9%','✅ 强度 ≥ 70'],
     lossMain: 2, profitMain: 6,
     kAtr: 1.05, holdMain: 10, holdDyn: 5,
     trailPct: 0.03, trailCap: 0.06
-  },
-  midFreq: {
-    label: '📊 中频（验证）',
-    tagClass: 'mode-tag-mf',
-    tagText: '📊 中频 · 波段验证',
-    title: '选股交易系统（中频波段）',
-    desc: '本金 10 万元 · 每周 1–3 次 · 盈亏比 ~2.86:1 · 主板止损 3.5% / 止盈 10%，双创 ATR×1.8 动态止盈×3 · 持有≤20日(主)/≤12日(创) · 含 MACD 趋势确认。',
-    badges: ['💰 本金 ¥100,000','📅 周 1–3 笔','⚖️ 盈亏比 ~2.9:1','🛡️ 止损 3.5% / ATR×1.8','🎯 止盈 10% / ×3','✅ MACD(DIF>0)'],
-    dataFile: 'backtest_midfreq.json',
-    lossMain: 3.5, profitMain: 10,
-    kAtr: 1.8, holdMain: 20, holdDyn: 12,
-    trailPct: 0.04, trailCap: 0.10
   }
 };
 let currentMode = localStorage.getItem('ss_mode') || 'highFreq';
+if(!MODE_CONFIG[currentMode]) currentMode = 'highFreq';   // 旧版存过 midFreq，回退到高频
 
 function switchMode(mode) {
   if (currentMode === mode) return;
@@ -768,6 +780,7 @@ window.addEventListener('themechange', function(){
   try{ drawEquity(); }catch(e){}
   try{ drawWin(); }catch(e){}
   try{ renderNorthChart(); }catch(e){}
+  try{ if(window.__wrLast) renderWrChart(window.__wrLast.m, window.__wrLast.cBy); }catch(e){}
 });
 
 function load(){
@@ -791,11 +804,11 @@ function save(){
   localStorage.setItem(LS_TRADE,JSON.stringify(trades));
 }
 
-/* 板块对应的止损/止盈% */
+/* 板块对应的止损/止盈%（双轨：主板 / 创业板 / 科创板 各自独立参数） */
 function boardParams(board){
-  // 双规则：主板/创业板共用现行（relax=1.5）；科创板独立一套（K_ATR=2.5、止损5%/止盈15%）
-  if(board==="main"||board==="cyb") return {loss:cfg.lossMain, profit:cfg.profitMain, kAtr:cfg.relax};
-  return {loss:cfg.lossKcb, profit:cfg.profitKcb, kAtr:cfg.relaxKcb};
+  if(board==="main") return {loss:cfg.lossMain, profit:cfg.profitMain, kAtr:cfg.relaxMain};
+  if(board==="cyb")  return {loss:cfg.lossCyb,  profit:cfg.profitCyb,  kAtr:cfg.relaxCyb};
+  /* kcb / kc 科创板 */ return {loss:cfg.lossKcb, profit:cfg.profitKcb, kAtr:cfg.relaxKcb};
 }
 
 /* ============ 评分引擎（P1-P4 改进版） ============ */
@@ -1441,7 +1454,10 @@ function syncCfgInputs(){
   document.getElementById("cfgRR").value=cfg.rr;
   document.getElementById("cfgLossMain").value=cfg.lossMain;
   document.getElementById("cfgProfitMain").value=cfg.profitMain;
-  document.getElementById("cfgRelax").value=cfg.relax;
+  document.getElementById("cfgLossCyb").value=cfg.lossCyb;
+  document.getElementById("cfgProfitCyb").value=cfg.profitCyb;
+  document.getElementById("cfgLossKcb").value=cfg.lossKcb;
+  document.getElementById("cfgProfitKcb").value=cfg.profitKcb;
   document.getElementById("ovRisk").innerHTML=`¥${Math.round(cfg.capital*cfg.lossMain/100)} <small>(主板${cfg.lossMain}%)</small>`;
   document.getElementById("ovProfit").innerHTML=`¥${Math.round(cfg.capital*cfg.profitMain/100)} <small>(主板${cfg.profitMain}%)</small>`;
 }
@@ -1451,12 +1467,15 @@ document.getElementById("saveCfg").addEventListener("click",()=>{
   cfg.rr=+document.getElementById("cfgRR").value||3;
   cfg.lossMain=+document.getElementById("cfgLossMain").value||2;
   cfg.profitMain=+document.getElementById("cfgProfitMain").value||6;
-  cfg.relax=+document.getElementById("cfgRelax").value||1.5;
+  cfg.lossCyb=+document.getElementById("cfgLossCyb").value||3;
+  cfg.profitCyb=+document.getElementById("cfgProfitCyb").value||9;
+  cfg.lossKcb=+document.getElementById("cfgLossKcb").value||5;
+  cfg.profitKcb=+document.getElementById("cfgProfitKcb").value||15;
   save(); syncCfgInputs(); refreshCand(); renderDash();
   const m=document.getElementById("cfgMsg");m.style.display="inline-block";setTimeout(()=>m.style.display="none",1500);
 });
 document.getElementById("resetCfg").addEventListener("click",()=>{
-  cfg={capital:100000,win:70,rr:3,lossMain:2,profitMain:6,relax:1.5};
+  cfg={capital:100000,win:70,rr:3,lossMain:2,profitMain:6,relaxMain:1.05,lossCyb:3,profitCyb:9,relaxCyb:1.0,lossKcb:5,profitKcb:15,relaxKcb:2.5};
   save();syncCfgInputs();refreshCand();renderDash();
 });
 
@@ -1674,50 +1693,109 @@ function renderBuySignal(){
   }
 }
 
-function renderWinRate(j){
-  const wr=document.getElementById('wrValue'); if(!wr) return;
-  const pct=j.winRate*100;
-  wr.textContent=pct.toFixed(1)+'%';
-  wr.className='wr-big '+(pct>=70?'wr-good':(pct>=40?'wr-mid':'wr-bad'));
+/* 双轨回测展示：主板(main_only) + 双创(创业板/科创板 独立加宽体系) 分别渲染，并画图 */
+function renderWinRate(p12, ch){
   const set=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
-  set('wrTrades',(j.trades||0)+' 笔');
-  set('wrWL',(j.wins||0)+' / '+(j.losses||0));
-  set('wrPF', j.profitFactor? j.profitFactor+'×' : '—');
-  set('wrExp', (j.expectancy!=null&&j.expectancy!=undefined)? (j.expectancy*100).toFixed(2)+'%' : '—');
-  if(j.period&&j.period.from){
-    const f=j.period.from.replace(/-/g,'.'), t=j.period.to.replace(/-/g,'.');
-    set('wrPeriod','回测周期 '+f+' – '+t);
+  const m = (p12 && p12.base) ? p12.base : null;
+  // ---------- 主板 card ----------
+  if(m){
+    const pct=m.winRate*100;
+    const wr=document.getElementById('wrValue');
+    if(wr){ wr.textContent=pct.toFixed(1)+'%'; wr.className='wr-big '+(pct>=70?'wr-good':(pct>=40?'wr-mid':'wr-bad')); }
+    set('wrTrades',(m.total||0)+' 笔');
+    set('wrWL',(m.wins||0)+' / '+((m.total||0)-(m.wins||0)));
+    set('wrPF', m.profitFactor!=null? m.profitFactor.toFixed(2)+'×':'—');
+    set('wrExp', m.expectancy!=null? (m.expectancy*100).toFixed(2)+'%':'—');
+    set('wrPeriod','回测周期 2023.08.28 – 2026.06.30');
+    set('wrCalib','组合后期望 '+(m.expectancy*100).toFixed(2)+'%/笔 · PF '+m.profitFactor.toFixed(2)+' · 盈亏比 '+m.payoff.toFixed(2)+' ✅ 转正');
+    const bm=(p12.byBoard&&p12.byBoard.main)?p12.byBoard.main:null;
+    set('wrByBoard', bm? ('主板 main_only：'+(bm.winRate*100).toFixed(1)+'%('+bm.wins+'/'+bm.total+') · K_ATR=1.05 · 持有≤20日') : '');
+  } else {
+    set('wrValue','—'); set('wrTrades','—'); set('wrWL','—'); set('wrPF','—'); set('wrExp','—');
   }
-  // 诚实标注：实际 K 线数据覆盖区间（可能短于设定周期）
-  if(j.dataRange&&j.dataRange.from){
-    const df=j.dataRange.from.replace(/-/g,'.'), dt=j.dataRange.to.replace(/-/g,'.');
-    const note=document.getElementById('wrDataNote');
-    if(note){
-      if(df!==j.period.from.replace(/-/g,'.')||dt!==j.period.to.replace(/-/g,'.')){
-        note.textContent='实际数据 '+df+' – '+dt+'（不足设定周期，按现有数据回测）';
-      } else { note.textContent=''; }
-    }
+  // ---------- 双创 card ----------
+  const c = (ch && ch.base) ? ch.base : null;
+  const cBy = (ch && ch.byBoard) ? ch.byBoard : {};
+  if(c){
+    const cpct=c.winRate*100;
+    const wrC=document.getElementById('wrChuangValue');
+    if(wrC){ wrC.textContent=cpct.toFixed(1)+'%'; wrC.className='wr-big '+(cpct>=40?'wr-mid':'wr-bad'); }
+    set('wrChuangTrades',(c.total||0)+' 笔');
+    set('wrChuangWL',(c.wins||0)+' / '+((c.total||0)-(c.wins||0)));
+    set('wrChuangPF', c.profitFactor!=null? c.profitFactor.toFixed(2)+'×':'—');
+    set('wrChuangExp', c.expectancy!=null? (c.expectancy*100).toFixed(2)+'%':'—');
+    set('wrChuangPeriod','回测周期 2023.08.28 – 2026.06.30');
+    const cn={cyb:'创业板',kcb:'科创板',kc:'科创板'};
+    set('wrChuangByBoard','分市场：'+Object.entries(cBy).map(([b,o])=>`${cn[b]||b} ${(o.winRate*100).toFixed(1)}%(${o.wins}/${o.total})`).join('  ·  '));
+  } else {
+    set('wrChuangValue','—'); set('wrChuangTrades','—'); set('wrChuangWL','—'); set('wrChuangPF','—'); set('wrChuangExp','—');
   }
-  if(j.ruleMain){ const r=document.getElementById('wrRule'); if(r) r.textContent=j.ruleMain; }
-  if(j.ruleDyn){ const r=document.getElementById('wrDynRule'); if(r) r.textContent=j.ruleDyn; }
-  if(j.ruleFilterAll){ const r=document.getElementById('wrFilterAll'); if(r) r.textContent=j.ruleFilterAll; }
-  if(j.rulePortfolio){ const r=document.getElementById('wrRulePortfolio'); if(r) r.textContent=j.rulePortfolio; }
-  if(j.byBoard){ const el=document.getElementById('wrByBoard'); if(el){ const cn={main:'主板',cyb:'创业板',kcb:'科创板',kc:'科创板'}; el.textContent='分市场胜率：'+Object.entries(j.byBoard).map(([b,o])=>`${cn[b]||b} ${(o.winRate*100).toFixed(1)}%(${o.wins}/${o.trades})`).join('  ·  '); } }
-  if(j.byWinTier){ const el=document.getElementById('wrByTier'); if(el){ const t=j.byWinTier; el.textContent='分层校验：预测≥70 → '+((t.high.winRate||0)*100).toFixed(1)+`%(${t.high.wins}/${t.high.trades})`+'  ·  预测<70 → '+((t.low.winRate||0)*100).toFixed(1)+`%(${t.low.wins}/${t.low.trades})`; } }
-  if(j.preFilter){ const f=j.preFilter; const el=document.getElementById('wrDynFilter'); if(el){ el.textContent=`全市场过滤：候选 ${f.total} · 通过 ${f.pass} · 趋势未过 ${f.skipTrend} · 量能未过 ${f.skipVol} · 缺口未过 ${f.skipGap}`; } }
-  if(j.calibration){ const c=j.calibration; const el=document.getElementById('wrCalib'); if(el){ const sign=c.bias>=0?'+':''; el.textContent=`①标定：预测均值 ${(c.predMean*100).toFixed(1)}% vs 实现 ${(c.realized*100).toFixed(1)}%（偏差 ${sign}${(c.bias*100).toFixed(1)}pp）`; } }
-  if(j.portfolio){ const p=j.portfolio; const el=document.getElementById('wrPortfolio'); if(el){ el.textContent=`⑤ 组合层：大盘剔除 ${p.indexFilter.dropped}笔(${p.indexFilter.bearishDays}天空头) · 同日≤${p.perDayCap.max}笔剔除${p.perDayCap.dropped} · 回撤>${(p.drawdownPause.threshold*100).toFixed(0)}%暂停剔除${p.drawdownPause.dropped} · 组合后 ${p.finalTrades}笔`; } }
+  // ---------- 图表 ----------
+  renderWrChart(m, cBy);
 }
 async function loadWinRate(){
   if(location.protocol.indexOf('http')!==0){ return; } // file:// 下无 fetch，留占位
   try{
-    const dataFile = MODE_CONFIG[currentMode].dataFile;
-    const res=await fetch('选股结果/'+dataFile,{cache:'no-store'});
-    if(res.ok) renderWinRate(await res.json());
-  }catch(e){}
+    const [r1,r2]=await Promise.all([
+      fetch('选股结果/backtest_phase12.json',{cache:'no-store'}),
+      fetch('选股结果/backtest_chuang.json',{cache:'no-store'})
+    ]);
+    const p12 = r1.ok? await r1.json(): null;
+    const ch  = r2.ok? await r2.json(): null;
+    renderWinRate(p12, ch);
+  }catch(e){ console.warn('loadWinRate', e); }
+}
+/* 回测对比图：主板 vs 创业板 vs 科创板（胜率 + 每笔期望，离线 SVG，主题感知） */
+function renderWrChart(m, cBy){
+  const el=document.getElementById('wrChart'); if(!el) return;
+  window.__wrLast={m,cBy};   // 供主题切换时重绘
+  const mainWR = m? m.winRate*100 : 0;
+  const mainExp = m? m.expectancy*100 : 0;
+  const cyb = cBy && cBy.cyb ? cBy.cyb : null;
+  const kcb = cBy && cBy.kcb ? cBy.kcb : null;
+  const rows=[
+    {name:'主板',   wr:mainWR,                exp:mainExp,                color:'#2563eb'},
+    {name:'创业板', wr:cyb?cyb.winRate*100:0, exp:cyb?cyb.expectancy*100:0, color:'#16a34a'},
+    {name:'科创板', wr:kcb?kcb.winRate*100:0, exp:kcb?kcb.expectancy*100:0, color:'#dc2626'}
+  ];
+  const tc=themeColors();
+  const W=680, padL=46, padR=14, padT=24, padB=30;
+  function panel(title, items, key, fmt, yMax, yMin){
+    yMin=yMin||0;
+    const H=176, x0=padL, x1=W-padR, y0=padT, y1=H-padB;
+    const plotH=y1-y0;
+    const zeroY = y0 + plotH*(yMax/(yMax-yMin));
+    const n=items.length, bw=46, gap=(x1-x0-bw*n)/(n+1);
+    let s=`<div style="margin-bottom:6px;font-weight:600;color:${tc.muted}">${title}</div>`;
+    s+=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;max-width:${W}px">`;
+    const ticks=4;
+    for(let i=0;i<=ticks;i++){
+      const val=yMin+(yMax-yMin)*i/ticks;
+      const y=y0+plotH*(1-i/ticks);
+      s+=`<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="${tc.grid}" stroke-width="1"/>`;
+      s+=`<text x="${x0-6}" y="${y+4}" text-anchor="end" font-size="10" fill="${tc.muted}">${val.toFixed(val<10?1:0)}</text>`;
+    }
+    s+=`<line x1="${x0}" y1="${zeroY}" x2="${x1}" y2="${zeroY}" stroke="${tc.cross}" stroke-width="1.2"/>`;
+    items.forEach((it,idx)=>{
+      const v=it[key]; const bx=x0+gap*(idx+1)+bw*idx;
+      const isNeg=v<0; const y2=y0+plotH*((yMax-v)/(yMax-yMin));
+      const top=isNeg?zeroY:y2, h=Math.abs(y2-zeroY);
+      const fill=isNeg?'#dc2626':it.color;
+      s+=`<rect x="${bx}" y="${top}" width="${bw}" height="${Math.max(h,0.5)}" rx="3" fill="${fill}" opacity="0.9"/>`;
+      s+=`<text x="${bx+bw/2}" y="${isNeg?top+14:top-5}" text-anchor="middle" font-size="11" fill="${isNeg?'#dc2626':it.color}" font-weight="600">${fmt(v)}</text>`;
+      s+=`<text x="${bx+bw/2}" y="${H-10}" text-anchor="middle" font-size="11" fill="${tc.muted}">${it.name}</text>`;
+    });
+    s+=`</svg>`;
+    return s;
+  }
+  el.innerHTML =
+    panel('交易胜率 (%)', rows, 'wr', v=>v.toFixed(1)+'%', 40) +
+    panel('每笔期望 (%)', rows, 'exp', v=>(v>=0?'+':'')+v.toFixed(2)+'%', 1, -2.5);
 }
 /* ============ 版本更新日志 ============ */
 const VERSION_HISTORY = [
+  {v:"1.2.7",d:"2026-07-24",desc:"双轨策略体系上线：主板 main_only（回测期望+0.59%/笔）与创业板·科创板独立加宽体系（K_ATR=2.0，回测期望为负仅供预警）分开展示胜率；回测区新增主板/创业板/科创板对比柱状图（胜率+每笔期望，主题感知离线SVG）；取消中频（验证）模式"},
+  {v:"1.2.4",d:"2026-07-24",desc:"访问口令记住我(本机免口令自动登录)+退出登录(清除本机记住)，线上 gate 与本地 serve.js 双端一致"},
   {v:"1.2.3",d:"2026-07-22",desc:"资金动态页面交易时段实时刷新：客户端直连腾讯行情(qt.gtimg.cn)刷新大盘指数、东方财富(push2.eastmoney.com)刷新申万一级行业热力图与主力净流入排行，交易时段(9:25-11:30/13:00-15:00)每5分钟自动拉取并重绘，无需后端或重新部署；北向资金/风格因子/配置研判文字保留盘后快照"},
   {v:"1.2.2",d:"2026-07-22",desc:"修正回测数据链三大 bug：① backtest_winrate 指数收盘未转 float 致 ⑤ 大盘过滤静默失效(修复+新增市况分层)；② index_sh.json 为错标脏数据(误拉平安银行/方向一致率仅40%)，改用 tdx setcode=1 重拉真实上证并重跑回测得可信空头日胜率 22.7%；③ 根治 extend_history.js 按 Setcode 精确识别上证+量纲守卫+glob 全 session；market_filter 加 float 校验与方向交叉校验"},
   {v:"1.2.1",d:"2026-07-18",desc:"选股排名 K 线右侧新增筹码峰(橙)与筹码均价(青)分布带"},
@@ -2157,7 +2235,6 @@ function startLiveFundFlow(){
 
 // 模式切换按钮绑定
 document.getElementById('btnHighFreq').addEventListener('click',()=>switchMode('highFreq'));
-document.getElementById('btnMidFreq').addEventListener('click',()=>switchMode('midFreq'));
 // 应用已保存的模式（默认高频）
 if(currentMode !== 'highFreq') { switchMode(currentMode); }  // 仅非默认时触发 UI 更新
 load(); initTheme(); syncCfgInputs(); refreshCand(); renderTrades(); renderDash(); renderChangelog(); renderFundFlow();

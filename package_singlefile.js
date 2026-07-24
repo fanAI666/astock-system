@@ -16,8 +16,8 @@ const OUT = 'D:/WorkBuddy/选股系统_离线版.html';
 // 需要内嵌的数据文件（键名 = 离线 loader 读取的 EMBED_DATA 键）
 const EMBED_MAP = {
   import_final:      'import_final.json',
-  backtest_winrate: 'backtest_winrate.json',
-  backtest_midfreq: 'backtest_midfreq.json',
+  backtest_phase12: 'backtest_phase12.json',
+  backtest_chuang: 'backtest_chuang.json',
   briefing_final:    'briefing_final.json',
   buy_signal:       'buy_signal.json',
 };
@@ -76,8 +76,9 @@ const patches = [
   {
     name: 'loadWinRate',
     from: "if(location.protocol.indexOf('http')!==0){ return; } // file:// 下无 fetch，留占位",
-    to:   "const __df = MODE_CONFIG[currentMode].dataFile; const __emb=__df.replace(/\\.json$/,'');\n" +
-          "  if(window.EMBED_DATA&&window.EMBED_DATA[__emb]){ renderWinRate(window.EMBED_DATA[__emb]); return; }\n" +
+    to:   "const __p12 = (window.EMBED_DATA&&window.EMBED_DATA.backtest_phase12)||null;\n" +
+          "  const __ch = (window.EMBED_DATA&&window.EMBED_DATA.backtest_chuang)||null;\n" +
+          "  if(__p12||__ch){ renderWinRate(__p12, __ch); return; }\n" +
           "  if(location.protocol.indexOf('http')!==0){ return; } // file:// 下无 fetch，留占位",
   },
   {
