@@ -18,17 +18,48 @@ const GATE_CSS = `
 #gate input:focus{border-color:#2563eb}
 #gate button{margin-top:14px;width:100%;padding:11px;border:0;border-radius:9px;background:#2563eb;color:#fff;font-size:15px;cursor:pointer}
 #gate button:hover{background:#1d4ed8}
-#gate .err{color:#dc2626;font-size:12.5px;min-height:17px;margin-top:9px}`;
+#gate .err{color:#dc2626;font-size:12.5px;min-height:17px;margin-top:9px}
+#gateRememberWrap{display:flex;align-items:center;gap:7px;margin-top:13px;font-size:13px;color:#475569;justify-content:flex-start;cursor:pointer}
+#gateRememberWrap input{width:auto;margin:0;cursor:pointer}
+#gateForgot{display:inline-block;margin-top:11px;font-size:12px;color:#2563eb;cursor:pointer;text-decoration:underline}
+#gateLogout{position:fixed;right:12px;bottom:12px;z-index:9998;font-size:12px;color:#64748b;background:rgba(255,255,255,.92);border:1px solid #e2e8f0;border-radius:8px;padding:5px 11px;cursor:pointer;display:none;font-family:system-ui,'Microsoft YaHei',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+#gateLogout:hover{border-color:#94a3b8;color:#334155}`;
 
-const GATE_DIV = `<div id="gate"><div class="box"><h3>访问保护</h3><p>请输入访问口令后进入</p><input id="gatePw" type="password" placeholder="访问口令" autocomplete="off"><div class="err" id="gateErr"></div><button id="gateBtn">进入系统</button></div></div>`;
+const GATE_DIV = `<div id="gate"><div class="box"><h3>访问保护</h3><p>请输入访问口令后进入</p><input id="gatePw" type="password" placeholder="访问口令" autocomplete="off"><label id="gateRememberWrap"><input type="checkbox" id="gateRemember"> 在本机记住我（下次免口令）</label><div class="err" id="gateErr"></div><button id="gateBtn">进入系统</button><span id="gateForgot">清除本机记住</span></div></div>`;
 
 const GATE_JS = `<script>
 (function(){
   var PW='stock2026';
-  function open(){var v=document.getElementById('gatePw').value;if(v===PW){document.getElementById('gate').style.display='none';}else{document.getElementById('gateErr').textContent='口令错误，请重试';}}
+  var REM='astock_remember';
+  // 口令散列后存储，避免明文落盘（纯前端 gate 仅作遮挡，无真实安全边界）
+  function token(){var s=PW+'::astock-salt',h=0;for(var i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0;}return 't'+h.toString(16);}
+  var gate=document.getElementById('gate');
+  function showLogout(){var lb=document.getElementById('gateLogout');if(lb)lb.style.display='inline-block';}
+  function hideGate(){gate.style.display='none';showLogout();}
+  function relock(){try{localStorage.removeItem(REM);}catch(e){}gate.style.display='flex';var lb=document.getElementById('gateLogout');if(lb)lb.style.display='none';var pw=document.getElementById('gatePw');if(pw)pw.value='';var err=document.getElementById('gateErr');if(err)err.textContent='';var rm=document.getElementById('gateRemember');if(rm)rm.checked=false;}
+  function open(){
+    var v=document.getElementById('gatePw').value;
+    if(v===PW){
+      hideGate();
+      var rm=document.getElementById('gateRemember');
+      try{ if(rm&&rm.checked){localStorage.setItem(REM,token());}else{localStorage.removeItem(REM);} }catch(e){}
+    }else{
+      document.getElementById('gateErr').textContent='口令错误，请重试';
+    }
+  }
+  // 浮动退出按钮（动态注入，免改 HTML 结构）
+  var lb=document.createElement('div');
+  lb.id='gateLogout';lb.textContent='退出登录';
+  lb.addEventListener('click',relock);
+  document.body.appendChild(lb);
+  // 自动登录：本机已记住且口令未变更
+  try{ if(localStorage.getItem(REM)===token()){hideGate();} }catch(e){}
   document.getElementById('gateBtn').addEventListener('click',open);
-  document.getElementById('gatePw').addEventListener('keydown',function(e){if(e.key==='Enter')open();});
-  document.getElementById('gatePw').focus();
+  var pw=document.getElementById('gatePw');
+  pw.addEventListener('keydown',function(e){if(e.key==='Enter')open();});
+  var forgot=document.getElementById('gateForgot');
+  if(forgot)forgot.addEventListener('click',relock);
+  if(gate.style.display!=='none')pw.focus();
 })();
 <\/script>`;
 

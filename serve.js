@@ -50,8 +50,9 @@ function loginHtml() {
   <body><div class="box"><h2>选股系统 · 访问保护</h2><div class="sub">请输入访问口令</div>
   <div class="err" id="err"></div>
   <input id="pw" type="password" placeholder="访问口令" autofocus>
+  <label style="display:flex;align-items:center;gap:7px;font-size:13px;color:#94a3b8;margin:0 0 12px;cursor:pointer"><input type="checkbox" id="rm" checked style="width:auto;margin:0"> 记住我（30 天内免口令）</label>
   <button onclick="go()">进入</button></div>
-  <script>function go(){var p=document.getElementById('pw').value;fetch('/_login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:p})}).then(r=>r.json()).then(function(d){if(d.ok){location.reload();}else{document.getElementById('err').textContent='口令错误';}}).catch(function(){document.getElementById('err').textContent='网络错误';});}
+  <script>function go(){var p=document.getElementById('pw').value;var rm=document.getElementById('rm');fetch('/_login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:p,remember:!!(rm&&rm.checked)})}).then(r=>r.json()).then(function(d){if(d.ok){location.reload();}else{document.getElementById('err').textContent='口令错误';}}).catch(function(){document.getElementById('err').textContent='网络错误';});}
   document.getElementById('pw').addEventListener('keydown',function(e){if(e.key==='Enter')go();});</script></body></html>`;
 }
 
@@ -72,10 +73,12 @@ const server = http.createServer((req, res) => {
     let b = "";
     req.on("data", c => (b += c));
     req.on("end", () => {
-      let pwd = "";
-      try { pwd = JSON.parse(b).password || ""; } catch (e) {}
+      let pwd = "", remember = false;
+      try { const o = JSON.parse(b); pwd = o.password || ""; remember = o.remember === true; } catch (e) {}
       if (pwd === TOKEN) {
-        res.setHeader("Set-Cookie", `tok=${TOK_VAL}; Path=/; HttpOnly; SameSite=Strict; Max-age=2592000`);
+        // 勾选“记住我” → 30 天持久 Cookie；未勾选 → 会话 Cookie（关浏览器即失效）
+        const cookie = `tok=${TOK_VAL}; Path=/; HttpOnly; SameSite=Strict` + (remember ? `; Max-age=2592000` : ``);
+        res.setHeader("Set-Cookie", cookie);
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end('{"ok":true}');
       } else {
@@ -83,6 +86,14 @@ const server = http.createServer((req, res) => {
         res.end('{"ok":false}');
       }
     });
+    return;
+  }
+
+  // 退出登录：清除 Cookie
+  if (req.method === "GET" && req.url === "/_logout") {
+    res.setHeader("Set-Cookie", `tok=; Path=/; HttpOnly; SameSite=Strict; Max-age=0`);
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(`<!doctype html><html lang="zh"><head><meta charset="utf-8"><title>已退出</title><style>body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#0f172a;color:#e2e8f0;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}.box{background:#1e293b;padding:30px 28px;border-radius:14px;text-align:center}.box a{color:#e23b3b;text-decoration:none;font-weight:700}</style></head><body><div class="box"><h2>已退出登录</h2><p style="color:#94a3b8;font-size:13px">本机记住已清除</p><p><a href="/">重新登录</a></p></div></body></html>`);
     return;
   }
 
@@ -109,10 +120,20 @@ const server = http.createServer((req, res) => {
       res.end("not found: " + p);
       return;
     }
+    let out = data;
+    const ext = path.extname(fp);
+    if (ext === ".html") {
+      const htmlStr = data.toString("utf8");
+      // 避免与已自带 gate 的页面（deploy/index.html）重复注入
+      if (!htmlStr.includes("gateLogout") && !htmlStr.includes("svLogout")) {
+        const widget = `<div id="svLogout" style="position:fixed;right:12px;bottom:12px;z-index:9998;font-size:12px;color:#64748b;background:rgba(255,255,255,.92);border:1px solid #e2e8f0;border-radius:8px;padding:5px 11px;cursor:pointer;font-family:system-ui,'Microsoft YaHei',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.08)" onclick="fetch('/_logout').then(()=>location.href='/')">退出登录</div>`;
+        out = Buffer.from(htmlStr.replace("</body>", widget + "</body>"), "utf8");
+      }
+    }
     res.writeHead(200, {
-      "Content-Type": MIME[path.extname(fp)] || "application/octet-stream; charset=utf-8"
+      "Content-Type": MIME[ext] || "application/octet-stream; charset=utf-8"
     });
-    res.end(data);
+    res.end(out);
   });
 });
 
