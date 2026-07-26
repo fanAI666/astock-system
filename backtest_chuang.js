@@ -7,9 +7,10 @@
 // 复用 phase12 的引擎(genSignals/applyPortfolio/summarize/置信区间/walk-forward)，仅改 board 过滤与网格。
 
 const fs = require('fs');
-const SRC = 'D:/WorkBuddy/选股结果/import_final.json';
+// 4.3：数据源可经环境变量切换，同一份策略代码既能跑 9 支(import_final)也能跑全市场(universe_klines)
+const SRC = process.env.BT_SRC || 'D:/WorkBuddy/选股结果/import_final.json';
 const INDEX_FILE = 'D:/WorkBuddy/选股结果/index_sh.json';
-const OUT = 'D:/WorkBuddy/选股结果/backtest_chuang.json';
+const OUT = process.env.BT_OUT || 'D:/WorkBuddy/选股结果/backtest_chuang.json';
 
 const ATR_WIN = 14;
 const MA_WIN_TREND = 20, MA_WIN_SHORT = 5, VOL_MULT = 1.2;
@@ -25,7 +26,7 @@ const CHUANG_GATES = process.env.CHUANG_GATES !== '0';
 const G2_ATR_MIN = 0.03, G2_ATR_MAX = 0.06;          // G2 波动率带：入场日 ATR14% ∈ [3%,6%]
 const G3_MA20_EXT = 0.12, G3_RSI_LO = 40, G3_RSI_HI = 65; // G3 动量洁净度：距MA20∈[0,+12%] 且 RSI∈[40,65]
 const G1_LIQ_FLOOR = 1.0e8;                          // G1 流动性：近20日日均成交额 ≥ 1亿元（量(手)×100×价 近似）
-const FUND_FILE = 'D:/WorkBuddy/选股结果/fundamental.json';
+const FUND_FILE = process.env.BT_FUND || 'D:/WorkBuddy/选股结果/fundamental.json';
 // G5 盈利质量（4.0 边车数据）：仅当 g5Quality 显式为 false 才剔除；无数据(undefined)放行，防陈旧数据误杀
 const G5 = {};
 try { const fj = JSON.parse(fs.readFileSync(FUND_FILE, 'utf8')); Object.entries(fj.items || {}).forEach(([c, f]) => G5[c] = f.g5Quality === true); } catch (e) { }
@@ -94,51 +95,53 @@ for (let i = 0; i < ib.length; i++) {
     idxMA[ib[i][0]] = s / IDX_MA_WIN;
   }
 }
-const idxMA20 = {};
+const idxMA20 = {}, idxMA20ago = {};
 for (let i = 0; i < ib.length; i++) {
   if (i >= 19) { let s = 0; for (let k = i - 19; k <= i; k++) s += ib[k][2]; idxMA20[ib[i][0]] = s / 20; }
+  if (i >= 19 + 20) { let s2 = 0; for (let k = i - 19 - 20; k <= i - 20; k++) s2 += ib[k][2]; idxMA20ago[ib[i][0]] = s2 / 20; }
 }
 function idxRegime(date, kind) {
   const cl = idxClose[date], ma = idxMA[date], ma20 = idxMA20[date];
   if (cl == null) return 'unknown';
   if (kind === 'ma20_up') { if (ma20 == null) return 'unknown'; return cl > ma20 ? 'bull' : 'bear'; }
   if (ma == null) return 'unknown';
-  const i = ib.findIndex(b => b[0] === date);
-  if (i < IDX_MA_WIN + 19) return 'unknown';
-  let s = 0; for (let k = i - 19; k <= i; k++) s += ib[k][2];
-  const ma20ago = s / 20;
+  const ma20ago = idxMA20ago[date]; if (ma20ago == null) return 'unknown';   // 预计算，O(1)（原 findIndex O(n)）
   if (cl > ma && ma >= ma20ago) return 'bull';
   if (cl < ma && ma < ma20ago) return 'bear';
   return 'side';
 }
-const stockMA60 = {};
-items.forEach(s => {
-  const bars = (s.kline && s.kline.day) || [];
-  const m = {};
-  for (let i = 0; i < bars.length; i++) {
-    if (i >= IDX_MA_WIN - 1) { let ss = 0; for (let k = i - IDX_MA_WIN + 1; k <= i; k++) ss += bars[k][2]; m[bars[i][0]] = ss / IDX_MA_WIN; }
-  }
-  stockMA60[s.code] = m;
-});
-const allDatesSorted = [...new Set(items.flatMap(s => (s.kline.day || []).map(b => b[0])))].sort();
-const basketRegime = {};
-for (const date of allDatesSorted) {
-  let up = 0, down = 0, above = 0, tot = 0;
+// basket 市况仅在 regime 含 basket 时才需要；网格现只用 none/not_bear（走 idxRegime），
+// 全市场(1949支)下 basketRegime 预计算 O(dates×items×findIndex) 过慢，默认跳过（BT_BASKET=1 才启用）。
+const USE_BASKET = process.env.BT_BASKET === '1';
+const stockMA60 = {}; const basketRegime = {};
+if (USE_BASKET) {
   items.forEach(s => {
-    const m = stockMA60[s.code]; if (!m || m[date] == null) return;
-    const bars = s.kline.day; const i = bars.findIndex(b => b[0] === date); if (i < 0) return;
-    tot++;
-    if (bars[i][2] > m[date]) above++;
-    if (i >= 20) {
-      const past = bars[i - 20]; const mp = m[past[0]];
-      if (mp != null) { if (m[date] > mp) up++; else down++; }
+    const bars = (s.kline && s.kline.day) || [];
+    const m = {};
+    for (let i = 0; i < bars.length; i++) {
+      if (i >= IDX_MA_WIN - 1) { let ss = 0; for (let k = i - IDX_MA_WIN + 1; k <= i; k++) ss += bars[k][2]; m[bars[i][0]] = ss / IDX_MA_WIN; }
     }
+    stockMA60[s.code] = m;
   });
-  if (tot === 0) { basketRegime[date] = 'unknown'; continue; }
-  const aboveFrac = above / tot;
-  if (aboveFrac > 0.5 && up >= down) basketRegime[date] = 'bull';
-  else if (aboveFrac < 0.5 && down > up) basketRegime[date] = 'bear';
-  else basketRegime[date] = 'side';
+  const allDatesSorted = [...new Set(items.flatMap(s => (s.kline.day || []).map(b => b[0])))].sort();
+  for (const date of allDatesSorted) {
+    let up = 0, down = 0, above = 0, tot = 0;
+    items.forEach(s => {
+      const m = stockMA60[s.code]; if (!m || m[date] == null) return;
+      const bars = s.kline.day; const i = bars.findIndex(b => b[0] === date); if (i < 0) return;
+      tot++;
+      if (bars[i][2] > m[date]) above++;
+      if (i >= 20) {
+        const past = bars[i - 20]; const mp = m[past[0]];
+        if (mp != null) { if (m[date] > mp) up++; else down++; }
+      }
+    });
+    if (tot === 0) { basketRegime[date] = 'unknown'; continue; }
+    const aboveFrac = above / tot;
+    if (aboveFrac > 0.5 && up >= down) basketRegime[date] = 'bull';
+    else if (aboveFrac < 0.5 && down > up) basketRegime[date] = 'bear';
+    else basketRegime[date] = 'side';
+  }
 }
 function regimeOf(date, kind) {
   if (kind === 'basket' || kind === 'basket_not_bear') return basketRegime[date] || 'unknown';
@@ -339,15 +342,20 @@ function backtest(cfg) {
     const wt = sorted.filter(t => t.signalDate >= lo && t.signalDate <= hi);
     if (wt.length >= 10) { const sm = summarize(wt); wf.push({ window: lo + '~' + hi, n: wt.length, exp: sm.expectancy, winRate: sm.winRate, pf: sm.profitFactor }); }
   }
-  return { cfg, base, byBoard, byYear, byRegime, walkForward: wf, portfolio: { idxFiltered: port.idxFiltered, perDayCapped: port.perDayCapped, ddPaused: port.ddPaused }, preStats };
+  return { cfg, base, byBoard, byYear, byRegime, walkForward: wf, portfolio: { idxFiltered: port.idxFiltered, perDayCapped: port.perDayCapped, ddPaused: port.ddPaused }, preStats, signalCodes: [...new Set(cands.map(c => c.code))] };
 }
 
 const PERIOD = { from: '20230828', to: '20260630' };
+// 网格规模：BT_GRID=full(48) / quick(16，全市场加速) / single(单一配置快验，BT_K/BT_H/BT_R 可指定)
+const GRID_MODE = process.env.BT_GRID || 'full';
+let kList = [1.5, 2.0, 2.5, 3.0, 3.5, 4.0], hList = [5, 8, 10, 12], rList = ['none', 'not_bear'];
+if (GRID_MODE === 'quick') { kList = [2.5, 3.0, 3.5, 4.0]; hList = [5, 8]; }
+if (GRID_MODE === 'single') { kList = [+(process.env.BT_K || 3)]; hList = [+(process.env.BT_H || 5)]; rList = [process.env.BT_R || 'none']; }
 const grid = [];
-[1.5, 2.0, 2.5, 3.0, 3.5, 4.0].forEach(kAtrDyn =>
+kList.forEach(kAtrDyn =>
   ['chuang_only'].forEach(boards =>
-    ['none', 'not_bear'].forEach(regime =>
-      [5, 8, 10, 12].forEach(maxHoldDyn => {
+    rList.forEach(regime =>
+      hList.forEach(maxHoldDyn => {
         grid.push({ kAtrDyn, boards, regime, maxHoldDyn, maxHoldMain: 20, from: PERIOD.from, to: PERIOD.to });
       }))));
 
@@ -379,6 +387,7 @@ const out = {
   walkForward: detail.walkForward,
   portfolio: detail.portfolio,
   preStats: detail.preStats,
+  signalCodes: detail.signalCodes,          // 产生信号的股票代码（供 4.3 两遍法抓 G5 基本面）
   sweepPassCount: passed.length,
   sweepTotal: grid.length,
   generatedAt: new Date().toISOString().slice(0, 10)

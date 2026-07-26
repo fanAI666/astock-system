@@ -15,9 +15,11 @@
 // 幂等可重跑：读取既有 fundamental.json，仅更新本次采集的 code，保留其余；写前备份 .bak。
 
 const fs = require('fs');
-const SRC = 'D:/WorkBuddy/选股结果/import_final.json';
-const OUT = 'D:/WorkBuddy/选股结果/fundamental.json';
-const BAK = 'D:/WorkBuddy/选股结果/fundamental.bak';
+// 4.3：可经环境变量切换输入/输出/代码清单，复用于全市场基本面抓取（默认行为不变）
+const SRC = process.env.FUND_SRC || 'D:/WorkBuddy/选股结果/import_final.json';
+const OUT = process.env.FUND_OUT || 'D:/WorkBuddy/选股结果/fundamental.json';
+const BAK = OUT + '.bak';
+const CODES_FILE = process.env.FUND_CODES || '';   // 可选：JSON 数组文件，指定要抓的代码（覆盖 import_final/argv）
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 // A股代码 → 东方财富 SECUCODE：6 开头(含 688 科创)→.SH，0/3 开头→.SZ
@@ -80,8 +82,9 @@ async function collect(code) {
   const latest = rows[0];
   const annual = rows.find(r => r.REPORT_TYPE === '年报');
   const revGrowth = latest.TOTALOPERATEREVETZ, npGrowth = latest.PARENTNETPROFITTZ;
-  await sleep(200);
-  const researchCount90d = await getResearchCount(code);
+  // G6 研报覆盖为加分项非硬门槛；全市场大批量抓取时可用 FUND_SKIP_G6=1 跳过以提速
+  let researchCount90d = null;
+  if (process.env.FUND_SKIP_G6 !== '1') { await sleep(200); researchCount90d = await getResearchCount(code); }
   const npTtmYi = npTtm != null ? +(npTtm / YI).toFixed(3) : null;
   const g5Quality = (npTtm != null && npTtm > 0) && ((npTtmYoY != null && npTtmYoY > 0) || (revGrowth != null && revGrowth > 0));
   return {
@@ -102,8 +105,10 @@ async function collect(code) {
   const arg = process.argv.slice(2);
   const data = JSON.parse(fs.readFileSync(SRC, 'utf8'));
   const items = (data.items || []).filter(s => ['cyb', 'kcb', 'kc'].includes(s.board));
-  let codes = arg.length ? arg : items.map(s => s.code);
-  const nameOf = {}; items.forEach(s => nameOf[s.code] = s.name);
+  const nameOf = {}; (data.items || []).forEach(s => nameOf[s.code] = s.name);
+  let codes;
+  if (CODES_FILE) { codes = JSON.parse(fs.readFileSync(CODES_FILE, 'utf8')); }   // 全市场清单文件优先
+  else { codes = arg.length ? arg : items.map(s => s.code); }
 
   // 读取既有边车，便于增量合并
   let store = {};
