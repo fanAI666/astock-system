@@ -1,7 +1,7 @@
 {
   "baseVersion": "1.0.0",
-  "version": "1.5.7",
-  "featurePoints": 57,
+  "version": "1.6.7",
+  "featurePoints": 67,
   "rule": "以 1.0.0 为基准；每新增 1 个功能点版本 +0.0.1；满 10 个点进 1（即 0.0.9 → 0.1.0，相对基准为 1.0.9 → 1.1.0）；满 10 个次版本进 1（1.9.0 → 2.0.0）。版本号 = 基准主版本 + 功能点数按 10 进 1 进位。",
   "history": [
     {
@@ -141,6 +141,12 @@
       "date": "2026-07-26",
       "points": 10,
       "desc": "4.1 双创选股指标G1-G5：backtest_chuang.js genSignals加G1流动性(≥1亿)/G2波动带(ATR3-6%)/G3动量洁净(距MA20≤12%且RSI40-65)/G4相对强度(个股20日>上证)/G5盈利质量(读fundamental边车,剔除万邦/睿智/上海凯宝)，全按board∈{cyb,kcb,kc}门控+CHUANG_GATES回滚开关，主板不动；回测期望-1.07%→-0.72%(创业板-0.85%→-0.08%接近盈亏平衡,样本缩至28笔)；scoreCandidate接G5硬拒+G6提示，build_deploy/offline同步fundamental"
+    },
+    {
+      "version": "1.6.7",
+      "date": "2026-07-26",
+      "points": 10,
+      "desc": "4.2 双创执行层E1-E3：backtest_chuang.js 仅chuang_only加E1弹性止盈(TP=max(2×SL,1.8×ATR14)替代固定3:1)/E2回踩MA20入场(信号bar低点回踩MA20±3%且收上)/E3跟踪止损3%→2%，CHUANG_EXEC回滚开关，主板3:1不动；双创期望-0.72%→+0.70%转正、创业板-0.08%→+1.00%、盈亏比8.6→18.78，但样本仅13笔；双创卡加样本量守卫(<30笔标注仅供研究)+配置动态读取ch.best"
     }
   ]
 }

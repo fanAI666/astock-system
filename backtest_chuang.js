@@ -43,6 +43,13 @@ function avgTurnover20(bars, idx) {
   return s / 20;
 }
 
+// ===== 双创升级 4.2：E1–E3 执行层适配（仅 chuang_only，主板 3:1 完全不动）=====
+// 回滚开关：CHUANG_EXEC=0 node backtest_chuang.js  → 关闭全部执行层改动
+const CHUANG_EXEC = process.env.CHUANG_EXEC !== '0';
+const E1_TP_R = 2.0, E1_TP_ATR = 1.8;   // E1 弹性止盈：TP = max(2.0×SL, 1.8×ATR14)（替代固定 3:1）
+const E2_PULLBACK_TOL = 0.03;           // E2 回踩入场：信号bar低点须回踩至 MA20±3% 内且收在 MA20 上
+const E3_TRAIL = 0.02;                  // E3 跟踪止损：3% → 2%（高波动下更快锁利）
+
 function atr14(bars, idx) {
   if (idx < ATR_WIN) return null;
   let s = 0;
@@ -196,19 +203,27 @@ function genSignals(stock, cfg) {
     if (!baseline || !nextOpen) continue;
     const dev = (nextOpen - baseline) / baseline;
     if (Math.abs(dev) > tol) continue;
+    // E2 回踩 MA20 不破才入场（仅双创，4.2）：信号bar低点回踩至 MA20±3% 内且收在 MA20 上，过滤追高
+    if (isDyn && CHUANG_EXEC) {
+      const ma20e = sma(bars, i, MA_WIN_TREND, 2); const lowI = bars[i][4];
+      if (ma20e == null || lowI > ma20e * (1 + E2_PULLBACK_TOL) || d[2] < ma20e) { preStats.skipE2++; continue; }
+    }
     const entry = nextOpen;
     let sl, tp, slDist;
     if (isDyn) {
       const a = atr14(bars, i); if (a == null) { preStats.skipAtr++; continue; }
-      slDist = K_ATR * a; sl = entry - slDist; tp = entry + 3 * slDist;
+      slDist = K_ATR * a; sl = entry - slDist;
+      // E1 弹性止盈（4.2）：TP = max(2.0×SL, 1.8×ATR14)，替代固定 3:1；主板仍走下方固定 2%/6%
+      tp = CHUANG_EXEC ? entry + Math.max(E1_TP_R * slDist, E1_TP_ATR * a) : entry + 3 * slDist;
     } else { slDist = entry * STOP_MAIN; sl = entry * (1 - STOP_MAIN); tp = entry * (1 + PROFIT_MAIN); }
+    const trailPct = (isDyn && CHUANG_EXEC) ? E3_TRAIL : TRAIL_PCT;   // E3 跟踪止损 3%→2%（仅双创）
     const trailCap = entry * (1 + TRAIL_CAP);
     let curSL = sl, outcome = null, exitPrice = entry, exitIdx = i + 1, holdDays = 0;
     for (let j = i + 1; j < bars.length && j <= i + maxHold; j++) {
       const h = bars[j][3], l = bars[j][4]; holdDays++;
       if (l <= curSL) { outcome = 'loss'; exitPrice = curSL; exitIdx = j; break; }
       if (h >= tp) { outcome = 'win'; exitPrice = tp; exitIdx = j; break; }
-      if (isDyn) { const nsl = Math.min(trailCap, Math.max(curSL, h * (1 - TRAIL_PCT))); if (nsl > curSL) curSL = nsl; }
+      if (isDyn) { const nsl = Math.min(trailCap, Math.max(curSL, h * (1 - trailPct))); if (nsl > curSL) curSL = nsl; }
     }
     if (!outcome) {
       const jlast = Math.min(bars.length - 1, i + maxHold);
@@ -223,7 +238,7 @@ function genSignals(stock, cfg) {
   return out;
 }
 
-let preStats = { total: 0, pass: 0, skipTrend: 0, skipVol: 0, skipGap: 0, skipAtr: 0, skipG1: 0, skipG2: 0, skipG3: 0, skipG4: 0, skipG5: 0 };
+let preStats = { total: 0, pass: 0, skipTrend: 0, skipVol: 0, skipGap: 0, skipAtr: 0, skipG1: 0, skipG2: 0, skipG3: 0, skipG4: 0, skipG5: 0, skipE2: 0 };
 function applyPortfolio(cands) {
   const afterIndex = [], idxFiltered = [];
   cands.forEach(c => {
@@ -301,7 +316,7 @@ function summarize(trades) {
 }
 
 function backtest(cfg) {
-  preStats = { total: 0, pass: 0, skipTrend: 0, skipVol: 0, skipGap: 0, skipAtr: 0, skipG1: 0, skipG2: 0, skipG3: 0, skipG4: 0, skipG5: 0 };
+  preStats = { total: 0, pass: 0, skipTrend: 0, skipVol: 0, skipGap: 0, skipAtr: 0, skipG1: 0, skipG2: 0, skipG3: 0, skipG4: 0, skipG5: 0, skipE2: 0 };
   let cands = [];
   items.forEach(s => { cands = cands.concat(genSignals(s, cfg)); });
   const port = applyPortfolio(cands);
@@ -372,5 +387,6 @@ fs.writeFileSync(OUT, JSON.stringify(out, null, 2), 'utf8');
 console.log('\n双创最优配置:', JSON.stringify(best.cfg), '→ exp=', (detail.base.expectancy*100).toFixed(2)+'%/笔, 文件:', OUT);
 const ps = detail.preStats;
 console.log(`\n=== 双创 G 门过滤效果（CHUANG_GATES=${CHUANG_GATES ? '开' : '关'}）===`);
-console.log(`候选信号=${ps.total} 通过预过滤=${ps.pass} | G1流动性剔除=${ps.skipG1} G2波动带剔除=${ps.skipG2} G3动量洁净剔除=${ps.skipG3} G4相对强度剔除=${ps.skipG4} G5盈利质量剔除(整只)=${ps.skipG5}`);
+console.log(`候选信号=${ps.total} 通过预过滤=${ps.pass} | G1流动性剔除=${ps.skipG1} G2波动带剔除=${ps.skipG2} G3动量洁净剔除=${ps.skipG3} G4相对强度剔除=${ps.skipG4} G5盈利质量剔除(整只)=${ps.skipG5} E2回踩入场剔除=${ps.skipE2}`);
+console.log(`执行层: CHUANG_EXEC=${CHUANG_EXEC ? '开(E1弹性止盈/E2回踩/E3跟踪2%)' : '关(固定3:1)'} | byBoard盈亏比:`, JSON.stringify(Object.fromEntries(Object.entries(detail.byBoard).map(([b, s]) => [b, +(s.payoff).toFixed(2)]))));
 console.log(`最优配置 byBoard:`, JSON.stringify(Object.fromEntries(Object.entries(detail.byBoard).map(([b, s]) => [b, { n: s.total, win: +(s.winRate * 100).toFixed(1), exp: +(s.expectancy * 100).toFixed(2) }]))));
