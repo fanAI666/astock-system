@@ -177,7 +177,13 @@
     "skipG5": 3,
     "skipE2": 20
   },
+  "signalCodes": [
+    "688621",
+    "300534",
+    "300643",
+    "300779"
+  ],
   "sweepPassCount": 0,
-  "sweepTotal": 48,
+  "sweepTotal": 16,
   "generatedAt": "2026-07-26"
 }
