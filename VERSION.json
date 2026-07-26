@@ -1,7 +1,7 @@
 {
   "baseVersion": "1.0.0",
-  "version": "1.4.7",
-  "featurePoints": 47,
+  "version": "1.5.7",
+  "featurePoints": 57,
   "rule": "以 1.0.0 为基准；每新增 1 个功能点版本 +0.0.1；满 10 个点进 1（即 0.0.9 → 0.1.0，相对基准为 1.0.9 → 1.1.0）；满 10 个次版本进 1（1.9.0 → 2.0.0）。版本号 = 基准主版本 + 功能点数按 10 进 1 进位。",
   "history": [
     {
@@ -135,6 +135,12 @@
       "date": "2026-07-26",
       "points": 10,
       "desc": "4.0 双创数据补采集：新增 extend_fundamental.js，经东方财富公开F10接口(Node直连HTTP,无需tdx/westock连接器)采集9支双创归母净利TTM及同比/营收净利同比/最新年报/近90日研报覆盖，拆单季算TTM；成果写入边车文件 选股结果/fundamental.json（规避build_final每日重建import_final的覆盖），G5盈利质量达标6/9（过滤万邦医药/睿智医药/上海凯宝），G6研报覆盖3支≥1"
+    },
+    {
+      "version": "1.5.7",
+      "date": "2026-07-26",
+      "points": 10,
+      "desc": "4.1 双创选股指标G1-G5：backtest_chuang.js genSignals加G1流动性(≥1亿)/G2波动带(ATR3-6%)/G3动量洁净(距MA20≤12%且RSI40-65)/G4相对强度(个股20日>上证)/G5盈利质量(读fundamental边车,剔除万邦/睿智/上海凯宝)，全按board∈{cyb,kcb,kc}门控+CHUANG_GATES回滚开关，主板不动；回测期望-1.07%→-0.72%(创业板-0.85%→-0.08%接近盈亏平衡,样本缩至28笔)；scoreCandidate接G5硬拒+G6提示，build_deploy/offline同步fundamental"
     }
   ]
 }

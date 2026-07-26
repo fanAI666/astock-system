@@ -19,6 +19,30 @@ const STOP_MAIN = 0.02, PROFIT_MAIN = 0.06;
 const TRAIL_PCT = 0.03, TRAIL_CAP = 0.06;
 const MAX_BUY_PER_DAY = 3, DD_PAUSE = 0.08;
 
+// ===== 双创升级 4.1：G1–G5 选股门（仅 chuang_only 板块生效，主板 main 完全不动）=====
+// 回滚开关：CHUANG_GATES=0 node backtest_chuang.js  → 一键关闭全部新门
+const CHUANG_GATES = process.env.CHUANG_GATES !== '0';
+const G2_ATR_MIN = 0.03, G2_ATR_MAX = 0.06;          // G2 波动率带：入场日 ATR14% ∈ [3%,6%]
+const G3_MA20_EXT = 0.12, G3_RSI_LO = 40, G3_RSI_HI = 65; // G3 动量洁净度：距MA20∈[0,+12%] 且 RSI∈[40,65]
+const G1_LIQ_FLOOR = 1.0e8;                          // G1 流动性：近20日日均成交额 ≥ 1亿元（量(手)×100×价 近似）
+const FUND_FILE = 'D:/WorkBuddy/选股结果/fundamental.json';
+// G5 盈利质量（4.0 边车数据）：仅当 g5Quality 显式为 false 才剔除；无数据(undefined)放行，防陈旧数据误杀
+const G5 = {};
+try { const fj = JSON.parse(fs.readFileSync(FUND_FILE, 'utf8')); Object.entries(fj.items || {}).forEach(([c, f]) => G5[c] = f.g5Quality === true); } catch (e) { }
+
+function rsi14(bars, idx) {
+  if (idx < ATR_WIN) return null;
+  let g = 0, l = 0;
+  for (let k = idx - ATR_WIN + 1; k <= idx; k++) { const ch = bars[k][2] - bars[k - 1][2]; if (ch > 0) g += ch; else l -= ch; }
+  if (l === 0) return 100; const rs = g / l; return 100 - 100 / (1 + rs);
+}
+// 近20日日均成交额(元) = mean(vol[手]×100×close)
+function avgTurnover20(bars, idx) {
+  if (idx < 19) return null;
+  let s = 0; for (let k = idx - 19; k <= idx; k++) s += bars[k][5] * 100 * bars[k][2];
+  return s / 20;
+}
+
 function atr14(bars, idx) {
   if (idx < ATR_WIN) return null;
   let s = 0;
@@ -55,6 +79,8 @@ const idx = JSON.parse(fs.readFileSync(INDEX_FILE, 'utf8'));
 const ib = idx.bars || [];
 const idxClose = {}, idxMA = {};
 ib.forEach(b => { idxClose[b[0]] = b[2]; });
+const idxDates = ib.map(b => b[0]).sort();          // G4 相对强度用：指数交易日序列与位置
+const idxPos = {}; idxDates.forEach((d, i) => idxPos[d] = i);
 for (let i = 0; i < ib.length; i++) {
   if (i >= IDX_MA_WIN - 1) {
     let s = 0; for (let k = i - IDX_MA_WIN + 1; k <= i; k++) s += ib[k][2];
@@ -120,6 +146,8 @@ function genSignals(stock, cfg) {
   if (cfg.boards === 'no_kcb' && board === 'kcb') return [];
   if (cfg.boards === 'chuang_only' && !['cyb', 'kcb', 'kc'].includes(board)) return [];
   const isDyn = (board === 'cyb' || board === 'kcb' || board === 'kc');
+  // G5 盈利质量（股票级，4.0 边车）：仅当显式不达标(g5Quality===false)才剔除整只；无数据放行
+  if (isDyn && CHUANG_GATES && G5[stock.code] === false) { preStats.skipG5++; return []; }
   const tol = (board === 'cyb' || board === 'kcb' || board === 'kc') ? 0.03 : 0.02;
   const K_ATR = isDyn ? cfg.kAtrDyn : 1.05;
   const maxHold = isDyn ? cfg.maxHoldDyn : cfg.maxHoldMain;
@@ -146,6 +174,24 @@ function genSignals(stock, cfg) {
     if (!f.volOk) { preStats.skipVol++; continue; }
     if (!f.gapOk) { preStats.skipGap++; continue; }
     preStats.pass++;
+    // ===== 双创 G1–G4 逐日选股门（仅双创；主板在上方 board 过滤已 return，不经过此处）=====
+    if (isDyn && CHUANG_GATES) {
+      // G2 波动率带：ATR14% ∈ [3%,6%]
+      const a0 = atr14(bars, i); const atrPct = a0 != null ? a0 / d[2] : null;
+      if (atrPct == null || atrPct < G2_ATR_MIN || atrPct > G2_ATR_MAX) { preStats.skipG2++; continue; }
+      // G3 动量洁净度：站上 MA20 且 距MA20 ∈ [0,+12%]，且 RSI(14) ∈ [40,65]
+      const ma20g = sma(bars, i, MA_WIN_TREND, 2); const rrsi = rsi14(bars, i);
+      if (ma20g == null || rrsi == null) { preStats.skipG3++; continue; }
+      const ext = (d[2] - ma20g) / ma20g;
+      if (ext < 0 || ext > G3_MA20_EXT || rrsi < G3_RSI_LO || rrsi > G3_RSI_HI) { preStats.skipG3++; continue; }
+      // G1 流动性：近20日日均成交额 ≥ 1亿元
+      const t20 = avgTurnover20(bars, i);
+      if (t20 == null || t20 < G1_LIQ_FLOOR) { preStats.skipG1++; continue; }
+      // G4 相对强度：个股近20日收益 > 上证同期收益（行业/个股有 beta 才做）
+      const sr = i >= 20 ? d[2] / bars[i - 20][2] - 1 : null;
+      const ip = idxPos[dateD]; const ir = (ip != null && ip >= 20) ? idxClose[idxDates[ip]] / idxClose[idxDates[ip - 20]] - 1 : null;
+      if (sr == null || ir == null || sr <= ir) { preStats.skipG4++; continue; }
+    }
     const baseline = d[2], nextOpen = nd[1];
     if (!baseline || !nextOpen) continue;
     const dev = (nextOpen - baseline) / baseline;
@@ -177,7 +223,7 @@ function genSignals(stock, cfg) {
   return out;
 }
 
-let preStats = { total: 0, pass: 0, skipTrend: 0, skipVol: 0, skipGap: 0, skipAtr: 0 };
+let preStats = { total: 0, pass: 0, skipTrend: 0, skipVol: 0, skipGap: 0, skipAtr: 0, skipG1: 0, skipG2: 0, skipG3: 0, skipG4: 0, skipG5: 0 };
 function applyPortfolio(cands) {
   const afterIndex = [], idxFiltered = [];
   cands.forEach(c => {
@@ -255,7 +301,7 @@ function summarize(trades) {
 }
 
 function backtest(cfg) {
-  preStats = { total: 0, pass: 0, skipTrend: 0, skipVol: 0, skipGap: 0, skipAtr: 0 };
+  preStats = { total: 0, pass: 0, skipTrend: 0, skipVol: 0, skipGap: 0, skipAtr: 0, skipG1: 0, skipG2: 0, skipG3: 0, skipG4: 0, skipG5: 0 };
   let cands = [];
   items.forEach(s => { cands = cands.concat(genSignals(s, cfg)); });
   const port = applyPortfolio(cands);
@@ -324,3 +370,7 @@ const out = {
 };
 fs.writeFileSync(OUT, JSON.stringify(out, null, 2), 'utf8');
 console.log('\n双创最优配置:', JSON.stringify(best.cfg), '→ exp=', (detail.base.expectancy*100).toFixed(2)+'%/笔, 文件:', OUT);
+const ps = detail.preStats;
+console.log(`\n=== 双创 G 门过滤效果（CHUANG_GATES=${CHUANG_GATES ? '开' : '关'}）===`);
+console.log(`候选信号=${ps.total} 通过预过滤=${ps.pass} | G1流动性剔除=${ps.skipG1} G2波动带剔除=${ps.skipG2} G3动量洁净剔除=${ps.skipG3} G4相对强度剔除=${ps.skipG4} G5盈利质量剔除(整只)=${ps.skipG5}`);
+console.log(`最优配置 byBoard:`, JSON.stringify(Object.fromEntries(Object.entries(detail.byBoard).map(([b, s]) => [b, { n: s.total, win: +(s.winRate * 100).toFixed(1), exp: +(s.expectancy * 100).toFixed(2) }]))));

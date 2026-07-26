@@ -20,6 +20,7 @@ const EMBED_MAP = {
   backtest_chuang: 'backtest_chuang.json',
   briefing_final:    'briefing_final.json',
   buy_signal:       'buy_signal.json',
+  fundamental:      'fundamental.json',   // 4.0 双创基本面（G5/G6），供离线版 G5 门
 };
 
 function loadJSON(name) {
