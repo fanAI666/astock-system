@@ -160,6 +160,37 @@
 .bs-meta{font-size:13px;color:#475569;margin-bottom:8px}
 .bs-reason{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px 12px;border-radius:10px;font-size:13.5px;line-height:1.6;margin-bottom:14px}
 .bs-sub{font-size:14px;margin:4px 0 8px;color:#334155}
+/* =========== 双创信号面板 =========== */
+.chg-banner{padding:13px 16px;border-radius:13px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;font-weight:600;font-size:13.5px;margin:4px 0 12px;background:linear-gradient(135deg,#fff7ed,#ffedd5);color:#9a3412;border:1px solid #fed7aa}
+.chg-banner .chg-wait{font-weight:500;font-size:13px;color:#64748b}
+.chg-summ{display:flex;flex-wrap:wrap;gap:8px 12px;margin:6px 0 12px}
+.chg-summ .s{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 13px;font-size:12.5px;color:var(--sub)}
+.chg-summ .s b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums;margin-left:5px}
+.chg-buy{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin:10px 0;box-shadow:0 4px 14px rgba(15,23,42,.06)}
+.chg-buy .chg-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:9px}
+.chg-buy .chg-name{font-weight:700;font-size:15px;color:var(--ink)}
+.chg-buy .chg-code{font-size:12px;color:var(--sub)}
+.chg-tag{font-size:11px;font-weight:700;padding:2px 9px;border-radius:6px}
+.chg-tag-cyb{background:#eef4ff;color:#2563eb}
+.chg-tag-kcb{background:#f0fdf4;color:#16a34a}
+.chg-tag-kc{background:#faf5ff;color:#7c3aed}
+.chg-out{font-size:11px;font-weight:700;padding:2px 9px;border-radius:6px}
+.chg-out-win{background:#dcfce7;color:#166534}
+.chg-out-loss{background:#fee2e2;color:#991b1b}
+.chg-price{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:13px;margin-bottom:2px}
+.chg-price .p{border:1px solid var(--line);border-radius:9px;padding:6px 11px;background:var(--card);min-width:84px}
+.chg-price .p .lab{font-size:11px;color:var(--sub);display:block;margin-bottom:3px}
+.chg-price .p .val{font-weight:700;font-variant-numeric:tabular-nums}
+.chg-price .p.lose .val{color:var(--bad)}
+.chg-price .p.gain .val{color:var(--ok)}
+.chg-price .p.pos .val{color:var(--brand)}
+.chg-meta{font-size:12px;color:var(--sub);margin:6px 0}
+.chg-reasons{margin-top:8px;font-size:12.5px;color:#475569;line-height:1.65}
+.chg-reasons .r{display:inline-block;background:#f1f5f9;border-radius:6px;padding:2px 9px;margin:3px 6px 0 0;color:#334155}
+.chg-empty{color:var(--sub);font-size:13px;padding:18px 4px}
+.chg-sell{border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-top:14px;background:var(--card)}
+.chg-sell h3{font-size:14px;margin:0 0 8px;color:#334155}
+.chg-sell ul{margin:6px 0;padding-left:18px;font-size:13px;color:#475569;line-height:1.7}
 /* =========== 交易胜率 置顶 =========== */
 .winrate-top{padding:0;margin-bottom:14px}
 .wr-card{display:flex;flex-wrap:wrap;align-items:center;gap:16px 30px;background:linear-gradient(135deg,#0f172a,#1e293b);color:#e2e8f0;border-radius:16px;padding:18px 24px;box-shadow:0 12px 34px rgba(15,23,42,.35);border:1px solid rgba(148,163,184,.18)}
@@ -326,6 +357,7 @@
     <button data-tab="fundflow">💰 资金动态</button>
     <button data-tab="screen">🔍 选股评分</button>
     <button data-tab="buysig">📈 买入信号</button>
+    <button data-tab="chuang">🚀 双创信号</button>
     <button data-tab="calc">🧮 仓位计算</button>
     <button data-tab="brief">📑 每日简报</button>
     <button data-tab="journal">📓 交易日志</button>
@@ -584,6 +616,22 @@
       <div class="bs-reason" id="bsReason" style="display:none"></div>
       <h3 class="bs-sub">Top3 信号明细</h3>
       <div id="bsTop3"><div class="empty">暂无明细。</div></div>
+    </div>
+  </section>
+
+  <!-- ===================== 双创选股信号（BUY/SELL） ===================== -->
+  <section class="panel" id="chuang">
+    <div class="card">
+      <h2><span class="dot"></span>双创选股信号 · BUY / SELL</h2>
+      <p class="hint">基于重构后的 <code>chuang/</code> 策略引擎（G1–G5 选股门控 + E1–E3 执行层）生成，数据来自 <code>选股结果/chuang_signals.json</code>（运行 <code>node chuang/index.js signals</code> 产出）。每条 BUY 信号含计划入场价 / 止损价 / 目标价 / 建议仓位比；SELL 规则为四档退出纪律。⚠️ 双创板块全市场回测期望为负，此信号基于精选池，仅作<strong>预警 / 研究样本</strong>，非实盘建议。</p>
+      <div id="chgBanner" class="chg-banner"><span class="chg-wait">等待双创信号数据…</span></div>
+      <div class="chg-summ" id="chgSummary"></div>
+      <h3 class="bs-sub">BUY 信号明细（历史回测样本）</h3>
+      <div id="chgBuys"><div class="empty">暂无信号。</div></div>
+      <div class="chg-sell">
+        <h3>SELL 规则（四档退出纪律）</h3>
+        <ul id="chgSell"></ul>
+      </div>
     </div>
   </section>
 
@@ -1715,6 +1763,83 @@ function renderBuySignal(){
   }
 }
 
+/* 双创信号展示（chuang_signals.json） */
+function chgFmt2(v){ return (v==null||isNaN(v))?"—":Number(v).toFixed(2); }
+function renderChuangSignal(){
+  const banner=document.getElementById("chgBanner");
+  const summ=document.getElementById("chgSummary");
+  const buys=document.getElementById("chgBuys");
+  const sell=document.getElementById("chgSell");
+  if(!banner) return;
+  const sig=window.chuangSignal;
+  if(!sig){
+    banner.className="chg-banner";
+    banner.innerHTML='<span class="chg-wait">等待双创信号数据…（请通过预览 / 本地服务器打开，或先运行 node chuang/index.js signals）</span>';
+    if(summ) summ.innerHTML="";
+    if(buys) buys.innerHTML='<div class="empty">暂无信号。</div>';
+    if(sell) sell.innerHTML="";
+    return;
+  }
+  const s=sig.summary||{};
+  const winPct=(s.winRate!=null)? (s.winRate*100).toFixed(1)+"%" : "—";
+  const exp=(s.expectancy!=null)? (s.expectancy>=0?"+":"")+s.expectancy.toFixed(2)+"%/笔" : "—";
+  banner.className="chg-banner";
+  banner.innerHTML='<span class="chg-warn">⚠ 预警 / 研究样本</span>'+
+    '<span>双创板块全市场回测期望为负，本信号基于精选池，仅作策略研究参考</span>';
+  if(summ){
+    summ.innerHTML=
+      '<span class="s">信号数<b>'+(s.total!=null?s.total:"—")+'</b></span>'+
+      '<span class="s">胜率<b>'+winPct+'</b></span>'+
+      '<span class="s">每笔期望<b>'+exp+'</b></span>'+
+      '<span class="s">盈亏比<b>'+(s.profitFactor!=null?s.profitFactor.toFixed(2)+"×":"—")+'</b></span>'+
+      '<span class="s">Kelly<b>'+(s.kelly!=null?(s.kelly*100).toFixed(1)+"%":"—")+'</b></span>'+
+      '<span class="s">生成日<b>'+(sig.generatedAt||"—")+'</b></span>';
+  }
+  if(buys){
+    const list=sig.buys||[];
+    if(!list.length){ buys.innerHTML='<div class="empty">暂无信号。</div>'; }
+    else{
+      buys.innerHTML=list.map(b=>{
+        const tagCls=b.board==="kcb"?'chg-tag-kcb':(b.board==="kc"?'chg-tag-kc':'chg-tag-cyb');
+        const out=b.resolved&&b.resolved.outcome;
+        const outCls=out==="win"?'chg-out-win':(out==="loss"?'chg-out-loss':'');
+        const outTxt=out==="win"?'✓ 已实现盈利':(out==="loss"?'✗ 已实现亏损':'未平仓');
+        const rlist=(b.reasons||[]).map(r=>'<span class="r">'+r+'</span>').join("");
+        return '<div class="chg-buy">'+
+          '<div class="chg-head">'+
+            '<span class="chg-name">'+b.name+'</span>'+
+            '<span class="chg-code">'+b.code+'</span>'+
+            '<span class="chg-tag '+tagCls+'">'+(b.boardName||b.board)+'</span>'+
+            (outCls?'<span class="chg-out '+outCls+'">'+outTxt+'</span>':'')+
+          '</div>'+
+          '<div class="chg-price">'+
+            '<div class="p"><span class="lab">计划入场</span><span class="val">'+chgFmt2(b.entry)+'</span></div>'+
+            '<div class="p lose"><span class="lab">止损价</span><span class="val">'+chgFmt2(b.stopLoss)+'</span></div>'+
+            '<div class="p gain"><span class="lab">目标价</span><span class="val">'+chgFmt2(b.takeProfit)+'</span></div>'+
+            '<div class="p pos"><span class="lab">建议仓位</span><span class="val">'+(b.positionPct!=null?(b.positionPct*100).toFixed(2)+'%':'—')+'</span></div>'+
+          '</div>'+
+          '<div class="chg-meta">仓位档位：'+(b.positionLabel||"—")+' ｜ 信号日 '+(b.signalDate||"—")+' ｜ 入场日 '+(b.entryDate||"—")+' ｜ 最长持有 '+(b.maxHoldDays||"—")+' 日 ｜ 跟踪止损 '+(b.trailingStopPct!=null?(b.trailingStopPct*100).toFixed(0)+'%':"—")+(b.resolved&&b.resolved.holdDays!=null?' ｜ 实际持有 '+b.resolved.holdDays+' 日':"")+'</div>'+
+          '<div class="chg-reasons">'+rlist+'</div>'+
+        '</div>';
+      }).join("");
+    }
+  }
+  if(sell){
+    const sr=sig.sellRules||{};
+    const items=[['止损',sr.stopLoss],['止盈',sr.takeProfit],['跟踪止损',sr.trailingStop],['周期结束',sr.maxHold]];
+    sell.innerHTML=items.filter(it=>it[1]).map(it=>'<li><b>'+it[0]+'：</b>'+it[1]+'</li>').join("");
+  }
+}
+async function loadChuangSignal(){
+  window.chuangSignal=null;
+  if(location.protocol.indexOf("http")!==0){ renderChuangSignal(); return; }
+  try{
+    const res=await fetch("选股结果/chuang_signals.json",{cache:"no-store"});
+    if(res.ok) window.chuangSignal=await res.json();
+  }catch(e){}
+  renderChuangSignal();
+}
+
 /* 双轨回测展示：主板(main_only) + 双创(创业板/科创板 独立加宽体系) 分别渲染，并画图 */
 function renderWinRate(p12, ch){
   const set=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
@@ -1837,6 +1962,7 @@ const VERSION_HISTORY = [
   {v:"1.6.7",d:"2026-07-26",desc:"双创升级 4.2·执行层E1-E3：仅双创加 E1弹性止盈(TP=max(2×SL,1.8×ATR14)替代固定3:1)/E2回踩MA20入场/E3跟踪止损3%→2%，CHUANG_EXEC回滚开关，主板3:1不动；双创期望-0.72%→+0.70%转正、创业板-0.08%→+1.00%、盈亏比8.6→18.78，但样本仅13笔；双创卡加样本量守卫(<30笔标注仅供研究)+配置动态读取"},
   {v:"1.5.7",d:"2026-07-26",desc:"双创升级 4.1·选股指标G1-G5：回测 genSignals 加 G1流动性(≥1亿)/G2波动带(ATR3-6%)/G3动量洁净(距MA20≤12%且RSI40-65)/G4相对强度(20日>上证)/G5盈利质量(读fundamental,剔除万邦/睿智/上海凯宝)，全按双创门控+CHUANG_GATES回滚开关，主板不动；期望-1.07%→-0.72%(创业板近盈亏平衡,样本28笔)；候选卡接G5硬拒+G6研报提示"},
   {v:"1.4.7",d:"2026-07-26",desc:"双创升级 4.0·数据补采集：新增 extend_fundamental.js 经东方财富公开F10接口采集9支双创归母净利TTM及同比/营收净利同比/近90日研报覆盖，写入边车 fundamental.json（规避 build_final 每日重建覆盖）；G5盈利质量达标6/9（过滤万邦医药/睿智医药/上海凯宝），为 G5/G6 指标提供数据底座"},
+  {v:"1.8.7",d:"2026-07-28",desc:"双创选股策略模块化重构并接入展示：新建 chuang/ 包（config/logger/indicators/data/fundamentals/strategy/risk/backtest/signals/index），G1–G5+E1–E3 逻辑逐位精确迁移（回测 parity 已验证）；新增「🚀 双创信号」Tab，渲染 chuang_signals.json 的 BUY 信号（入场/止损/目标/建议仓位）与四档 SELL 退出纪律，明确标注双创全市场回测期望为负、仅作预警/研究样本"},
   {v:"1.3.7",d:"2026-07-26",desc:"双创升级 Stage0·先行修复：候选评分卡双创(创业板/科创板)不再展示失真旧标定胜率(66~75，与 Phase3 实测创业板≈7%/科创板≈2.4%矛盾)，改按模型综合强度分展示并加失真提示，主板标定逻辑不变"},
   {v:"1.2.7",d:"2026-07-24",desc:"双轨策略体系上线：主板 main_only（回测期望+0.59%/笔）与创业板·科创板独立加宽体系（K_ATR=2.0，回测期望为负仅供预警）分开展示胜率；回测区新增主板/创业板/科创板对比柱状图（胜率+每笔期望，主题感知离线SVG）；取消中频（验证）模式"},
   {v:"1.2.4",d:"2026-07-24",desc:"访问口令记住我(本机免口令自动登录)+退出登录(清除本机记住)，线上 gate 与本地 serve.js 双端一致"},
@@ -2282,7 +2408,7 @@ document.getElementById('btnHighFreq').addEventListener('click',()=>switchMode('
 // 应用已保存的模式（默认高频）
 if(currentMode !== 'highFreq') { switchMode(currentMode); }  // 仅非默认时触发 UI 更新
 load(); initTheme(); syncCfgInputs(); refreshCand(); renderTrades(); renderDash(); renderChangelog(); renderFundFlow();
-if(location.protocol.indexOf("http")===0){ importToday(); loadBuySignal(); loadWinRate(); loadBriefings(); loadFundFlow().then(()=>{ startLiveFundFlow(); }); }
+if(location.protocol.indexOf("http")===0){ importToday(); loadBuySignal(); loadChuangSignal(); loadWinRate(); loadBriefings(); loadFundFlow().then(()=>{ startLiveFundFlow(); }); }
 loadFundamental();   // 4.0 双创基本面（G5/G6），http 下 fetch、离线走 EMBED 兜底，到达后重渲染候选卡
 window.addEventListener("resize",()=>{ for(const id in charts){ charts[id]._resize(); } });
 </script>
