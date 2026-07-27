@@ -1,0 +1,510 @@
+{
+  "generatedAt": "2026-07-27",
+  "config": {
+    "kAtrDyn": 1.5,
+    "maxHoldDyn": 5,
+    "regime": "none",
+    "boards": "chuang_only",
+    "period": {
+      "from": "20230828",
+      "to": "20260630"
+    }
+  },
+  "method": "chuang-strategy-refactor",
+  "summary": {
+    "total": 17,
+    "winRate": 0.1765,
+    "expectancy": 0.626,
+    "profitFactor": 1.3699233216544575,
+    "kelly": 0.048
+  },
+  "sellRules": {
+    "stopLoss": "跌破入场价下方 K_ATR×ATR14 止损位即卖出（双创动态止损）",
+    "takeProfit": "触及 E1 弹性止盈 max(2.0×SL, 1.8×ATR14) 即卖出",
+    "trailingStop": "持仓创新高后，从高点回撤 2%（双创）/ 3%（主板）触发跟踪止损卖出",
+    "maxHold": "持有满 5 日强制平仓（周期结束）"
+  },
+  "buys": [
+    {
+      "code": "300643",
+      "name": "万通智控 300643",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260316",
+      "entryDate": "20260317",
+      "entry": 22.110001,
+      "stopLoss": 20.33035825,
+      "takeProfit": 25.669286500000002,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0238,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 20.33035825,
+        "holdDays": 1
+      },
+      "reasons": [
+        "信号日 20260316（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 20.33（-8.0%）",
+        "计划目标价 25.67（+16.1%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300779",
+      "name": "惠城环保 300779",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260313",
+      "entryDate": "20260316",
+      "entry": 73.459999,
+      "stopLoss": 67.80178578571427,
+      "takeProfit": 84.77642542857143,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0238,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 73.40200195999999,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260313（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 67.80（-7.7%）",
+        "计划目标价 84.78（+15.4%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300643",
+      "name": "万通智控 300643",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260304",
+      "entryDate": "20260305",
+      "entry": 20.68,
+      "stopLoss": 19.49285725,
+      "takeProfit": 23.0542855,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0238,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 21.0014,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260304（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 19.49（-5.7%）",
+        "计划目标价 23.05（+11.5%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300643",
+      "name": "万通智控 300643",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260126",
+      "entryDate": "20260127",
+      "entry": 20.16,
+      "stopLoss": 18.97178517857143,
+      "takeProfit": 22.536429642857144,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0238,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 19.81559902,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260126（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 18.97（-5.9%）",
+        "计划目标价 22.54（+11.8%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300534",
+      "name": "陇神戎发 300534",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251201",
+      "entryDate": "20251202",
+      "entry": 10.51,
+      "stopLoss": 9.911071428571429,
+      "takeProfit": 11.707857142857144,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0238,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 10.584,
+        "holdDays": 3
+      },
+      "reasons": [
+        "信号日 20251201（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 9.91（-5.7%）",
+        "计划目标价 11.71（+11.4%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300643",
+      "name": "万通智控 300643",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20250806",
+      "entryDate": "20250807",
+      "entry": 24.709999,
+      "stopLoss": 22.941070214285713,
+      "takeProfit": 28.24785657142857,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0238,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 24.9214,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20250806（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 22.94（-7.2%）",
+        "计划目标价 28.25（+14.3%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300779",
+      "name": "惠城环保 300779",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20250703",
+      "entryDate": "20250704",
+      "entry": 131.889999,
+      "stopLoss": 124.71356935714284,
+      "takeProfit": 146.24285828571428,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0238,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 146.24285828571428,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20250703（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 124.71（-5.4%）",
+        "计划目标价 146.24（+10.9%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300779",
+      "name": "惠城环保 300779",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20250626",
+      "entryDate": "20250627",
+      "entry": 131.589996,
+      "stopLoss": 124.28928117857144,
+      "takeProfit": 146.19142564285715,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0238,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 130.69280098000002,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20250626（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 124.29（-5.5%）",
+        "计划目标价 146.19（+11.1%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300534",
+      "name": "陇神戎发 300534",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20250513",
+      "entryDate": "20250514",
+      "entry": 9.45,
+      "stopLoss": 8.921785714285715,
+      "takeProfit": 10.50642857142857,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0238,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 9.4472,
+        "holdDays": 4
+      },
+      "reasons": [
+        "信号日 20250513（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 8.92（-5.6%）",
+        "计划目标价 10.51（+11.2%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300534",
+      "name": "陇神戎发 300534",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20250331",
+      "entryDate": "20250401",
+      "entry": 8.59,
+      "stopLoss": 7.843214285714286,
+      "takeProfit": 10.083571428571428,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0238,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 10.083571428571428,
+        "holdDays": 1
+      },
+      "reasons": [
+        "信号日 20250331（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 7.84（-8.7%）",
+        "计划目标价 10.08（+17.4%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300779",
+      "name": "惠城环保 300779",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20250327",
+      "entryDate": "20250328",
+      "entry": 101.900002,
+      "stopLoss": 95.59250328571429,
+      "takeProfit": 114.51499942857143,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0238,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 101.88079902,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20250327（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 95.59（-6.2%）",
+        "计划目标价 114.51（+12.4%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300441",
+      "name": "鲍斯股份 300441",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20250217",
+      "entryDate": "20250218",
+      "entry": 9.14,
+      "stopLoss": 8.713571428571429,
+      "takeProfit": 9.992857142857144,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0238,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 9.4864,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20250217（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 8.71（-4.7%）",
+        "计划目标价 9.99（+9.3%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300441",
+      "name": "鲍斯股份 300441",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20241226",
+      "entryDate": "20241227",
+      "entry": 9.08,
+      "stopLoss": 8.356785714285714,
+      "takeProfit": 10.526428571428571,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0238,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 9.1336,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20241226（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 8.36（-8.0%）",
+        "计划目标价 10.53（+15.9%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300441",
+      "name": "鲍斯股份 300441",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20241225",
+      "entryDate": "20241226",
+      "entry": 9.01,
+      "stopLoss": 8.316785714285714,
+      "takeProfit": 10.396428571428572,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0238,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 9.3296,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20241225（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 8.32（-7.7%）",
+        "计划目标价 10.40（+15.4%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300441",
+      "name": "鲍斯股份 300441",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20241219",
+      "entryDate": "20241220",
+      "entry": 8.72,
+      "stopLoss": 8.233571428571429,
+      "takeProfit": 9.692857142857143,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0238,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 9.692857142857143,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20241219（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 8.23（-5.6%）",
+        "计划目标价 9.69（+11.2%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300779",
+      "name": "惠城环保 300779",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20241212",
+      "entryDate": "20241213",
+      "entry": 68.150002,
+      "stopLoss": 63.616788892857144,
+      "takeProfit": 77.21642821428571,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0238,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 71.07939902,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20241212（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 63.62（-6.7%）",
+        "计划目标价 77.22（+13.3%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "688621",
+      "name": "阳光诺和 688621",
+      "board": "kcb",
+      "boardName": "科创板",
+      "signalDate": "20241111",
+      "entryDate": "20241112",
+      "entry": 46.65,
+      "stopLoss": 42.89035714285714,
+      "takeProfit": 54.169285714285714,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0238,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 47.9906,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20241111（无市况约束）",
+        "买入板块：科创板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 42.89（-8.1%）",
+        "计划目标价 54.17（+16.1%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    }
+  ],
+  "stats": {
+    "total": 17,
+    "inWindow": 17,
+    "newAlerts": 5
+  }
+}
