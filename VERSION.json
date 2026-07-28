@@ -1,7 +1,7 @@
 {
   "baseVersion": "1.0.0",
-  "version": "1.8.7",
-  "featurePoints": 87,
+  "version": "1.8.8",
+  "featurePoints": 88,
   "rule": "以 1.0.0 为基准；每新增 1 个功能点版本 +0.0.1；满 10 个点进 1（即 0.0.9 → 0.1.0，相对基准为 1.0.9 → 1.1.0）；满 10 个次版本进 1（1.9.0 → 2.0.0）。版本号 = 基准主版本 + 功能点数按 10 进 1 进位。",
   "history": [
     {
@@ -171,6 +171,14 @@
       "model": "Kimi-K3",
       "credits": "WorkBuddy项目全部会话累计 ≈1571107（项目上界；含双创重构、4.x升级及其他主题混合，无法按阶段精确拆分）",
       "desc": "双创选股策略模块化重构：新建 chuang/ 包（config/logger/indicators/data/fundamentals/strategy/risk/backtest/signals/index），将原 backtest_chuang.js 的 G1-G5+E1-E3 逻辑逐位精确迁移（回测 parity 已验证：import_final 全量 diff=0、宇宙创业板 n=667 exp=-1.27% 完全一致）；新增 BUY/SELL 信号与持仓比例建议（chuang_signals.json）补齐 app 缺失能力；全参数集中参数化、新增可配置指标层(PE/PB/营收增长/MACD)默认关；原 backtest_chuang.js/extend_fundamental.js 改为薄入口保留调用契约"
+    },
+    {
+      "version": "1.8.8",
+      "date": "2026-07-28",
+      "points": 1,
+      "model": "Kimi-K3",
+      "credits": "WorkBuddy项目全部会话累计 ≈1571107（项目上界；含双创重构、4.x升级及其他主题混合，无法按阶段精确拆分）",
+      "desc": "双创信号自动刷新并入开盘抓取自动化：将 chuang_signals.json 的日级刷新步骤(6.5步)合并进现有『买入信号·开盘抓取』自动化(09:30)，与 buy_signal.json 同源同窗口(import_final.json)重跑 chuang 策略产出 BUY/SELL 信号+仓位建议；失败时降级不中断整体；sync_pages 部署链路已闭合(刷新后信号随站点上线)。无代码功能点变动，仅版本记录进阶"
     }
   ]
 }

@@ -24,6 +24,7 @@
 - **v1.6.7** (2026-07-26) +10 功能点：4.2 双创执行层E1-E3：backtest_chuang.js 仅chuang_only加E1弹性止盈(TP=max(2×SL,1.8×ATR14)替代固定3:1)/E2回踩MA20入场(信号bar低点回踩MA20±3%且收上)/E3跟踪止损3%→2%，CHUANG_EXEC回滚开关，主板3:1不动；双创期望-0.72%→+0.70%转正、创业板-0.08%→+1.00%、盈亏比8.6→18.78，但样本仅13笔；双创卡加样本量守卫(<30笔标注仅供研究)+配置动态读取ch.best  ［AI 模型：Kimi-K3；积分：双创升级程序会话级合计 888472，无法拆分到单阶段］
 - **v1.7.7** (2026-07-26) +10 功能点：4.3 双创全市场扩池+walk-forward样本外验证：扩池至1254创业板+16科创板（expand_universe东财screener枚举/tdx补K线源，universe_klines.json）。结果全市场稳健失败——创业板n=667 期望-1.27%/笔 胜率3.0% PF0.28 kelly-0.075，48组配置0达标，walk-forward 15/15滚动窗全负(-1.67%~-0.27%)；三组对照诊断(baseline无门控-1.34%/仅门控-1.75%/全开-1.27%)证明核心动量信号本身无法泛化、非G1-G5/E1-E3所致，9支精选池+0.70%系tiny样本过拟合。结论：4.3未达标→双创维持预警、4.4上线取消，转策略重构  ［AI 模型：Kimi-K3；积分：WorkBuddy项目全部会话累计 1571107，项目上界、含多主题混合，无法按主题/阶段精确拆分］
 - **v1.8.7** (2026-07-27) +10 功能点：双创选股策略模块化重构：新建 chuang/ 包（config/logger/indicators/data/fundamentals/strategy/risk/backtest/signals/index），将原 backtest_chuang.js 的 G1-G5+E1-E3 逻辑逐位精确迁移（回测 parity 已验证：import_final 全量 diff=0、宇宙创业板 n=667 exp=-1.27% 完全一致）；新增 BUY/SELL 信号与持仓比例建议（chuang_signals.json）补齐 app 缺失能力；全参数集中参数化、新增可配置指标层(PE/PB/营收增长/MACD)默认关；原 backtest_chuang.js/extend_fundamental.js 改为薄入口保留调用契约
+- **v1.8.8** (2026-07-28) +1 功能点：双创信号自动刷新并入开盘抓取自动化：将 chuang_signals.json 的日级刷新步骤(6.5步)合并进现有『买入信号·开盘抓取』自动化(09:30)，与 buy_signal.json 同源同窗口(import_final.json)重跑 chuang 策略产出 BUY/SELL 信号+仓位建议；失败时降级不中断整体；sync_pages 部署链路已闭合(刷新后信号随站点上线)。无代码功能点变动，仅版本记录进阶
 
 ## 历史
 
