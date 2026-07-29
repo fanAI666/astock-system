@@ -90,8 +90,8 @@ const patches = [
   },
   {
     name: 'init',
-    from: 'if(location.protocol.indexOf("http")===0){ importToday(); loadBuySignal(); loadWinRate(); loadBriefings(); loadFundFlow().then(()=>{ startLiveFundFlow(); }); }',
-    to:   'importToday(); loadBuySignal(); loadWinRate(); loadBriefings(); loadFundFlow().then(()=>{ startLiveFundFlow(); });',
+    from: 'if(location.protocol.indexOf("http")===0){ importToday(); loadBuySignal(); loadChuangSignal(); loadWinRate(); loadBriefings(); loadFundFlow().then(()=>{ startLiveFundFlow(); }); }',
+    to:   'importToday(); loadBuySignal(); loadChuangSignal(); loadWinRate(); loadBriefings(); loadFundFlow().then(()=>{ startLiveFundFlow(); });',
   },
 ];
 
