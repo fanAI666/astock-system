@@ -1905,7 +1905,6 @@ async function loadWinRate(){
 let FUND = {};
 function applyFund(j){ FUND=(j&&j.items)||{}; try{ renderCandidates(); }catch(e){} }
 async function loadFundamental(){
-  if(window.EMBED_DATA && window.EMBED_DATA.fundamental){ applyFund(window.EMBED_DATA.fundamental); return; } // 离线内嵌兜底
   if(location.protocol.indexOf('http')!==0){ return; }
   try{ const res=await fetch('选股结果/fundamental.json',{cache:'no-store'}); if(res.ok) applyFund(await res.json()); }catch(e){ console.warn('loadFundamental', e); }
 }
