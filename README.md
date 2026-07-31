@@ -75,7 +75,6 @@
 ```
 D:\WorkBuddy\
 ├─ stock-selection-system.html   # 系统主文件（单文件，含内联 CSS/JS）
-├─ 选股系统_离线版.html          # 内嵌数据的离线单文件版（package_singlefile.js 生成）
 ├─ serve.js                      # 本地预览服务器（端口 8080，口令 gate）
 ├─ build_deploy.js              # 打包 deploy/ + 注入 gate + 复制数据(VERSION/fundflow/…)
 ├─ sync_pages.js                # 构建并推送 GitHub Pages（gh-pages）
@@ -87,7 +86,6 @@ D:\WorkBuddy\
 ├─ recalibrate_win.py          # win 重标定（回测真实胜率回填）
 ├─ fetch_fundflow.py           # 资金动态盘后抓取（腾讯指数/风格 + 东财行业/北向）
 ├─ extend_history.js            # 从 tdx-connector 拉长 K 线至 320 根
-├─ package_singlefile.js        # 生成内嵌数据离线版
 ├─ VERSION.json                 # 版本状态（机器可读）
 ├─ CHANGELOG.md                # 版本变更日志（人类可读）
 ├─ 选股结果/                    # 数据源
