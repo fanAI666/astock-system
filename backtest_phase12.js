@@ -12,7 +12,7 @@
 const fs = require('fs');
 const SRC = 'D:/WorkBuddy/选股结果/import_final.json';
 const INDEX_FILE = 'D:/WorkBuddy/选股结果/index_sh.json';
-const OUT = 'D:/WorkBuddy/选股结果/backtest_phase12.json';
+const OUT = process.env.PHASE12_OUT || 'D:/WorkBuddy/选股结果/backtest_phase12.json';
 
 const ATR_WIN = 14;
 const MA_WIN_TREND = 20, MA_WIN_SHORT = 5, VOL_MULT = 1.2;
@@ -145,7 +145,8 @@ function genSignals(stock, cfg) {
   for (let i = 0; i < bars.length - 1; i++) {
     const d = bars[i], nd = bars[i + 1];
     const dateD = d[0];
-    if (dateD < cfg.from || dateD > cfg.to) continue;
+    const dateN = dateD.replace(/-/g, '');
+    if (dateN < cfg.from || dateN > cfg.to) continue;
     if (rKind) {
       const r = regimeOf(dateD, rKind);
       if (rMode === 'bull' && r !== 'bull') continue;
@@ -157,6 +158,24 @@ function genSignals(stock, cfg) {
     if (!f.volOk) { preStats.skipVol++; continue; }
     if (!f.gapOk) { preStats.skipGap++; continue; }
     preStats.pass++;
+    // ---- 新入场因子(研究分支, ENTRY_BREAKOUT=1 启用): 突破 / 放量确认 ----
+    // 假设: 在趋势+量能预过滤基础上, 仅在"20日新高附近"或"显著放量(≥1.5×MA20量)"时入场,
+    // 更可能在触及 +6% 目标前不被 -2% 止损打掉, 从而提升胜率。不影响基线(默认关闭)。
+    if (process.env.ENTRY_BREAKOUT === '1') {
+      const LB = 20;
+      let hi = -Infinity; for (let k = Math.max(0, i - LB + 1); k <= i; k++) hi = Math.max(hi, bars[k][2]);
+      const ma20Vol = sma(bars, i, MA_WIN_TREND, 5);
+      const volSurge = ma20Vol != null && bars[i][5] >= ma20Vol * 1.5;
+      const is20dHigh = bars[i][2] >= hi * 0.99;
+      if (!is20dHigh && !volSurge) { preStats.skipBreakout++; continue; }
+    }
+    // ---- 新入场因子(研究分支, ENTRY_PULLBACK=1 启用): 上升趋势中的回踩买点 ----
+    // 假设: 在趋势+量能预过滤(已要求 close>ma20 & ma5>ma20)基础上, 仅当 close 距 MA20 不远
+    // (≤5%, 即"强势中的回踩而非追高")时入场, 更可能在触及 +6% 目标前不被 -2% 止损打掉。默认关闭。
+    if (process.env.ENTRY_PULLBACK === '1') {
+      const ma20Now = sma(bars, i, MA_WIN_TREND, 2);
+      if (ma20Now == null || bars[i][2] > ma20Now * 1.05) { preStats.skipPullback++; continue; }
+    }
     const baseline = d[2], nextOpen = nd[1];
     if (!baseline || !nextOpen) continue;
     const dev = (nextOpen - baseline) / baseline;
@@ -189,7 +208,7 @@ function genSignals(stock, cfg) {
 }
 
 // ---- 组合层 (同 backtest_winrate.js) ----
-let preStats = { total: 0, pass: 0, skipTrend: 0, skipVol: 0, skipGap: 0, skipAtr: 0 };
+let preStats = { total: 0, pass: 0, skipTrend: 0, skipVol: 0, skipGap: 0, skipAtr: 0, skipBreakout: 0, skipPullback: 0 };
 function applyPortfolio(cands) {
   const afterIndex = [], idxFiltered = [];
   cands.forEach(c => {
@@ -270,7 +289,7 @@ function summarize(trades) {
 }
 
 function backtest(cfg) {
-  preStats = { total: 0, pass: 0, skipTrend: 0, skipVol: 0, skipGap: 0, skipAtr: 0 };
+  preStats = { total: 0, pass: 0, skipTrend: 0, skipVol: 0, skipGap: 0, skipAtr: 0, skipBreakout: 0, skipPullback: 0 };
   let cands = [];
   items.forEach(s => { cands = cands.concat(genSignals(s, cfg)); });
   const port = applyPortfolio(cands);
@@ -288,13 +307,14 @@ function backtest(cfg) {
   const byRegime = {};
   trades.forEach(t => { byRegime[t.regime] = byRegime[t.regime] || []; byRegime[t.regime].push(t); });
   Object.keys(byRegime).forEach(r => byRegime[r] = summarize(byRegime[r]));
-  // walk-forward: 滚动 6 个月窗口
+  // walk-forward: 滚动 6 个月窗口（日期统一转为 YYYYMMDD 以兼容 "YYYY-MM-DD" 与 "YYYYMMDD" 两种格式）
   const wf = [];
   const sorted = trades.slice().sort((a, b) => a.signalDate < b.signalDate ? -1 : 1);
-  const months = [...new Set(sorted.map(t => t.signalDate.slice(0, 6)))].sort();
+  const norm = s => String(s).replace(/-/g, '');
+  const months = [...new Set(sorted.map(t => norm(t.signalDate).slice(0, 6)))].sort();
   for (let m = 0; m + 5 < months.length; m++) {
     const lo = months[m], hi = months[m + 5];
-    const wt = sorted.filter(t => t.signalDate >= lo && t.signalDate <= hi);
+    const wt = sorted.filter(t => { const d = norm(t.signalDate); return d >= lo && d <= hi; });
     if (wt.length >= 10) { const sm = summarize(wt); wf.push({ window: lo + '~' + hi, n: wt.length, exp: sm.expectancy, winRate: sm.winRate, pf: sm.profitFactor }); }
   }
   return { cfg, base, byBoard, byYear, byRegime, walkForward: wf, portfolio: { idxFiltered: port.idxFiltered, perDayCapped: port.perDayCapped, ddPaused: port.ddPaused }, preStats };
@@ -303,12 +323,18 @@ function backtest(cfg) {
 // ---- 网格搜索 ----
 const PERIOD = { from: '20230828', to: '20260630' }; // 全 3 年
 const grid = [];
+if (process.env.PHASE12_ONLY) {
+  // 单配置验证模式(研究用): PHASE12_ONLY="kAtrDyn,boards,regime,maxHoldMain"
+  const [k, boards, regime, mh] = process.env.PHASE12_ONLY.split(',');
+  grid.push({ kAtrDyn: +k, boards, regime, maxHoldMain: +mh, from: PERIOD.from, to: PERIOD.to });
+} else {
 [1.05, 1.5, 2.0, 2.5, 3.0].forEach(kAtrDyn =>
   ['all', 'no_kcb', 'main_only'].forEach(boards =>
     ['none', 'bull_only', 'ma20_up', 'basket', 'not_bear', 'basket_not_bear'].forEach(regime =>
       [10, 20].forEach(maxHoldMain => {
         grid.push({ kAtrDyn, boards, regime, maxHoldMain, from: PERIOD.from, to: PERIOD.to });
       }))));
+}
 
 console.log('=== 网格搜索 (', grid.length, '配置 ) ===');
 const results = [];

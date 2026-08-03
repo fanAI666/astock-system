@@ -26,6 +26,7 @@
 - **v1.8.7** (2026-07-27) +10 功能点：双创选股策略模块化重构：新建 chuang/ 包（config/logger/indicators/data/fundamentals/strategy/risk/backtest/signals/index），将原 backtest_chuang.js 的 G1-G5+E1-E3 逻辑逐位精确迁移（回测 parity 已验证：import_final 全量 diff=0、宇宙创业板 n=667 exp=-1.27% 完全一致）；新增 BUY/SELL 信号与持仓比例建议（chuang_signals.json）补齐 app 缺失能力；全参数集中参数化、新增可配置指标层(PE/PB/营收增长/MACD)默认关；原 backtest_chuang.js/extend_fundamental.js 改为薄入口保留调用契约
 - **v1.8.8** (2026-07-28) +1 功能点：双创信号自动刷新并入开盘抓取自动化：将 chuang_signals.json 的日级刷新步骤(6.5步)合并进现有『买入信号·开盘抓取』自动化(09:30)，与 buy_signal.json 同源同窗口(import_final.json)重跑 chuang 策略产出 BUY/SELL 信号+仓位建议；失败时降级不中断整体；sync_pages 部署链路已闭合(刷新后信号随站点上线)。无代码功能点变动，仅版本记录进阶
 - **v1.8.9** (2026-07-30) +1 功能点：五日分时(min5)接入：新增 fetch_min5.js，经腾讯官方代理行情接口(proxy.finance.qq.com 分时)拉取最近5交易日1分钟分时并聚合为5分钟OHLC，写回 import_final.json 的 kline.min5（格式 [YYYYMMDD HHMM,open,close,high,low,vol]），补齐 westock 不含分钟级导致缺失的五日分时(ts5)/当日分时(ts1)数据；脚本自带容错(单日/单股失败跳过不编造、原有min5保留、.bak备份、并发池+超时重试)；16:00选股自动化步骤7新增运行该脚本，每日盘后自动刷新
+- **v1.9.2** (2026-08-03) +3 功能点：主板回踩入场P8上线(对齐回测验证入口,close<=MA20*1.05);双创C1质量增长筛选确认线上(质量优先宁缺毋滥);C2行业资金流Beta面板
 
 ## 历史
 

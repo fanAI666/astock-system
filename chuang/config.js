@@ -83,13 +83,14 @@ const CHUANG_CONFIG = {
   // ===== 4.3 全市场优化 =====
   basket: { enabled: env.BT_BASKET === '1' },
 
-  // ===== 新增可配置指标层（默认全部关闭，保留核心逻辑 parity）=====
+  // ===== 新增可配置指标层（C1 质量增长筛选：开 revGrowth/npGrowth，关 pe/pb 待补数据）=====
   // 开启后作为额外筛选门槛，不改变默认回测行为；用于后续新 edge 研究。
+  // 注意：fundamental.json 边车当前仅 9 支、无 PE/PB 字段，故 pe/pb 保持关闭（开启会因 null 全剔）。
   extraFilters: {
-    pe:         { enabled: false, min: 0,    max: 60 },   // 市盈率（来自基本面边车）
-    pb:         { enabled: false, min: 0,    max: 10 },   // 市净率
-    revGrowth:  { enabled: false, min: 0 },                // 营收同比增长(%) ≥
-    npGrowth:   { enabled: false, min: 0 },                // 净利润同比增长(%) ≥
+    pe:         { enabled: false, min: 0,    max: 60 },   // 市盈率（边车暂无字段，保持关）
+    pb:         { enabled: false, min: 0,    max: 10 },   // 市净率（边车暂无字段，保持关）
+    revGrowth:  { enabled: true, min: 0 },                 // C1: 营收同比增长(%) ≥ 0（剔除下滑）
+    npGrowth:   { enabled: true, min: 0 },                 // C1: 净利润同比增长(%) ≥ 0（剔除下滑/亏损）
     macd:       { enabled: false, goldenCross: true },     // MACD 金叉 / 零轴上方
   },
 

@@ -130,7 +130,8 @@ def metrics(day, q, pool_hyzaf=None):
         else: sector = "weak"
     return dict(ma20="up" if ma20_up else "down", priceMa="above" if price_above else "below",
                 ma60="up" if ma60_up else "down", rsi=round(r, 1), atr=round(a, 2),
-                vol=vol, struct=struct, sector=sector)
+                vol=vol, struct=struct, sector=sector,
+                ma20v=round(ma20, 2) if ma20 is not None else None)
 
 # ---------- 评分引擎（P1-P4 改进版，严格与 stock-selection-system.html scoreCandidate 同步） ----------
 def board_params(board):
@@ -145,6 +146,10 @@ RSI_OVERBOUGHT = 72
 # P3 涨幅过滤阈值
 PCT_HARD_REJECT = 9.5   # % 同日涨幅超此值硬拒绝
 PCT_WARNING = 6.0       # % 超此值扣分+警告
+
+# P8: 主板回踩入场带（对齐 backtest_phase12.js ENTRY_PULLBACK=1 的回测验证入口）
+# 主板仅在「上升趋势中、收盘价距 MA20 不超过 5%」时视为有效回踩入场；追高或跌破均不参与主板信号
+MAIN_PULLBACK_BAND = 0.05
 
 def score_candidate(c, pool_atrs=None):
     """返回 (total_score, formula_strength, atr_fit, bp, reasons, reject_info)
@@ -276,7 +281,18 @@ for it in pre_items:
     stop = round(entry * (1 - bp["loss"]/100), 2)
     target = round(entry * (1 + bp["profit"]/100), 2)
 
-    # P3/P4 拒决判定
+    # P8: 主板回踩入场硬约束（对齐 backtest_phase12.js ENTRY_PULLBACK=1 的验证入口）
+    # 仅在「上升趋势中、收盘价距 MA20 不超过 5%」时作为有效回踩入场；追高或跌破 MA20 均不参与主板信号
+    if board == "main" and m.get("ma20v") is not None:
+        band = m["ma20v"] * (1 + MAIN_PULLBACK_BAND)
+        pullback_ok = (m["priceMa"] == "above") and (entry <= band)
+        if not pullback_ok:
+            reason = (f"P8硬拒(主板回踩): 需上升回踩买点(价在MA20上且收盘<=MA20×1.05={round(band,2)}); "
+                      f"实际收盘{entry}、价{('在MA20上' if m['priceMa']=='above' else '在MA20下')}")
+            reject_info = (reject_info + " | " if reject_info else "") + reason
+            reasons.append("⛔ 主板回踩拒绝")
+
+    # P3/P4/P8 拒决判定
     hard_rejected = reject_info is not None
     pass_ = (strength >= 70) and (not hard_rejected)
 

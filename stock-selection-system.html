@@ -447,7 +447,7 @@
           <div class="meter" style="margin-top:8px"><span style="width:120px;font-size:12.5px">止损适配（ATR≤止损×1.2）</span><div class="bar"><i style="width:10%"></i></div><span class="num">10</span></div>
         </div>
       </div>
-      <div class="note">综合强度分 = 50 + 总分 × 0.35（上限 88）。总分 ≥ 57 即强度 ≥ 70。ATR 过大（波动超过止损）会被扣分并提示"波动剧烈"，这是实盘被扫损的主因。<b>P3/P4 新增：同日涨幅>9.5%硬拒绝追高；RSI>72超买硬约束直接淘汰。</b></div>
+      <div class="note">综合强度分 = 50 + 总分 × 0.35（上限 88）。总分 ≥ 57 即强度 ≥ 70。ATR 过大（波动超过止损）会被扣分并提示"波动剧烈"，这是实盘被扫损的主因。<b>P3/P4 新增：同日涨幅>9.5%硬拒绝追高；RSI>72超买硬约束直接淘汰。P8 新增：主板仅在「价在MA20上且收盘≤MA20×1.05」的上升回踩买点才放行，追高/跌破均不参与主板信号。</b></div>
     </div>
 
     <div class="card">
@@ -631,6 +631,20 @@
       <div class="chg-sell">
         <h3>SELL 规则（四档退出纪律）</h3>
         <ul id="chgSell"></ul>
+      </div>
+      <div class="chg-flow" style="margin-top:18px;border-top:1px solid #eee;padding-top:14px">
+        <h3 class="bs-sub">行业资金流 Beta · 选股行业热度参考（C2）</h3>
+        <p class="hint">数据来自 <code>选股结果/fundflow.json</code>（盘后快照）：左为 80 行业涨跌幅热度，右为 12 行业主力净流入（亿元）。用于判断当前资金偏好方向，辅助双创选股的行业 beta 判断。逐信号行业标注需基本面补 industry 字段，后续接入。</p>
+        <div class="flow-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px">
+          <div class="flow-col">
+            <div class="flow-h" style="font-weight:600;margin-bottom:6px">行业热度（按涨跌幅）</div>
+            <div id="flowHeat" class="flow-list"></div>
+          </div>
+          <div class="flow-col">
+            <div class="flow-h" style="font-weight:600;margin-bottom:6px">主力净流入（亿元）</div>
+            <div id="flowNet" class="flow-list"></div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -863,6 +877,7 @@ function boardParams(board){
 const RSI_OVERBOUGHT = 72;   // P4: RSI超买硬约束线
 const PCT_HARD_REJECT = 9.5; // P3: 同日涨幅硬拒绝阈值(%)
 const PCT_WARNING = 6.0;     // P3: 涨幅警告阈值(%)
+const MAIN_PULLBACK_BAND = 0.05; // P8: 主板回踩入场带（对齐 backtest_phase12.js ENTRY_PULLBACK=1 的验证入口）
 function scoreCandidate(c){
   let s=0, reasons=[];
 
@@ -920,6 +935,17 @@ function scoreCandidate(c){
     reasons.push(`<span style="color:var(--warn,#d97706)">⚠️ P3追高惩罚-10：日涨+${pctVal.toFixed(1)}%>${PCT_WARNING}%</span>`);
   }
 
+  // ---- P8: 主板回踩入场硬约束（对齐 backtest_phase12.js ENTRY_PULLBACK=1 的验证入口）----
+  // 主板仅在「上升趋势中、收盘价距 MA20 不超过 5%」时视为有效回踩入场；追高或跌破 MA20 均不参与主板信号
+  if(c.board==="main" && c.ma20v!=null && c.price!=null){
+    const band = c.ma20v*(1+MAIN_PULLBACK_BAND);
+    const pullbackOk = (c.priceMa==="above") && (c.price<=band);
+    if(!pullbackOk){
+      rejectType="MAIN_PULLBACK";
+      reasons.push(`<b style="color:#dc2626">⛔ P8硬拒(主板回踩)：需价在MA20上且收盘≤MA20×1.05=${band.toFixed(2)}（实际 ${c.priceMa==="above"?"价在MA20上":"价在MA20下"}、收盘=${c.price}）</b>`);
+    }
+  }
+
   const strength = Math.min(88, 50 + s*0.35);  // P1: 综合强度分（非胜率）
   let grade = s>=80?"A+":s>=70?"A":s>=60?"B":s>=45?"C":"D";
   const isChuang = (c.board==="cyb"||c.board==="kcb"||c.board==="kc");
@@ -950,8 +976,8 @@ function scoreCandidate(c){
     const _wr = Math.round(c.win*10)/10;
     const _sc = (c.score!=null && c.score!==undefined) ? c.score : s;
     const _g = _sc>=80?"A+":_sc>=70?"A":_sc>=60?"B":_sc>=45?"C":"D";
-    return {score:Math.round(_sc), strength:_sc, winRate:_wr, pass:_sc>=cfg.win, grade:_g,
-            isCalibrated:true, reasons:['成功概率=回测标定真实胜率（偏差已归零）'], rejected:false};
+    return {score:Math.round(_sc), strength:_sc, winRate:_wr, pass:_sc>=cfg.win && !rejectType, grade:_g,
+            isCalibrated:true, reasons:['成功概率=回测标定真实胜率（偏差已归零）'], rejected:!!rejectType, rejectType:rejectType||null};
   }
   // 未标定（手动评分）：winRate 显示为综合强度分，标签区分
   return {score:s, strength:Math.round(strength*10)/10, winRate:Math.round(strength*10)/10,
@@ -1830,6 +1856,27 @@ function renderChuangSignal(){
     sell.innerHTML=items.filter(it=>it[1]).map(it=>'<li><b>'+it[0]+'：</b>'+it[1]+'</li>').join("");
   }
 }
+async function loadFundFlow(){
+  const heat=document.getElementById("flowHeat");
+  const net=document.getElementById("flowNet");
+  if(!heat||!net) return;
+  if(location.protocol.indexOf("http")!==0){ heat.innerHTML='<div class="empty">需本地服务器/预览打开以加载 fundflow.json</div>'; net.innerHTML=''; return; }
+  try{
+    const res=await fetch("选股结果/fundflow.json",{cache:"no-store"});
+    if(!res.ok) throw new Error("http");
+    const d=await res.json();
+    const hs=(d.heatSectors||[]).slice().sort((a,b)=>b.pct-a.pct).slice(0,15);
+    heat.innerHTML=(hs.map(s=>{
+      const c=s.pct>=0?'#16a34a':'#dc2626';
+      return '<div class="flow-row" style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed #eee"><span class="fn">'+s.name+'</span><span class="fv" style="color:'+c+';font-variant-numeric:tabular-nums">'+(s.pct>=0?'+':'')+s.pct.toFixed(2)+'%</span></div>';
+    }).join("") || '<div class="empty">无数据</div>');
+    const ns=(d.fundFlow||[]).slice().sort((a,b)=>b.net-a.net).slice(0,15);
+    net.innerHTML=(ns.map(s=>{
+      const c=s.net>=0?'#16a34a':'#dc2626';
+      return '<div class="flow-row" style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed #eee"><span class="fn">'+s.sector+'</span><span class="fv" style="color:'+c+';font-variant-numeric:tabular-nums">'+(s.net>=0?'+':'')+s.net.toFixed(1)+'</span></div>';
+    }).join("") || '<div class="empty">无数据</div>');
+  }catch(e){ heat.innerHTML='<div class="empty">fundflow.json 加载失败</div>'; net.innerHTML=''; }
+}
 async function loadChuangSignal(){
   window.chuangSignal=null;
   if(location.protocol.indexOf("http")!==0){ renderChuangSignal(); return; }
@@ -1838,6 +1885,7 @@ async function loadChuangSignal(){
     if(res.ok) window.chuangSignal=await res.json();
   }catch(e){}
   renderChuangSignal();
+  loadFundFlow();
 }
 
 /* 双轨回测展示：主板(main_only) + 双创(创业板/科创板 独立加宽体系) 分别渲染，并画图 */
@@ -1957,6 +2005,7 @@ function renderWrChart(m, cBy){
 }
 /* ============ 版本更新日志 ============ */
 const VERSION_HISTORY = [
+  {v:"1.9.2",d:"2026-08-04",desc:"主板回踩入场P8上线：主板信号仅在「价在MA20上且收盘≤MA20×1.05」的上升回踩买点放行（对齐 backtest_phase12.js ENTRY_PULLBACK=1 回测验证入口，回测主板胜率30.8%→37.0%、期望+0.51%→+0.84%/笔、PF1.30→1.68、滚动窗负期望13/30→5/30）；build_0803.py/build_final.py/前端 scoreCandidate 三端严格同步。双创C1质量增长筛选(revGrowth/npGrowth≥0)确认线上、质量优先宁缺毋滥（信号宇宙当前0信号）。C2行业资金流Beta面板上线（读 fundflow.json 渲染80行业涨幅热度+12行业主力净流入）。另修复 backtest_phase12.js 日期格式bug（2023信号曾被漏算、walk-forward月份切片错误）"},
   {v:"1.8.9",d:"2026-07-30",desc:"五日分时(min5)接入：新增 fetch_min5.js 经腾讯官方代理分时接口(proxy.finance.qq.com)拉取最近5交易日1分钟分时聚合为5分钟OHLC，写回 import_final.json 的 kline.min5，补齐 westock 不含分钟级导致的五日分时(ts5)/当日分时(ts1)缺口；脚本自带容错(单日/单股失败跳过不编造、原有min5保留、.bak备份、并发池+超时重试)；16:00选股自动化步骤7新增运行该脚本每日盘后刷新"},
   {v:"1.8.8",d:"2026-07-28",desc:"双创信号自动刷新并入开盘抓取自动化：将 chuang_signals.json 的日级刷新步骤(6.5步)合并进现有『买入信号·开盘抓取』自动化(09:30)，与 buy_signal.json 同源同窗口(import_final.json)重跑 chuang 策略产出 BUY/SELL 信号+仓位建议；失败时降级不中断整体；sync_pages 部署链路已闭合(刷新后信号随站点上线)。无代码功能点变动，仅版本记录进阶"},
   {v:"1.8.7",d:"2026-07-27",desc:"双创选股策略模块化重构并接入展示：新建 chuang/ 包（config/logger/indicators/data/fundamentals/strategy/risk/backtest/signals/index），G1–G5+E1–E3 逻辑逐位精确迁移（回测 parity 已验证）；新增「🚀 双创信号」Tab，渲染 chuang_signals.json 的 BUY 信号（入场/止损/目标/建议仓位）与四档 SELL 退出纪律，明确标注双创全市场回测期望为负、仅作预警/研究样本"},

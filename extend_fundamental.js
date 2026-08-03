@@ -5,6 +5,12 @@
 const { CHUANG_CONFIG } = require('./chuang/config');
 const { buildFundamentals } = require('./chuang/fundamentals');
 
-buildFundamentals({ src: CHUANG_CONFIG.src, out: CHUANG_CONFIG.fundFile })
+buildFundamentals({
+  src: CHUANG_CONFIG.src,
+  out: CHUANG_CONFIG.fundFile,
+  codesFile: process.env.CODES_FILE || '',
+  skipG6: process.env.SKIP_G6 === '1',
+  skipVal: process.env.SKIP_VAL === '1',
+})
   .then(() => { console.log('fundamentals done →', CHUANG_CONFIG.fundFile); })
   .catch(e => { console.error(e); process.exit(1); });

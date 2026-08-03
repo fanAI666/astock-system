@@ -1,7 +1,7 @@
 {
   "baseVersion": "1.0.0",
-  "version": "1.8.9",
-  "featurePoints": 89,
+  "version": "1.9.2",
+  "featurePoints": 92,
   "rule": "以 1.0.0 为基准；每新增 1 个功能点版本 +0.0.1；满 10 个点进 1（即 0.0.9 → 0.1.0，相对基准为 1.0.9 → 1.1.0）；满 10 个次版本进 1（1.9.0 → 2.0.0）。版本号 = 基准主版本 + 功能点数按 10 进 1 进位。",
   "history": [
     {
@@ -187,6 +187,12 @@
       "desc": "五日分时(min5)接入：新增 fetch_min5.js，经腾讯官方代理行情接口(proxy.finance.qq.com 分时)拉取最近5交易日1分钟分时并聚合为5分钟OHLC，写回 import_final.json 的 kline.min5（格式 [YYYYMMDD HHMM,open,close,high,low,vol]），补齐 westock 不含分钟级导致缺失的五日分时(ts5)/当日分时(ts1)数据；脚本自带容错(单日/单股失败跳过不编造、原有min5保留、.bak备份、并发池+超时重试)；16:00选股自动化步骤7新增运行该脚本，每日盘后自动刷新",
       "model": "Kimi-K3",
       "credits": 1571107
+    },
+    {
+      "version": "1.9.2",
+      "date": "2026-08-03",
+      "points": 3,
+      "desc": "主板回踩入场P8上线(对齐回测验证入口,close<=MA20*1.05);双创C1质量增长筛选确认线上(质量优先宁缺毋滥);C2行业资金流Beta面板"
     }
   ]
 }
