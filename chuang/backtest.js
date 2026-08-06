@@ -54,8 +54,9 @@ function summarize(trades) {
 // ===== 单次回测（与旧 backtest(cfg) 等价，ctx 携带 items/index/g5/fund/config）=====
 function backtest(cfg, ctx) {
   resetPreStats();
+  const sigFn = (ctx && ctx.signalFn) || generateSignals;   // 5.1–5.6 观察轨道可注入 signalFn
   let cands = [];
-  ctx.items.forEach(s => { cands = cands.concat(generateSignals(s, cfg, ctx)); });
+  ctx.items.forEach(s => { cands = cands.concat(sigFn(s, cfg, ctx)); });
   const port = applyPortfolio(cands, ctx.config, ctx.index);
   const trades = port.trades;
   const base = summarize(trades);
@@ -68,6 +69,10 @@ function backtest(cfg, ctx) {
   const byRegime = {};
   trades.forEach(t => { byRegime[t.regime] = byRegime[t.regime] || []; byRegime[t.regime].push(t); });
   Object.keys(byRegime).forEach(r => byRegime[r] = summarize(byRegime[r]));
+  // 大盘开关子样本（圆桌新增）：开门 vs 关门 期望对比——直接验证"问题在择时还是选股"
+  const bySwitch = {};
+  trades.forEach(t => { const k = t.switch || 'na'; bySwitch[k] = bySwitch[k] || []; bySwitch[k].push(t); });
+  Object.keys(bySwitch).forEach(s => bySwitch[s] = summarize(bySwitch[s]));
   const wf = [];
   const sorted = trades.slice().sort((a, b) => a.signalDate < b.signalDate ? -1 : 1);
   const months = [...new Set(sorted.map(t => t.signalDate.slice(0, 6)))].sort();
@@ -77,7 +82,7 @@ function backtest(cfg, ctx) {
     if (wt.length >= 10) { const sm = summarize(wt); wf.push({ window: lo + '~' + hi, n: wt.length, exp: sm.expectancy, winRate: sm.winRate, pf: sm.profitFactor }); }
   }
   // portfolio 仅保留三项诊断计数（与旧 backtest_chuang.json schema 严格一致；trades 不写入，避免 schema 漂移）
-  return { cfg, base, byBoard, byYear, byRegime, walkForward: wf,
+  return { cfg, base, byBoard, byYear, byRegime, bySwitch, walkForward: wf,
            portfolio: { idxFiltered: port.idxFiltered, perDayCapped: port.perDayCapped, ddPaused: port.ddPaused },
            preStats: getPreStats(), signalCodes: [...new Set(cands.map(c => c.code))] };
 }
@@ -110,6 +115,7 @@ function runSweep(userConfig, ctx) {
     byBoard: detail.byBoard,
     byYear: detail.byYear,
     byRegime: detail.byRegime,
+    bySwitch: detail.bySwitch,
     walkForward: detail.walkForward,
     portfolio: detail.portfolio,
     preStats: detail.preStats,
@@ -121,8 +127,13 @@ function runSweep(userConfig, ctx) {
   fs.writeFileSync(config.out, JSON.stringify(out, null, 2), 'utf8');
   Logger.info('BT', `双创最优配置: ${JSON.stringify(best.cfg)} → exp=${(detail.base.expectancy*100).toFixed(2)}%/笔, 文件: ${config.out}`);
   const ps = detail.preStats;
-  Logger.info('BT', `G 门过滤: 候选=${ps.total} 通过预过滤=${ps.pass} | G1=${ps.skipG1} G2=${ps.skipG2} G3=${ps.skipG3} G4=${ps.skipG4} G5整只=${ps.skipG5} E2=${ps.skipE2}`);
+  Logger.info('BT', `G 门过滤: 候选=${ps.total} 通过预过滤=${ps.pass} | G1=${ps.skipG1} G2=${ps.skipG2} G3=${ps.skipG3} G4=${ps.skipG4} G5整只=${ps.skipG5} E2=${ps.skipE2} | TLS=${ps.skipTls} TSQ=${ps.skipTsq} PBES=${ps.skipPbes}`);
   Logger.info('BT', `byBoard: ${JSON.stringify(Object.fromEntries(Object.entries(detail.byBoard).map(([b, s]) => [b, { n: s.total, win: +(s.winRate*100).toFixed(1), exp: +(s.expectancy*100).toFixed(2) }])))}`);
+  if (detail.bySwitch) {
+    const bs = Object.fromEntries(Object.entries(detail.bySwitch).map(([s, x]) => [s, { n: x.total, win: +(x.winRate*100).toFixed(1), exp: +(x.expectancy*100).toFixed(2), pf: x.profitFactor == null ? 'inf' : +x.profitFactor.toFixed(2) }]));
+    const swOn = config.marketSwitch && config.marketSwitch.enabled;
+    Logger.info('BT', `大盘开关 bySwitch(${swOn ? '部署态·仅开门' : '验证态·全打标'}): ${JSON.stringify(bs)}`);
+  }
   return out;
 }
 

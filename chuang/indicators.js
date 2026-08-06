@@ -91,8 +91,47 @@ function turnover20Series(bars) {
   return out;
 }
 
+// TSQ 因子序列：成交量比 = vol[i] / median(vol[i-19..i])（代理换手突增；kline 无换手率字段）
+function volRatioSeries(bars) {
+  const n = bars.length, out = new Array(n).fill(null);
+  for (let i = 0; i < n; i++) {
+    if (i < 19) continue;
+    const arr = new Array(21);
+    for (let k = i - 19; k <= i; k++) arr[k - (i - 19)] = bars[k][5];
+    arr.sort((a, b) => a - b);
+    const med = arr[10];
+    out[i] = med > 0 ? bars[i][5] / med : null;
+  }
+  return out;
+}
+
+// PBES 因子序列（代理）：价格在区间 [i-lookback+1, i] 的归一化位置 = (close[i]-low)/(high-low)
+//   近似"自身 PE 分位"（EPS 短期稳定假设下 PE 位置≈价格位置；成长股有偏差，作否决层语义足够）
+function pricePctSeries(bars, lookback) {
+  const n = bars.length, out = new Array(n).fill(null);
+  for (let i = 0; i < n; i++) {
+    if (i < lookback - 1) continue;
+    let lo = Infinity, hi = -Infinity;
+    for (let k = i - lookback + 1; k <= i; k++) { const c = bars[k][2]; if (c < lo) lo = c; if (c > hi) hi = c; }
+    out[i] = hi > lo ? (bars[i][2] - lo) / (hi - lo) : 0.5;
+  }
+  return out;
+}
+
+// TSQ 涨停标记：双创 20cm，r=(close-prevClose)/prevClose ≥ 0.195 视为涨停（留 0.5% 容差）
+//   用于连板计数 H（从当前 i 往前数连续涨停天数）
+function isLimitUpSeries(bars) {
+  const n = bars.length, out = new Array(n).fill(false);
+  for (let i = 1; i < n; i++) {
+    const prevClose = bars[i - 1][2];
+    if (prevClose > 0) { const r = (bars[i][2] - prevClose) / prevClose; out[i] = r >= 0.195; }
+  }
+  return out;
+}
+
 // 一次性预计算某股票全部指标序列（O(bars)，替代 genSignals 内层重复计算 → 效率提升）
-function precompute(stock) {
+// opts.pbesLookback：PBES 价格分位滚动窗口（日）
+function precompute(stock, opts) {
   const bars = (stock.kline && stock.kline.day) || [];
   const ma5 = smaSeries(bars, 5, 2);
   const ma20 = smaSeries(bars, 20, 2);
@@ -100,8 +139,11 @@ function precompute(stock) {
   const rsi = rsiSeries(bars);
   const volMa20 = volMaSeries(bars, 20);
   const turnover20 = turnover20Series(bars);
+  const volRatio = volRatioSeries(bars);
+  const pricePct = pricePctSeries(bars, (opts && opts.pbesLookback) || 250);
+  const isLimitUp = isLimitUpSeries(bars);
   const { macd, signal: macdSig, hist: macdHist } = macdSeries(bars);
-  return { bars, ma5, ma20, atr, rsi, volMa20, turnover20, macd, macdSig, macdHist };
+  return { bars, ma5, ma20, atr, rsi, volMa20, turnover20, volRatio, pricePct, isLimitUp, macd, macdSig, macdHist };
 }
 
 // 预过滤（trend/vol/gap），与旧 passPreFilter 逐字等价
@@ -128,5 +170,6 @@ function screenPreFilter(ind, i, config) {
 module.exports = {
   ATR_WIN,
   smaSeries, atrSeries, rsiSeries, emaSeries, macdSeries, volMaSeries, turnover20Series,
+  volRatioSeries, pricePctSeries, isLimitUpSeries,
   precompute, screenPreFilter,
 };

@@ -58,6 +58,46 @@ function loadIndex(indexFile) {
   return { idxClose, idxPos, idxDates, idxMA, idxMA20, idxMA20ago, regimeOf, bars: ib };
 }
 
+// ===== 大盘开关指数（创业板指 sz399006 + 沪深300 sh000300）=====
+// switch_index.json = { cyb:[bars], hs300:[bars] }，bars=[date,o,c,h,l,v]
+// 评估器 switchOf(date) → 'open' | 'closed' | 'na'（na=数据缺失，部署态视为关门）
+function buildSwitchIdx(bars) {
+  const close = {}, vol = {}, dates = bars.map(b => b[0]).sort(), pos = {};
+  dates.forEach(d => { pos[d] = bars.findIndex(b => b[0] === d); });
+  dates.forEach(d => { close[d] = bars[pos[d]][2]; vol[d] = bars[pos[d]][5]; });
+  const ma20 = {}, vol20 = {};
+  for (let i = 0; i < bars.length; i++) {
+    if (i >= 19) {
+      let s = 0, v = 0;
+      for (let k = i - 19; k <= i; k++) { s += bars[k][2]; v += bars[k][5]; }
+      ma20[bars[i][0]] = s / 20; vol20[bars[i][0]] = v / 20;
+    }
+  }
+  return { close, vol, dates, pos, ma20, vol20 };
+}
+function loadSwitchIndex(file, ms) {
+  const raw = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const cyb = buildSwitchIdx(raw.cyb || []), hz = buildSwitchIdx(raw.hs300 || []);
+  const L = ms.rsLookback, M = ms.maWin, V = ms.volMult;
+  function switchOf(date) {
+    const ci = cyb.pos[date], hi = hz.pos[date];
+    if (ci == null || hi == null || ci < L || hi < L) return 'na';
+    const c = cyb.close[date], ma = cyb.ma20[date], v = cyb.vol[date], v20 = cyb.vol20[date];
+    if (c == null || ma == null || v == null || v20 == null) return 'na';
+    let ok = true;
+    if (ms.rsRequired) {
+      const c5 = cyb.close[cyb.dates[ci - L]], h5 = hz.close[hz.dates[hi - L]];
+      if (c5 == null || h5 == null) return 'na';
+      const rs = (c / c5 - 1) - (hz.close[date] / h5 - 1);
+      if (!(rs > 0)) ok = false;
+    }
+    if (ms.ma20Required && !(c > ma)) ok = false;
+    if (ms.volRequired && !(v > v20 * V)) ok = false;
+    return ok ? 'open' : 'closed';
+  }
+  return { switchOf };
+}
+
 // ===== ③ 全市场双创枚举 + 日K 抓取（接管 expand_universe.js）=====
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
@@ -151,4 +191,4 @@ async function buildUniverse(opts = {}) {
   return items;
 }
 
-module.exports = { loadUniverse, loadIndex, enumerateChuang, fetchKlineTencent, buildUniverse };
+module.exports = { loadUniverse, loadIndex, loadSwitchIndex, enumerateChuang, fetchKlineTencent, buildUniverse };
