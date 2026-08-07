@@ -765,6 +765,7 @@ let cfg={capital:100000,win:70,rr:3,
         // 科创板 独立体系（K_ATR 2.0，回测期望 −2.05%/笔，保持原样）
         lossKcb:5, profitKcb:15, relaxKcb:2.5};
 let candidates=[]; let trades=[];
+let AUTO_SNAPSHOT_DATE="";   // 自动选股快照日期（取自 import_final.json.updated），用于归档“选中日期”
 
 /* ============ 高频 模式切换 ============ */
 const MODE_CONFIG = {
@@ -1608,30 +1609,42 @@ function mergeItems(items){
     c.id="auto_"+Date.now()+"_"+(added++);
     c.src = it.category==="final"?"final":((it.category==="preok"||it.category==="preobs")?"pre":"manual");
     c.cat = it.category==="watch" ? "盘后·观察" : "盘后·定稿";
+    c.date = AUTO_SNAPSHOT_DATE;   // 归档用“选中日期”（取自快照 updated），使历史按交易日分组、评分页反映当日快照
     c._r=scoreCandidate(c);
     candidates.push(c);
   });
   return added;
 }
-function showImportMsg(added){
+function showImportMsg(added, got){
   const m=document.getElementById("importMsg");
-  if(added){ save(); refreshCand(); renderTrigger();
-    m.style.display="inline-block"; m.className="pill ok";
-    m.textContent="已导入 "+added+" 只（盘后）";
-  } else { m.style.display="inline-block"; m.className="pill warn"; m.textContent="暂无新的自动选股可导入"; }
+  m.style.display="inline-block";
+  if(got===false){ // 网络拉取失败：不改动本地候选
+    m.className="pill warn"; m.textContent="自动选股拉取失败，沿用本地候选";
+  } else if(added){
+    save(); refreshCand(); renderTrigger();
+    m.className="pill ok";
+    m.textContent=(got===true?("已同步最新选股 "+added+" 只（"+AUTO_SNAPSHOT_DATE+"）"):("已导入 "+added+" 只（盘后）"));
+  } else {
+    m.className="pill warn";
+    m.textContent=(got===true?"最新选股为空，未更新":"暂无新的自动选股可导入");
+  }
   setTimeout(()=>m.style.display="none",3000);
 }
 async function importToday(){
   const files=["选股结果/import_final.json"];
-  let added=0;
+  // 清掉上一批自动导入（非手动）候选，仅当成功拉到数据时才替换，避免网络失败时清空；保留手动候选
+  let got=false, total=0, cleared=false;
   for(const f of files){
     try{ const res=await fetch(f,{cache:"no-store"}); if(!res.ok) continue;
       const data=await res.json();
-      added+=mergeItems(data.items||[]);
-      added+=mergeItems(data.watch||[]);   // P6: 观察池（超行业上限降级）
+      AUTO_SNAPSHOT_DATE=(data.updated||"").slice(0,10)||todayStr();   // 快照日期→历史归档
+      got=true;
+      if(!cleared){ candidates=candidates.filter(c=>c.src==="manual"); cleared=true; }
+      total+=mergeItems(data.items||[]);
+      total+=mergeItems(data.watch||[]);   // P6: 观察池（超行业上限降级）
     }catch(e){}
   }
-  showImportMsg(added);
+  showImportMsg(total, got);
 }
 // 本地文件兜底：以 file:// 双击打开时 fetch 受 CORS 限制，改用文件选择器导入
 document.getElementById("importFile").addEventListener("change",e=>{
