@@ -494,8 +494,8 @@
       <div class="sgrid" id="styleGrid"></div>
     </div>
 
-    <!-- 模块五：北向资金动向与趋势 -->
-    <div class="ff-sec">
+    <!-- 模块五：北向资金动向与趋势（2026-08-08 起临时屏蔽：北向资金数据源取不到，恢复时移除 style="display:none" 即可） -->
+    <div class="ff-sec" style="display:none">
       <h3 class="ff-t"><span class="e">🌊</span> 北向资金动向与趋势 <span class="sub">近 20 日</span></h3>
       <div class="nbox">
         <div class="nm" id="northMain"></div>
@@ -2276,6 +2276,11 @@ function renderStyleGrid(){
 
 /* 模块五：北向资金（Canvas 手绘双线：沪股通蓝 / 深股通橙） */
 function renderNorthChart(){
+  // 2026-08-08 临时屏蔽：北向资金数据源不可用，section 已 display:none，跳过渲染避免空 canvas 报错/浪费
+  const nmEl=document.getElementById('northMain');
+  if(!nmEl) return;
+  const sec=nmEl.closest('.ff-sec');
+  if(sec && sec.offsetParent===null) return;   // 祖先为 display:none → 不渲染
   const nf=FF_DATA.northFlow; const TC=themeColors();
   const fmtAmt2 = v => (v==null)?'--':((v>=0?'+':'')+v.toFixed(1));
   const cls2 = v => (v==null?'':(v>=0?'up':'dn'));
