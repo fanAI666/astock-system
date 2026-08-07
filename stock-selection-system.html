@@ -1602,28 +1602,30 @@ document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("clic
 
 /* ============ 自动选股导入 ============ */
 function mergeItems(items){
-  let added=0;
+  let added=0, fSkip=0, idx=0;
   (items||[]).forEach(it=>{
-    if(candidates.some(c=>c.name===it.name && (c.date||"")===(it.date||""))) return; // 去重
     const c=Object.assign({},it);
-    c.id="auto_"+Date.now()+"_"+(added++);
+    c.id="auto_"+Date.now()+"_"+(idx++);
     c.src = it.category==="final"?"final":((it.category==="preok"||it.category==="preobs")?"pre":"manual");
     c.cat = it.category==="watch" ? "盘后·观察" : "盘后·定稿";
-    c.date = AUTO_SNAPSHOT_DATE;   // 归档用“选中日期”（取自快照 updated），使历史按交易日分组、评分页反映当日快照
     c._r=scoreCandidate(c);
-    candidates.push(c);
+    if(c._r.grade==="F"){ fSkip++; return; }   // 剔除F级（硬约束拒绝：RSI超买/MA60未向上/G5盈利质量），不进入动态选股
+    if(candidates.some(x=>x.name===it.name && (x.date||"")===(it.date||""))) return; // 去重
+    c.date = AUTO_SNAPSHOT_DATE;   // 归档用“选中日期”（取自快照 updated），使历史按交易日分组、评分页反映当日快照
+    candidates.push(c); added++;
   });
-  return added;
+  return {added, fSkip};
 }
-function showImportMsg(added, got){
+function showImportMsg(added, got, fSkip){
   const m=document.getElementById("importMsg");
   m.style.display="inline-block";
+  const fNote = (fSkip>0)? ("，已剔除 "+fSkip+" 只F级") : "";
   if(got===false){ // 网络拉取失败：不改动本地候选
     m.className="pill warn"; m.textContent="自动选股拉取失败，沿用本地候选";
   } else if(added){
     save(); refreshCand(); renderTrigger();
     m.className="pill ok";
-    m.textContent=(got===true?("已同步最新选股 "+added+" 只（"+AUTO_SNAPSHOT_DATE+"）"):("已导入 "+added+" 只（盘后）"));
+    m.textContent=(got===true?("已同步最新选股 "+added+" 只（"+AUTO_SNAPSHOT_DATE+"）"+fNote):("已导入 "+added+" 只（盘后）"+fNote));
   } else {
     m.className="pill warn";
     m.textContent=(got===true?"最新选股为空，未更新":"暂无新的自动选股可导入");
@@ -1633,27 +1635,30 @@ function showImportMsg(added, got){
 async function importToday(){
   const files=["选股结果/import_final.json"];
   // 清掉上一批自动导入（非手动）候选，仅当成功拉到数据时才替换，避免网络失败时清空；保留手动候选
-  let got=false, total=0, cleared=false;
+  let got=false, total=0, fSkip=0, cleared=false;
   for(const f of files){
     try{ const res=await fetch(f,{cache:"no-store"}); if(!res.ok) continue;
       const data=await res.json();
       AUTO_SNAPSHOT_DATE=(data.updated||"").slice(0,10)||todayStr();   // 快照日期→历史归档
       got=true;
       if(!cleared){ candidates=candidates.filter(c=>c.src==="manual"); cleared=true; }
-      total+=mergeItems(data.items||[]);
-      total+=mergeItems(data.watch||[]);   // P6: 观察池（超行业上限降级）
+      const r1=mergeItems(data.items||[]); total+=r1.added; fSkip+=r1.fSkip;
+      const r2=mergeItems(data.watch||[]); total+=r2.added; fSkip+=r2.fSkip;   // P6: 观察池（超行业上限降级）
     }catch(e){}
   }
-  showImportMsg(total, got);
+  showImportMsg(total, got, fSkip);
 }
 // 本地文件兜底：以 file:// 双击打开时 fetch 受 CORS 限制，改用文件选择器导入
 document.getElementById("importFile").addEventListener("change",e=>{
   const fs=e.target.files; if(!fs||!fs.length) return;
-  let pending=fs.length, added=0;
+  let pending=fs.length, added=0, fSkip=0;
   for(const file of fs){
     const reader=new FileReader();
-    reader.onload=ev=>{ try{ const d=JSON.parse(ev.target.result); added+=mergeItems(d.items||[]); added+=mergeItems(d.watch||[]); }catch(_){}
-      if(--pending===0) showImportMsg(added); };
+    reader.onload=ev=>{ try{ const d=JSON.parse(ev.target.result);
+      const r1=mergeItems(d.items||[]); added+=r1.added; fSkip+=r1.fSkip;
+      const r2=mergeItems(d.watch||[]); added+=r2.added; fSkip+=r2.fSkip;
+    }catch(_){}
+      if(--pending===0) showImportMsg(added, undefined, fSkip); };
     reader.readAsText(file,"utf-8");
   }
   e.target.value="";
