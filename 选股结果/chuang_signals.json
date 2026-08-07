@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-06",
+  "generatedAt": "2026-08-07",
   "config": {
     "kAtrDyn": 2.5,
     "maxHoldDyn": 5,
@@ -7,7 +7,7 @@
     "boards": "chuang_only",
     "period": {
       "from": "20230828",
-      "to": "20260806"
+      "to": "20260808"
     }
   },
   "method": "chuang-strategy-refactor",

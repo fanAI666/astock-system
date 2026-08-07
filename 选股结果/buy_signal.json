@@ -1,42 +1,49 @@
 {
-  "date": "2026-08-06",
-  "baselineDate": "2026-08-05",
+  "date": "2026-08-08",
+  "baselineDate": "2026-08-07",
+  "marketRegime": {
+    "index": "sh000001",
+    "close": 3940.04,
+    "ma20": 3859.47,
+    "dev": 0.0209,
+    "verdict": "多头"
+  },
   "top3": [
     {
       "code": "600000",
       "name": "浦发银行 600000",
       "board": "main",
       "win": 79.8,
-      "baseline": 9.26,
-      "open": 9.28,
-      "dev": 0.00216,
+      "baseline": 9.21,
+      "open": null,
+      "dev": null,
       "tol": 0.02,
       "decision": "hold",
-      "reason": "过滤未过：量能不足(795499 < 1060915)"
+      "reason": "过滤未过(量能:565457 < 1.2×MA20量 1059863)；且今日为非交易日(周六)，次日开盘价不可得"
     },
     {
       "code": "002415",
       "name": "海康威视 002415",
       "board": "main",
       "win": 79,
-      "baseline": 38.44,
-      "open": 38.09,
-      "dev": -0.009105,
+      "baseline": 37.24,
+      "open": null,
+      "dev": null,
       "tol": 0.02,
       "decision": "hold",
-      "reason": "过滤未过：量能不足(1050263 < 1390815)"
+      "reason": "过滤未过(量能:855704 < 1.2×MA20量 1368296)；且今日为非交易日(周六)，次日开盘价不可得"
     },
     {
       "code": "002900",
       "name": "哈三联 002900",
       "board": "main",
       "win": 79,
-      "baseline": 12.71,
-      "open": 12.41,
-      "dev": -0.023603,
+      "baseline": 13.48,
+      "open": null,
+      "dev": null,
       "tol": 0.02,
       "decision": "hold",
-      "reason": "开盘偏离超容差(-2.36% > ±2%)"
+      "reason": "5b过滤通过(趋势/量能/缺口全OK)，但今日为非交易日(周六)，无法获取次日(2026-08-10)开盘价 → 无法确认买入；另注:基准日08-07为涨停收盘(+10.04%)，追高风险高"
     }
   ],
   "trade": false
