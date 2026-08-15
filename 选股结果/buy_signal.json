@@ -1,43 +1,42 @@
 {
-  "date": "2026-08-12",
-  "baselineDate": "2026-08-10",
+  "date": "2026-08-14",
+  "baselineDate": "2026-08-13",
   "top3": [
     {
       "code": "600000",
       "name": "浦发银行 600000",
       "board": "main",
       "win": 79.8,
-      "baseline": 9.29,
-      "open": 9.21,
-      "dev": -0.0086,
+      "baseline": 9.18,
+      "open": 9.14,
+      "dev": -0.0044,
       "tol": 0.02,
       "decision": "hold",
-      "reason": "过滤未过(量能✗(vol=625425<1.2*MA20vol=1051931))"
+      "reason": "过滤未过·趋势未过/量能未过(vol=528860<985256)"
     },
     {
       "code": "002415",
       "name": "海康威视 002415",
       "board": "main",
       "win": 79,
-      "baseline": 37.44,
-      "open": 36.36,
-      "dev": -0.0288,
+      "baseline": 35.66,
+      "open": 35.62,
+      "dev": -0.0011,
       "tol": 0.02,
       "decision": "hold",
-      "reason": "容差未过(|dev|=2.88%>2%)"
+      "reason": "过滤未过·趋势未过/量能未过(vol=936951<1412750)"
     },
     {
       "code": "002900",
       "name": "哈三联 002900",
       "board": "main",
       "win": 79,
-      "baseline": 14.83,
-      "open": 14.29,
-      "dev": -0.0364,
+      "baseline": 14.22,
+      "open": 14.22,
+      "dev": 0.0,
       "tol": 0.02,
-      "decision": "hold",
-      "reason": "容差未过(|dev|=3.64%>2%)"
+      "decision": "buy"
     }
   ],
-  "trade": false
+  "trade": true
 }
