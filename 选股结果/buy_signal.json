@@ -1,42 +1,43 @@
 {
-  "date": "2026-08-14",
-  "baselineDate": "2026-08-13",
+  "date": "2026-08-15",
+  "baselineDate": "2026-08-14",
   "top3": [
     {
       "code": "600000",
       "name": "浦发银行 600000",
       "board": "main",
       "win": 79.8,
-      "baseline": 9.18,
-      "open": 9.14,
-      "dev": -0.0044,
+      "baseline": 9.10,
+      "open": null,
+      "dev": null,
       "tol": 0.02,
       "decision": "hold",
-      "reason": "过滤未过·趋势未过/量能未过(vol=528860<985256)"
+      "reason": "周六非交易日，腾讯自选股quote返回基准日2026-08-14数据，无次日开盘价，无法确认买入（参考：5b过滤亦未过·趋势+量能）"
     },
     {
       "code": "002415",
       "name": "海康威视 002415",
       "board": "main",
-      "win": 79,
-      "baseline": 35.66,
-      "open": 35.62,
-      "dev": -0.0011,
+      "win": 79.0,
+      "baseline": 34.88,
+      "open": null,
+      "dev": null,
       "tol": 0.02,
       "decision": "hold",
-      "reason": "过滤未过·趋势未过/量能未过(vol=936951<1412750)"
+      "reason": "周六非交易日，腾讯自选股quote返回基准日2026-08-14数据，无次日开盘价，无法确认买入（参考：5b过滤亦未过·趋势+量能）"
     },
     {
       "code": "002900",
       "name": "哈三联 002900",
       "board": "main",
-      "win": 79,
-      "baseline": 14.22,
-      "open": 14.22,
-      "dev": 0.0,
+      "win": 79.0,
+      "baseline": 13.92,
+      "open": null,
+      "dev": null,
       "tol": 0.02,
-      "decision": "buy"
+      "decision": "hold",
+      "reason": "周六非交易日，腾讯自选股quote返回基准日2026-08-14数据，无次日开盘价，无法确认买入（参考：5b过滤亦未过·量能）"
     }
   ],
-  "trade": true
+  "trade": false
 }
