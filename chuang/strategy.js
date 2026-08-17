@@ -14,7 +14,7 @@ const { precompute, screenPreFilter, ATR_WIN } = require('./indicators');
 function newPreStats() {
   return { total: 0, pass: 0, skipTrend: 0, skipVol: 0, skipGap: 0, skipAtr: 0,
            skipG1: 0, skipG2: 0, skipG3: 0, skipG4: 0, skipG5: 0, skipE2: 0, skipSwitch: 0,
-           skipTls: 0, skipTsq: 0, skipPbes: 0 };
+           skipTls: 0, skipTsq: 0, skipPbes: 0, skipFactor: 0, skipVolTarget: 0 };
 }
 let preStats = newPreStats();
 function resetPreStats() { preStats = newPreStats(); }
@@ -184,6 +184,21 @@ function generateSignals(stock, cfg, ctx) {
       if (rMode === 'bull' && r !== 'bull') continue;
       if (rMode === 'notbear' && r === 'bear') continue;
     }
+    // ===== 因子层主筛（idioVol60 低特质波动；仅双创；默认关，CHUANG_FACTORS=1 开启）=====
+    // 最外层过滤（先于 TLS/preFilter/gates/veto）：只把候选池压到当日 idioVol 最低 30%，
+    // 不动任何持有期/止损/止盈规则 → 与现有 G/E 体系正交，可独立开关做 A/B。
+    // 依据：R10b 证明现有 G3 动量核（aboveMA20/maStruc/mom60）在流动性中性池内劣于随机，
+    //       而低特质波动是 14 轮验证中唯一 F3 与 holdout 双正的因子（详见 chuang/factors.js）。
+    if (isDyn && config.factors && config.factors.enabled) {
+      const fset = ctx.factorPass && ctx.factorPass.get(dateD);
+      if (!fset || !fset.has(stock.code)) { preStats.skipFactor++; continue; }
+    }
+    // ===== 波动率目标叠加层（P1，risk-overlay；仅双创；默认关，CHUANG_VOLTARGET=1 开启）=====
+    // 高波动 regime 暂停入场：当日板块波动超阈值则本日全部信号跳过（不改选股/止损/止盈）。
+    if (isDyn && config.volTarget && config.volTarget.enabled) {
+      const ok = ctx.volTargetOK && ctx.volTargetOK.get(dateD);
+      if (!ok) { preStats.skipVolTarget++; continue; }
+    }
     // ===== TLS 板块内龙头主筛（圆桌路线 B；仅双创；默认关，CHUANG_TLS=1 开启）=====
     // 主筛（最外层过滤）：先把候选池压到「当周主线板块内龙头前N」，再走后续 gates/veto；
     // 解决 G3 与 PBES 互斥导致的否决层冗余——让 TSQ/PBES 在龙头样本上真正生效。
@@ -272,18 +287,29 @@ function generateSignals(stock, cfg, ctx) {
     }
     const trailPct = (isDyn && exec.enabled) ? exec.E3_trailPct : main.trailPct;   // E3 跟踪止损 3%→2%（仅双创）
     const trailCap = entry * (1 + main.trailCap);
-    let curSL = sl, outcome = null, exitPrice = entry, holdDays = 0;
+    // 出场修复（2026-08-17 P0）：
+    //  ① 跳空感知成交：触及 curSL 时若当日开盘已穿越止损位，仅能按开盘价成交（拿不到 curSL 价）；
+    //  ② 胜负按真实实现盈亏 exitPrice vs entry 判定，不再由触发的停止位决定
+    //     （原 bug：跟踪止损抬升后出场价仍 > 成本却被记成 'loss'，扭曲胜率/PF）。
+    let curSL = sl, exitPrice = null, holdDays = 0;
     for (let j = i + 1; j < bars.length && j <= i + maxHold; j++) {
-      const h = bars[j][3], l = bars[j][4]; holdDays++;
-      if (l <= curSL) { outcome = 'loss'; exitPrice = curSL; break; }
-      if (h >= tp) { outcome = 'win'; exitPrice = tp; break; }
-      if (isDyn) { const nsl = Math.min(trailCap, Math.max(curSL, h * (1 - trailPct))); if (nsl > curSL) curSL = nsl; }
+      const o = bars[j][1], h = bars[j][3], l = bars[j][4]; holdDays++;
+      if (l <= curSL) { exitPrice = Math.min(curSL, o); break; }            // 跳空感知成交
+      if (h >= tp) { exitPrice = tp; break; }
+      if (isDyn) {
+        const trig = exec.E3_trailTrigger || 0;                            // E3 盈利触发门槛：价格先越过 entry*(1+trig) 才开始跟踪
+        const canTrail = trig <= 0 ? true : h >= entry * (1 + trig);
+        if (canTrail) {
+          const nsl = Math.min(trailCap, Math.max(curSL, h * (1 - trailPct)));
+          if (nsl > curSL) curSL = nsl;
+        }
+      }
     }
-    if (!outcome) {
+    if (exitPrice == null) {
       const jlast = Math.min(bars.length - 1, i + maxHold);
-      exitPrice = bars[jlast][2];
-      outcome = exitPrice >= entry ? 'win' : 'loss'; holdDays = jlast - i;
+      exitPrice = bars[jlast][2]; holdDays = jlast - i;
     }
+    const outcome = exitPrice >= entry ? 'win' : 'loss';                   // 真实盈亏判定
     const ret = (exitPrice - entry) / entry;
     const rTrade = rKind ? index.regimeOf(dateD, rKind) : 'n/a';
     out.push({ code: stock.code, board, signalDate: dateD, entryDate: nd[0], entry, exit: exitPrice,

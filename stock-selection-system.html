@@ -371,16 +371,16 @@
       <div class="wr-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
         <div class="wr-card">
           <div class="wr-main">
-            <div class="wr-label">主板胜率<span class="wr-sub">main_only 体系</span></div>
+            <div class="wr-label">主板 每笔期望<span class="wr-sub">main_only 体系 · 主指标</span></div>
             <div class="wr-big" id="wrValue">—</div>
-            <div class="wr-period" id="wrPeriod">回测周期 2023.8.28 – 2026.6.30</div>
-            <div class="wr-period" id="wrDataNote" style="color:#f59e0b"></div>
+            <div class="wr-period" id="wrPeriod">回测周期 2023.08.28 – 2026.07.31</div>
+            <div class="wr-period" id="wrDataNote" style="color:#f59e0b">主指标已切为「期望/笔 + 盈亏比PF + 最大回撤」，胜率降为次要</div>
           </div>
           <div class="wr-stats">
             <div class="wr-stat"><span class="k">触发交易</span><b id="wrTrades">—</b></div>
-            <div class="wr-stat"><span class="k">盈利 / 亏损</span><b id="wrWL">—</b></div>
-            <div class="wr-stat"><span class="k">盈亏比</span><b id="wrPF">—</b></div>
-            <div class="wr-stat"><span class="k">每笔期望</span><b id="wrExp">—</b></div>
+            <div class="wr-stat"><span class="k">胜率</span><b id="wrWin">—</b></div>
+            <div class="wr-stat"><span class="k">盈亏比 PF</span><b id="wrPF">—</b></div>
+            <div class="wr-stat"><span class="k">最大回撤</span><b id="wrDD">—</b></div>
           </div>
           <div class="wr-rule" id="wrRule">主板 main_only：强制止损−2%/止盈+6%（固定3:1），持有≤20日，K_ATR=1.05</div>
           <div class="wr-rule" id="wrFilterAll" style="color:#0ea5e9">触发前需过 趋势+量能+缺口 过滤（v1.0.3 起）</div>
@@ -390,15 +390,15 @@
         </div>
         <div class="wr-card" style="border-color:#fca5a5">
           <div class="wr-main">
-            <div class="wr-label">双创胜率<span class="wr-sub">独立加宽K_ATR体系</span></div>
+            <div class="wr-label">双创 每笔期望<span class="wr-sub">独立加宽K_ATR体系 · 主指标</span></div>
             <div class="wr-big" id="wrChuangValue">—</div>
-            <div class="wr-period" id="wrChuangPeriod">回测周期 2023.8.28 – 2026.6.30</div>
+            <div class="wr-period" id="wrChuangPeriod">回测周期 2023.08.28 – 2026.07.31</div>
           </div>
           <div class="wr-stats">
             <div class="wr-stat"><span class="k">触发交易</span><b id="wrChuangTrades">—</b></div>
-            <div class="wr-stat"><span class="k">盈利 / 亏损</span><b id="wrChuangWL">—</b></div>
-            <div class="wr-stat"><span class="k">盈亏比</span><b id="wrChuangPF">—</b></div>
-            <div class="wr-stat"><span class="k">每笔期望</span><b id="wrChuangExp">—</b></div>
+            <div class="wr-stat"><span class="k">胜率</span><b id="wrChuangWin">—</b></div>
+            <div class="wr-stat"><span class="k">盈亏比 PF</span><b id="wrChuangPF">—</b></div>
+            <div class="wr-stat"><span class="k">最大回撤</span><b id="wrChuangDD">—</b></div>
           </div>
           <div class="wr-rule" id="wrChuangRule" style="color:#6366f1">创业板·科创板独立体系</div>
           <div class="wr-rule" id="wrChuangWarn" style="color:#dc2626">⚠️ 双创策略回测样本不足/期望未稳定，仅作研究，不建议实盘</div>
@@ -963,7 +963,7 @@ function scoreCandidate(c){
     }
     const _sc = (c.score!=null && c.score!==undefined) ? c.score : s;
     const _g = _sc>=80?"A+":_sc>=70?"A":_sc>=60?"B":_sc>=45?"C":"D";
-    const _notes=[`<b style="color:var(--warn,#d97706)">⚠️ 双创胜率回测标定已失真（Phase3 实测 创业板≈7%/科创板≈2.4%），本卡改按模型综合强度分展示，待 Phase4 重标</b>`];
+    const _notes=[`<b style="color:var(--warn,#d97706)">⚠️ 双创主指标已切换为「期望/笔 + 盈亏比PF + 最大回撤」（修正后的回测基线与主板同口径，胜率仅作次要参考）；修正引擎已修复出场标签 bug，原 −1.37% 负期望为统计假象，真实为微正期望，仅供研究</b>`];
     if(_fd){ _notes.push(`<span style="color:var(--ok)">✓ G5盈利质量达标（TTM=${_fd.npTtm!=null?_fd.npTtm+'亿':'—'}，TTM同比=${_fd.npTtmYoY!=null?_fd.npTtmYoY+'%':'—'}）</span>`
       + ((_fd.researchCount90d||0)>0 ? `<span style="color:var(--brand)"> · G6 近90日研报×${_fd.researchCount90d}</span>` : '')); }
     return {score:Math.round(_sc), strength:Math.round(strength*10)/10, winRate:Math.round(strength*10)/10,
@@ -1910,47 +1910,46 @@ async function loadChuangSignal(){
 function renderWinRate(p12, ch){
   const set=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
   const m = (p12 && p12.base) ? p12.base : null;
-  // ---------- 主板 card ----------
+  // ---------- 主板 card（主指标：期望/笔）----------
   if(m){
-    const pct=m.winRate*100;
+    const exp=m.expectancy!=null? m.expectancy*100 : 0;
     const wr=document.getElementById('wrValue');
-    if(wr){ wr.textContent=pct.toFixed(1)+'%'; wr.className='wr-big '+(pct>=70?'wr-good':(pct>=40?'wr-mid':'wr-bad')); }
+    if(wr){ wr.textContent=(exp>=0?'+':'')+exp.toFixed(2)+'%'; wr.className='wr-big '+(exp>=0?'wr-good':'wr-bad'); }
     set('wrTrades',(m.total||0)+' 笔');
-    set('wrWL',(m.wins||0)+' / '+((m.total||0)-(m.wins||0)));
+    set('wrWin',(m.winRate*100).toFixed(1)+'%');
     set('wrPF', m.profitFactor!=null? m.profitFactor.toFixed(2)+'×':'—');
-    set('wrExp', m.expectancy!=null? (m.expectancy*100).toFixed(2)+'%':'—');
-    set('wrPeriod','回测周期 2023.08.28 – 2026.06.30');
-    set('wrCalib','组合后期望 '+(m.expectancy*100).toFixed(2)+'%/笔 · PF '+m.profitFactor.toFixed(2)+' · 盈亏比 '+m.payoff.toFixed(2)+' ✅ 转正');
+    set('wrDD', m.maxDD!=null? (m.maxDD*100).toFixed(1)+'%':'—');
+    set('wrPeriod','回测周期 2023.08.28 – 2026.07.31');
+    set('wrCalib','期望 '+(m.expectancy*100).toFixed(2)+'%/笔 · PF '+m.profitFactor.toFixed(2)+' · 最大回撤 '+(m.maxDD!=null?(m.maxDD*100).toFixed(1):'—')+'% ✅ 转正');
     const bm=(p12.byBoard&&p12.byBoard.main)?p12.byBoard.main:null;
-    set('wrByBoard', bm? ('主板 main_only：'+(bm.winRate*100).toFixed(1)+'%('+bm.wins+'/'+bm.total+') · K_ATR=1.05 · 持有≤20日') : '');
+    set('wrByBoard', bm? ('主板 main_only：'+(bm.winRate*100).toFixed(1)+'%胜('+bm.wins+'/'+bm.total+') · K_ATR=1.05 · 持有≤20日') : '');
   } else {
-    set('wrValue','—'); set('wrTrades','—'); set('wrWL','—'); set('wrPF','—'); set('wrExp','—');
+    set('wrValue','—'); set('wrTrades','—'); set('wrWin','—'); set('wrPF','—'); set('wrDD','—');
   }
-  // ---------- 双创 card ----------
+  // ---------- 双创 card（主指标：期望/笔）----------
   const c = (ch && ch.base) ? ch.base : null;
   const cBy = (ch && ch.byBoard) ? ch.byBoard : {};
   if(c){
-    const cpct=c.winRate*100;
+    const cexp=c.expectancy!=null? c.expectancy*100 : 0;
     const wrC=document.getElementById('wrChuangValue');
-    if(wrC){ wrC.textContent=cpct.toFixed(1)+'%'; wrC.className='wr-big '+(cpct>=40?'wr-mid':'wr-bad'); }
+    if(wrC){ wrC.textContent=(cexp>=0?'+':'')+cexp.toFixed(2)+'%'; wrC.className='wr-big '+(cexp>=0?'wr-mid':'wr-bad'); }
     set('wrChuangTrades',(c.total||0)+' 笔');
-    set('wrChuangWL',(c.wins||0)+' / '+((c.total||0)-(c.wins||0)));
+    set('wrChuangWin',(c.winRate*100).toFixed(1)+'%');
     set('wrChuangPF', c.profitFactor!=null? c.profitFactor.toFixed(2)+'×':'—');
-    set('wrChuangExp', c.expectancy!=null? (c.expectancy*100).toFixed(2)+'%':'—');
-    set('wrChuangPeriod','回测周期 2023.08.28 – 2026.06.30');
+    set('wrChuangDD', c.maxDD!=null? (c.maxDD*100).toFixed(1)+'%':'—');
+    set('wrChuangPeriod','回测周期 2023.08.28 – 2026.07.31');
     const cn={cyb:'创业板',kcb:'科创板',kc:'科创板'};
-    set('wrChuangByBoard','分市场：'+Object.entries(cBy).map(([b,o])=>`${cn[b]||b} ${(o.winRate*100).toFixed(1)}%(${o.wins}/${o.total})`).join('  ·  '));
-    // 配置描述 + 样本量守卫（4.1/4.2 后小样本，诚实标注，待 4.3 全市场验证）
+    set('wrChuangByBoard','分市场：'+Object.entries(cBy).map(([b,o])=>`${cn[b]||b} 期望${(o.expectancy*100).toFixed(2)}%/笔 胜${(o.winRate*100).toFixed(1)}%(${o.wins}/${o.total})`).join('  ·  '));
     const bt=(ch&&ch.best)?ch.best:null;
     set('wrChuangRule', bt? `创业板·科创板独立体系：G1-G5选股+E1-E3执行 · K_ATR=${bt.kAtrDyn} · 持有≤${bt.maxHoldDyn}日` : '创业板·科创板独立体系');
     const warn=document.getElementById('wrChuangWarn');
     if(warn){
-      if((c.total||0)<30){ warn.style.color='#dc2626'; warn.textContent=`⚠️ 样本过少（仅 ${c.total||0} 笔 < 30），统计不显著，仅供研究；待 4.3 全市场扩池验证`; }
+      if((c.total||0)<30){ warn.style.color='#dc2626'; warn.textContent=`⚠️ 样本过少（仅 ${c.total||0} 笔 < 30），统计不显著，仅供研究`; }
       else if((c.expectancy||0)<0){ warn.style.color='#dc2626'; warn.textContent=`⚠️ 双创回测期望为负（${(c.expectancy*100).toFixed(2)}%/笔），仅作研究/预警，不建议实盘`; }
-      else { warn.style.color='#d97706'; warn.textContent=`⚠️ 双创期望转正但未完成全市场样本外验证（4.3），仅供研究，不建议实盘`; }
+      else { warn.style.color='#d97706'; warn.textContent=`⚠️ 双创期望转正但未完成样本外验证，主指标看「期望/PF/回撤」而非胜率，仅供研究`; }
     }
   } else {
-    set('wrChuangValue','—'); set('wrChuangTrades','—'); set('wrChuangWL','—'); set('wrChuangPF','—'); set('wrChuangExp','—');
+    set('wrChuangValue','—'); set('wrChuangTrades','—'); set('wrChuangWin','—'); set('wrChuangPF','—'); set('wrChuangDD','—');
   }
   // ---------- 图表 ----------
   renderWrChart(m, cBy);
@@ -1983,9 +1982,9 @@ function renderWrChart(m, cBy){
   const cyb = cBy && cBy.cyb ? cBy.cyb : null;
   const kcb = cBy && cBy.kcb ? cBy.kcb : null;
   const rows=[
-    {name:'主板',   wr:mainWR,                exp:mainExp,                color:'#2563eb'},
-    {name:'创业板', wr:cyb?cyb.winRate*100:0, exp:cyb?cyb.expectancy*100:0, color:'#16a34a'},
-    {name:'科创板', wr:kcb?kcb.winRate*100:0, exp:kcb?kcb.expectancy*100:0, color:'#dc2626'}
+    {name:'主板',   wr:mainWR,                exp:mainExp,                pf:m?m.profitFactor:0,                dd:m?m.maxDD*100:0,                color:'#2563eb'},
+    {name:'创业板', wr:cyb?cyb.winRate*100:0, exp:cyb?cyb.expectancy*100:0, pf:cyb?cyb.profitFactor:0, dd:cyb?cyb.maxDD*100:0, color:'#16a34a'},
+    {name:'科创板', wr:kcb?kcb.winRate*100:0, exp:kcb?kcb.expectancy*100:0, pf:kcb?kcb.profitFactor:0, dd:kcb?kcb.maxDD*100:0, color:'#dc2626'}
   ];
   const tc=themeColors();
   const W=680, padL=46, padR=14, padT=24, padB=30;
@@ -2018,8 +2017,10 @@ function renderWrChart(m, cBy){
     return s;
   }
   el.innerHTML =
-    panel('交易胜率 (%)', rows, 'wr', v=>v.toFixed(1)+'%', 40) +
-    panel('每笔期望 (%)', rows, 'exp', v=>(v>=0?'+':'')+v.toFixed(2)+'%', 1, -2.5);
+    panel('每笔期望 (%)', rows, 'exp', v=>(v>=0?'+':'')+v.toFixed(2)+'%', 1, -2.5) +
+    panel('盈亏比 PF', rows, 'pf', v=>v.toFixed(2)+'×', 3) +
+    panel('最大回撤 (%)', rows, 'dd', v=>v.toFixed(1)+'%', 40) +
+    panel('交易胜率 (%)', rows, 'wr', v=>v.toFixed(1)+'%', 40);
 }
 /* ============ 版本更新日志 ============ */
 const VERSION_HISTORY = [

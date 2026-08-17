@@ -57,6 +57,40 @@ const CHUANG_CONFIG = {
     G5_earningsQuality: true,                 // G5 盈利质量：读边车 g5Quality===false 才剔除整只
   },
 
+  // ===== 因子层（2026-08-12 因子挖掘 14 轮验证唯一存活因子；默认关 → 回测 parity 不变）=====
+  // 因子：idioVol60(low) = 低特质波动（对市场等权收益 60 日滚动回归残差的年化波动，取每日最低 maxPct 比例）
+  // 定位：最外层主筛（先于 TLS/preFilter/gates/veto），只缩池不改任何持有期/止损/止盈规则。
+  // 证据链（详见 chuang/factors.js 头部注释 + 选股结果/factor_*.json）：
+  //   R1  横截面 RankIC = -0.0936 / ICIR = -0.52（h=20，负号 → 低波更优），441 个交易日
+  //   R10b 流动性中性池内 36.28% 胜率 / +0.773%/笔 / PF1.61  vs 同池随机 31.11% / +0.465% / PF1.34
+  //   R11 生产级流动性池(≥1亿) 35.32% / +0.669% / PF1.52，holdout +0.163 vs 随机 +0.032
+  //   R14 block-bootstrap ×1000：期望差 +0.35~0.39pp，95%CI [0.18,0.60]，P(差>0)=1.000
+  // 短板：分年度 2024 +0.343% / 2025 +0.417% / 2026YTD -0.349% → 相对优势稳定但绝对期望在弱市为负。
+  // 故默认 enabled=false，等中报季 5.7 闸门用真实数据定夺；验证用 CHUANG_FACTORS=1 显式开启。
+  factors: {
+    enabled: boolEnv('CHUANG_FACTORS', false),
+    universeFile: 'D:/WorkBuddy/选股结果/universe_klines.json',
+    idioVolWindow: numEnv('CHUANG_FACTOR_WIN', 60),   // 特质波动回归窗口（日）
+    minBars: 250,                                     // 次新股护栏（与 build_08xx.py 的 MIN_BARS 同口径）
+    maxPct: numEnv('CHUANG_FACTOR_PCT', 0.30),        // 每日保留 idioVol 最低的比例（R10/R11 均用 30%）
+    minKeep: 30,                                      // 比例过小时的保底只数
+    minCrossSection: 60,                              // 当日横截面样本 < 60 支则本日不启用因子筛（避免小样本噪声）
+    minTurnover: 1.0e8,                               // 与 G1 同口径的流动性下限，防低流动性边界套利（R6 结论）
+  },
+
+  // ===== 波动率目标叠加层（P1，2026-08-17；risk-overlay，默认关）=====
+  // 高波动 regime 暂停入场，不改选股/止损/止盈规则。绝对阈值(abs)/z 分数(z) 两模式，env 可切。
+  // 验证假设「择时贡献 > 选股」（详见 chuang/voltarget.js 头部）。回测 parity：enabled=false 时不调用。
+  volTarget: {
+    enabled: boolEnv('CHUANG_VOLTARGET', false),
+    universeFile: 'D:/WorkBuddy/选股结果/universe_klines.json',
+    mode: process.env.CHUANG_VT_MODE || 'abs',            // 'abs'（年化波动阈值）| 'z'（滚动 z 分数）
+    window: numEnv('CHUANG_VT_WIN', 60),                  // 滚动波动窗（日）
+    volPause: numEnv('CHUANG_VT_VOL', 0.40),              // abs 模式：板块年化波动 > 40% 暂停
+    zThresh: numEnv('CHUANG_VT_Z', 1.5),                  // z 模式阈值
+    zLook: numEnv('CHUANG_VT_ZLOOK', 250),                // z 模式历史回看窗
+  },
+
   // ===== 5.0 反手证伪开关（圆桌决策：一锤定音"方向反了 vs 带宽错配"）=====
   // 开启后：仅翻转动量入场极性（G3 由"站上MA20且距MA20∈[0,+12%]"→"跌破MA20且∈[-35%,0]"；
   //   G4 由"个股20日收益>上证"→"个股20日收益<上证（深跌）"），preFilter 的 trendOk 与 E2 回踩门在反手态放松。
@@ -69,6 +103,7 @@ const CHUANG_CONFIG = {
     E1_tpR: 2.0, E1_tpAtr: 1.8,               // E1 弹性止盈：TP = max(2.0×SL, 1.8×ATR14)
     E2_pullbackTol: 0.03,                     // E2 回踩入场：信号bar低点回踩至 MA20±3% 内且收在 MA20 上
     E3_trailPct: 0.02,                        // E3 跟踪止损：3% → 2%
+    E3_trailTrigger: numEnv('CHUANG_E3_TRIG', 0), // E3 盈利触发门槛：价格先越过 entry*(1+trig) 才开始跟踪（2026-08-17 P0 新增；0=即日跟踪）
     kAtr: 2.5,                                // 双创动态止损倍数（网格可覆盖）
     maxHold: 8,                               // 双创持有期（网格可覆盖）
     tol: 0.03,                                // 开盘偏离容差（双创）

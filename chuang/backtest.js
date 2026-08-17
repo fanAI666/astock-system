@@ -31,6 +31,20 @@ function bootstrapExp(rets, iter = 2000, seed = 12345) {
 }
 function kelly(p, b) { return b > 0 ? p - (1 - p) / b : -Infinity; }
 
+// 累计权益曲线最大回撤（基于 P&L 序列，signalDate 升序）
+function maxDrawdown(trades) {
+  if (!trades.length) return 0;
+  const sorted = trades.slice().sort((a, b) => (a.signalDate < b.signalDate ? -1 : a.signalDate > b.signalDate ? 1 : 0));
+  let eq = 1, peak = 1, mdd = 0;
+  for (const t of sorted) {
+    eq *= (1 + (t.ret || 0));
+    if (eq > peak) peak = eq;
+    const dd = peak > 0 ? (peak - eq) / peak : 0;
+    if (dd > mdd) mdd = dd;
+  }
+  return mdd;
+}
+
 function summarize(trades) {
   const total = trades.length;
   const wins = trades.filter(t => t.outcome === 'win');
@@ -48,6 +62,7 @@ function summarize(trades) {
   const f = kelly(winRate, payoff);
   return { total, wins: wins.length, winRate, avgWin, avgLoss, profitFactor: isFinite(pf) ? pf : null,
     payoff, expectancy, expCI: [expLo, expHi], wrCI: [wrLo, wrHi], kelly: f,
+    maxDD: maxDrawdown(trades),
     avgHold: total ? trades.reduce((s, t) => s + t.holdDays, 0) / total : 0 };
 }
 
@@ -127,7 +142,7 @@ function runSweep(userConfig, ctx) {
   fs.writeFileSync(config.out, JSON.stringify(out, null, 2), 'utf8');
   Logger.info('BT', `双创最优配置: ${JSON.stringify(best.cfg)} → exp=${(detail.base.expectancy*100).toFixed(2)}%/笔, 文件: ${config.out}`);
   const ps = detail.preStats;
-  Logger.info('BT', `G 门过滤: 候选=${ps.total} 通过预过滤=${ps.pass} | G1=${ps.skipG1} G2=${ps.skipG2} G3=${ps.skipG3} G4=${ps.skipG4} G5整只=${ps.skipG5} E2=${ps.skipE2} | TLS=${ps.skipTls} TSQ=${ps.skipTsq} PBES=${ps.skipPbes}`);
+  Logger.info('BT', `G 门过滤: 候选=${ps.total} 通过预过滤=${ps.pass} | G1=${ps.skipG1} G2=${ps.skipG2} G3=${ps.skipG3} G4=${ps.skipG4} G5整只=${ps.skipG5} E2=${ps.skipE2} | FACTOR=${ps.skipFactor} VOLT=${ps.skipVolTarget} TLS=${ps.skipTls} TSQ=${ps.skipTsq} PBES=${ps.skipPbes}`);
   Logger.info('BT', `byBoard: ${JSON.stringify(Object.fromEntries(Object.entries(detail.byBoard).map(([b, s]) => [b, { n: s.total, win: +(s.winRate*100).toFixed(1), exp: +(s.expectancy*100).toFixed(2) }])))}`);
   if (detail.bySwitch) {
     const bs = Object.fromEntries(Object.entries(detail.bySwitch).map(([s, x]) => [s, { n: x.total, win: +(x.winRate*100).toFixed(1), exp: +(x.expectancy*100).toFixed(2), pf: x.profitFactor == null ? 'inf' : +x.profitFactor.toFixed(2) }]));

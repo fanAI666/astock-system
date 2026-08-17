@@ -61,6 +61,24 @@ function buildBaseCtx(config, switchIndex) {
       Logger.info('CLI', `TLS 主筛已构建: ${JSON.stringify(built.stats)}`);
     } catch (e) { Logger.warn('CLI', `TLS 主筛构建失败: ${e.message}`); }
   }
+  // 因子层主筛（idioVol60 低特质波动，14 轮验证唯一存活；默认关 → parity 不变）
+  if (config.factors && config.factors.enabled) {
+    try {
+      const { buildFactorPass } = require('./factors');
+      const built = buildFactorPass(config);
+      ctx.factorPass = built.passByDate;
+      Logger.info('CLI', `因子层已构建: ${JSON.stringify(built.stats)}`);
+    } catch (e) { Logger.warn('CLI', `因子层构建失败: ${e.message}`); }
+  }
+  // 波动率目标叠加层（P1，risk-overlay；默认关 → parity 不变）
+  if (config.volTarget && config.volTarget.enabled) {
+    try {
+      const { buildVolTarget } = require('./voltarget');
+      const built = buildVolTarget(config);
+      ctx.volTargetOK = built.okByDate;
+      Logger.info('CLI', `波动率叠加层已构建: ${JSON.stringify(built.stats)}`);
+    } catch (e) { Logger.warn('CLI', `波动率叠加层构建失败: ${e.message}`); }
+  }
   return ctx;
 }
 

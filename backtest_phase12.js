@@ -22,6 +22,15 @@ const STOP_MAIN = 0.02, PROFIT_MAIN = 0.06;   // 主板固定 2%/6%
 const TRAIL_PCT = 0.03, TRAIL_CAP = 0.06;
 const MAX_BUY_PER_DAY = 3, DD_PAUSE = 0.08;
 
+// ===== 出场成交价现实化开关（2026-08-06 审计新增；默认关 → 生产输出严格 parity 不变）=====
+// 问题：原逻辑 `if (l <= curSL) exitPrice = curSL` 假设总能在止损价成交。
+//   现实中若当日跳空低开、开盘价已在止损位下方，止损单只能按开盘价成交，拿不到止损价。
+//   双创侧审计（chuang_fill_audit.js）显示 60.08% 的出场属于此类跳空穿越，
+//   修正后期望由 +1.47%/笔 降到 +0.32%/笔 —— 即原口径系统性高估。
+// FILL_GAP=1 → exitPrice = min(curSL, open)；SLIP=0.003 → 双边各 0.3% 滑点计入 ret。
+const FILL_GAP = process.env.FILL_GAP === '1';
+const SLIP = +(process.env.SLIP || 0);
+
 function atr14(bars, idx) {
   if (idx < ATR_WIN) return null;
   let s = 0;
@@ -189,8 +198,12 @@ function genSignals(stock, cfg) {
     const trailCap = entry * (1 + TRAIL_CAP);
     let curSL = sl, outcome = null, exitPrice = entry, exitIdx = i + 1, holdDays = 0;
     for (let j = i + 1; j < bars.length && j <= i + maxHold; j++) {
-      const h = bars[j][3], l = bars[j][4]; holdDays++;
-      if (l <= curSL) { outcome = 'loss'; exitPrice = curSL; exitIdx = j; break; }
+      const o = bars[j][1], h = bars[j][3], l = bars[j][4]; holdDays++;
+      if (l <= curSL) {
+        exitPrice = FILL_GAP ? Math.min(curSL, o) : curSL;   // 跳空穿越 → 只能按开盘价成交
+        // 标签按成交价与成本的真实关系判定（跟踪止损抬升后可能高于成本 → 不应记为亏损）
+        outcome = exitPrice >= entry ? 'win' : 'loss'; exitIdx = j; break;
+      }
       if (h >= tp) { outcome = 'win'; exitPrice = tp; exitIdx = j; break; }
       if (isDyn) { const nsl = Math.min(trailCap, Math.max(curSL, h * (1 - TRAIL_PCT))); if (nsl > curSL) curSL = nsl; }
     }
@@ -199,7 +212,7 @@ function genSignals(stock, cfg) {
       exitPrice = bars[jlast][2];
       outcome = exitPrice >= entry ? 'win' : 'loss'; holdDays = jlast - i;
     }
-    const ret = (exitPrice - entry) / entry;
+    const ret = SLIP ? (exitPrice * (1 - SLIP)) / (entry * (1 + SLIP)) - 1 : (exitPrice - entry) / entry;
     const rTrade = rKind ? regimeOf(dateD, rKind) : 'n/a';
     out.push({ code: stock.code, board, signalDate: dateD, entryDate: nd[0], entry, exit: exitPrice,
                outcome, ret, holdDays, regime: rTrade, year: dateD.slice(0, 4) });
