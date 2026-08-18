@@ -1,18 +1,18 @@
 {
-  "date": "2026-08-15",
-  "baselineDate": "2026-08-14",
+  "date": "2026-08-18",
+  "baselineDate": "2026-08-15",
   "top3": [
     {
       "code": "600000",
       "name": "浦发银行 600000",
       "board": "main",
       "win": 79.8,
-      "baseline": 9.10,
-      "open": null,
-      "dev": null,
+      "baseline": 9.1,
+      "open": 9.07,
+      "dev": -0.0033,
       "tol": 0.02,
       "decision": "hold",
-      "reason": "周六非交易日，腾讯自选股quote返回基准日2026-08-14数据，无次日开盘价，无法确认买入（参考：5b过滤亦未过·趋势+量能）"
+      "reason": "过滤未过·趋势(close9.10<MA209.23)+量能(vol436231<1.2×MA20量963655)"
     },
     {
       "code": "002415",
@@ -20,11 +20,11 @@
       "board": "main",
       "win": 79.0,
       "baseline": 34.88,
-      "open": null,
-      "dev": null,
+      "open": 35.0,
+      "dev": 0.0034,
       "tol": 0.02,
       "decision": "hold",
-      "reason": "周六非交易日，腾讯自选股quote返回基准日2026-08-14数据，无次日开盘价，无法确认买入（参考：5b过滤亦未过·趋势+量能）"
+      "reason": "过滤未过·趋势(close34.88<MA2036.45)+量能(vol987041<1.2×MA20量1414301)"
     },
     {
       "code": "002900",
@@ -32,11 +32,11 @@
       "board": "main",
       "win": 79.0,
       "baseline": 13.92,
-      "open": null,
-      "dev": null,
+      "open": 14.71,
+      "dev": 0.0568,
       "tol": 0.02,
       "decision": "hold",
-      "reason": "周六非交易日，腾讯自选股quote返回基准日2026-08-14数据，无次日开盘价，无法确认买入（参考：5b过滤亦未过·量能）"
+      "reason": "容差超±2%(开盘偏离+5.68%>2%)"
     }
   ],
   "trade": false
