@@ -1,0 +1,43 @@
+{
+  "date": "2026-08-20",
+  "baselineDate": "2026-08-20",
+  "top3": [
+    {
+      "code": "600000",
+      "name": "浦发银行 600000",
+      "board": "main",
+      "win": 79.8,
+      "baseline": 9.11,
+      "open": 9.03,
+      "dev": -0.008782,
+      "tol": 0.02,
+      "decision": "hold",
+      "reason": "5b全市场过滤未过(趋势/量能)"
+    },
+    {
+      "code": "002415",
+      "name": "海康威视 002415",
+      "board": "main",
+      "win": 79,
+      "baseline": 34.07,
+      "open": 34.05,
+      "dev": -0.000587,
+      "tol": 0.02,
+      "decision": "hold",
+      "reason": "5b全市场过滤未过(趋势/量能)"
+    },
+    {
+      "code": "002900",
+      "name": "哈三联 002900",
+      "board": "main",
+      "win": 79,
+      "baseline": 15.3,
+      "open": 17.19,
+      "dev": 0.123529,
+      "tol": 0.02,
+      "decision": "hold",
+      "reason": "开盘偏离 +12.35% 超main ±2% 容差"
+    }
+  ],
+  "trade": false
+}
