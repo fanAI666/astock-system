@@ -1,65 +1,392 @@
 {
-  "_note": "示例数据（模板）。本文件由每日『三周期选股』自动化任务覆盖生成；字段: generatedAt/summary{total,resonance,partial,diverge,marketPhase}/stocks[{name,code,board(main|cyb|kcb),month|week|day(up|down|flat),score,entry,stopLoss,target,reasons[]}]。board 取值需与系统一致。",
   "generatedAt": "2026-08-25",
   "summary": {
-    "total": 4,
-    "resonance": 2,
-    "partial": 2,
+    "total": 20,
+    "resonance": 20,
+    "partial": 0,
     "diverge": 0,
-    "marketPhase": "月线多头 / 周线整理 / 日线转强"
+    "marketPhase": "月线多头20% / 周线多头12% / 日线多头43%"
   },
   "stocks": [
     {
-      "name": "宁德时代",
-      "code": "300750",
+      "name": "新开源",
+      "code": "300109",
       "board": "cyb",
       "month": "up",
       "week": "up",
       "day": "up",
-      "score": 85,
-      "entry": 265.00,
-      "stopLoss": 247.00,
-      "target": 298.00,
-      "reasons": ["月线站上MA20、多头排列", "周线缩量回踩MA20不破", "日线放量突破前高、MACD金叉"]
+      "score": 95,
+      "entry": 15.95,
+      "stopLoss": 13.22,
+      "target": 24.14,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线放量站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 14.7%"
+      ]
     },
     {
-      "name": "中芯国际",
-      "code": "688981",
-      "board": "kcb",
-      "month": "up",
-      "week": "up",
-      "day": "up",
-      "score": 81,
-      "entry": 96.50,
-      "stopLoss": 90.20,
-      "target": 108.00,
-      "reasons": ["月线创新高回落守MA10", "周线平台突破", "日线放量站上所有均线"]
-    },
-    {
-      "name": "北方华创",
-      "code": "002371",
-      "board": "main",
-      "month": "up",
-      "week": "flat",
-      "day": "up",
-      "score": 73,
-      "entry": 412.00,
-      "stopLoss": 385.00,
-      "target": 460.00,
-      "reasons": ["月线多头未破", "周线横盘蓄势", "日线回踩MA20后转强"]
-    },
-    {
-      "name": "汇川技术",
-      "code": "300124",
+      "name": "晓程科技",
+      "code": "300139",
       "board": "cyb",
-      "month": "flat",
+      "month": "up",
       "week": "up",
       "day": "up",
-      "score": 70,
-      "entry": 68.30,
-      "stopLoss": 63.90,
-      "target": 76.50,
-      "reasons": ["月线高位震荡", "周线拐头向上", "日线突破短期下降趋势线"]
+      "score": 95,
+      "entry": 58.33,
+      "stopLoss": 43.64,
+      "target": 102.4,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 24.1%"
+      ]
+    },
+    {
+      "name": "沃森生物",
+      "code": "300142",
+      "board": "cyb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 95,
+      "entry": 14.9,
+      "stopLoss": 12.54,
+      "target": 21.98,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线放量站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 12.0%"
+      ]
+    },
+    {
+      "name": "科德教育",
+      "code": "300192",
+      "board": "cyb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 95,
+      "entry": 17.39,
+      "stopLoss": 12.92,
+      "target": 30.8,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线放量站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 19.8%"
+      ]
+    },
+    {
+      "name": "天山生物",
+      "code": "300313",
+      "board": "cyb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 95,
+      "entry": 15.36,
+      "stopLoss": 8.28,
+      "target": 36.6,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线放量站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 43.2%"
+      ]
+    },
+    {
+      "name": "华民股份",
+      "code": "300345",
+      "board": "cyb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 95,
+      "entry": 9.6,
+      "stopLoss": 6.36,
+      "target": 19.32,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线放量站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 7.9%"
+      ]
+    },
+    {
+      "name": "斯莱克",
+      "code": "300382",
+      "board": "cyb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 95,
+      "entry": 17.93,
+      "stopLoss": 13.86,
+      "target": 30.14,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 9.8%"
+      ]
+    },
+    {
+      "name": "亿联网络",
+      "code": "300628",
+      "board": "cyb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 95,
+      "entry": 42.18,
+      "stopLoss": 38.82,
+      "target": 52.26,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线放量站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 5.1%"
+      ]
+    },
+    {
+      "name": "蓝盾光电",
+      "code": "300862",
+      "board": "cyb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 95,
+      "entry": 55.1,
+      "stopLoss": 16.01,
+      "target": 172.37,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线放量站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 67.8%"
+      ]
+    },
+    {
+      "name": "南大环境",
+      "code": "300864",
+      "board": "cyb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 95,
+      "entry": 25.69,
+      "stopLoss": 18.71,
+      "target": 46.63,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线放量站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 31.7%"
+      ]
+    },
+    {
+      "name": "中胤时尚",
+      "code": "300901",
+      "board": "cyb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 95,
+      "entry": 19.1,
+      "stopLoss": 15.62,
+      "target": 29.54,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线放量站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 6.1%"
+      ]
+    },
+    {
+      "name": "江苏博云",
+      "code": "301003",
+      "board": "cyb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 95,
+      "entry": 57.5,
+      "stopLoss": 50.35,
+      "target": 78.95,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 6.6%"
+      ]
+    },
+    {
+      "name": "中捷精工",
+      "code": "301072",
+      "board": "cyb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 95,
+      "entry": 41.82,
+      "stopLoss": 34.6,
+      "target": 63.48,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 5.3%"
+      ]
+    },
+    {
+      "name": "采纳股份",
+      "code": "301122",
+      "board": "cyb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 95,
+      "entry": 39,
+      "stopLoss": 31.4,
+      "target": 61.8,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线放量站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 7.4%"
+      ]
+    },
+    {
+      "name": "西点药业",
+      "code": "301130",
+      "board": "cyb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 95,
+      "entry": 33.09,
+      "stopLoss": 25.04,
+      "target": 57.24,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线放量站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 9.5%"
+      ]
+    },
+    {
+      "name": "东田微",
+      "code": "301183",
+      "board": "cyb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 95,
+      "entry": 235.19,
+      "stopLoss": 172.81,
+      "target": 422.33,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 9.0%"
+      ]
+    },
+    {
+      "name": "森鹰窗业",
+      "code": "301227",
+      "board": "cyb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 95,
+      "entry": 30.4,
+      "stopLoss": 24.4,
+      "target": 48.4,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线放量站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 19.0%"
+      ]
+    },
+    {
+      "name": "五洲医疗",
+      "code": "301234",
+      "board": "cyb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 95,
+      "entry": 110,
+      "stopLoss": 84.68,
+      "target": 185.96,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 17.0%"
+      ]
+    },
+    {
+      "name": "翰博高新",
+      "code": "301321",
+      "board": "cyb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 95,
+      "entry": 41.04,
+      "stopLoss": 35.78,
+      "target": 56.82,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 5.3%"
+      ]
+    },
+    {
+      "name": "太辰光",
+      "code": "300570",
+      "board": "cyb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 94,
+      "entry": 202.9,
+      "stopLoss": 137,
+      "target": 400.6,
+      "reasons": [
+        "月线站上MA12、多头排列",
+        "周线MA20上行",
+        "日线放量站上MA20、短线转强",
+        "三周期共振，趋势最强",
+        "近5日涨幅 4.7%"
+      ]
     }
   ]
 }
