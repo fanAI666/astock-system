@@ -191,6 +191,37 @@
 .chg-sell{border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-top:14px;background:var(--card)}
 .chg-sell h3{font-size:14px;margin:0 0 8px;color:#334155}
 .chg-sell ul{margin:6px 0;padding-left:18px;font-size:13px;color:#475569;line-height:1.7}
+/* =========== 三周期选股面板 =========== */
+.tri-banner{padding:13px 16px;border-radius:13px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;font-weight:600;font-size:13.5px;margin:4px 0 12px;background:linear-gradient(135deg,#eff6ff,#dbeafe);color:#1e40af;border:1px solid #bfdbfe}
+.tri-banner .tri-wait{font-weight:500;font-size:13px;color:#64748b}
+.tri-summ{display:flex;flex-wrap:wrap;gap:8px 12px;margin:6px 0 12px}
+.tri-summ .s{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 13px;font-size:12.5px;color:var(--sub)}
+.tri-summ .s b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums;margin-left:5px}
+.tri-buy{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin:10px 0;box-shadow:0 4px 14px rgba(15,23,42,.06)}
+.tri-buy .tri-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:9px}
+.tri-buy .tri-name{font-weight:700;font-size:15px;color:var(--ink)}
+.tri-buy .tri-code{font-size:12px;color:var(--sub)}
+.tri-tag{font-size:11px;font-weight:700;padding:2px 9px;border-radius:6px}
+.tri-tag-cyb{background:#eef4ff;color:#2563eb}
+.tri-tag-kcb{background:#f0fdf4;color:#16a34a}
+.tri-tag-main{background:#f1f5f9;color:#475569}
+.tri-align{font-size:11px;font-weight:700;padding:2px 9px;border-radius:6px}
+.tri-align-res{background:#dcfce7;color:#166534}
+.tri-align-div{background:#fee2e2;color:#991b1b}
+.tri-align-par{background:#fef9c3;color:#854d0e}
+.tri-cycles{display:flex;gap:8px;margin:6px 0 10px}
+.tri-cyc{font-size:12px;font-weight:700;padding:3px 11px;border-radius:8px;border:1px solid var(--line)}
+.tri-cyc.up{background:#dcfce7;color:#166534;border-color:#bbf7d0}
+.tri-cyc.down{background:#fee2e2;color:#991b1b;border-color:#fecaca}
+.tri-cyc.flat{background:#f1f5f9;color:#64748b;border-color:#e2e8f0}
+.tri-price{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:13px;margin-bottom:2px}
+.tri-price .p{border:1px solid var(--line);border-radius:9px;padding:6px 11px;background:var(--card);min-width:84px}
+.tri-price .p .lab{font-size:11px;color:var(--sub);display:block;margin-bottom:3px}
+.tri-price .p .val{font-weight:700;font-variant-numeric:tabular-nums}
+.tri-price .p.lose .val{color:var(--bad)}
+.tri-price .p.gain .val{color:var(--ok)}
+.tri-reasons{margin-top:8px;font-size:12.5px;color:#475569;line-height:1.65}
+.tri-reasons .r{display:inline-block;background:#f1f5f9;border-radius:6px;padding:2px 9px;margin:3px 6px 0 0;color:#334155}
 /* =========== 交易胜率 置顶 =========== */
 .winrate-top{padding:0;margin-bottom:14px}
 .wr-card{display:flex;flex-wrap:wrap;align-items:center;gap:16px 30px;background:linear-gradient(135deg,#0f172a,#1e293b);color:#e2e8f0;border-radius:16px;padding:18px 24px;box-shadow:0 12px 34px rgba(15,23,42,.35);border:1px solid rgba(148,163,184,.18)}
@@ -358,6 +389,7 @@
     <button data-tab="screen">🔍 选股评分</button>
     <button data-tab="buysig">📈 买入信号</button>
     <button data-tab="chuang">🚀 双创信号</button>
+    <button data-tab="tri">🔄 三周期</button>
     <button data-tab="calc">🧮 仓位计算</button>
     <button data-tab="brief">📑 每日简报</button>
     <button data-tab="journal">📓 交易日志</button>
@@ -646,6 +678,18 @@
           </div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- ===================== 三周期选股分析 ===================== -->
+  <section class="panel" id="tri">
+    <div class="card">
+      <h2><span class="dot"></span>三周期选股分析 · 月 / 周 / 日 共振</h2>
+      <p class="hint">多周期共振选股：当月线、周线、日线三周期趋势同向（尤其三周期齐多）时为强信号。数据来自 <code>选股结果/sanqizhou_report.json</code>，由每日自动化任务生成并随站点上线。⚠️ 仅作策略研究参考，非实盘建议。</p>
+      <div id="triBanner" class="tri-banner"><span class="tri-wait">等待三周期选股报告…</span></div>
+      <div class="tri-summ" id="triSummary"></div>
+      <h3 class="bs-sub">三周期共振标的</h3>
+      <div id="triList"><div class="empty">暂无信号。</div></div>
     </div>
   </section>
 
@@ -1905,6 +1949,72 @@ async function loadChuangSignal(){
   renderChuangSignal();
   loadFundFlow();
 }
+/* 三周期选股分析展示（sanqizhou_report.json） */
+function triCycleBadge(v){
+  if(v==="up")   return '<span class="tri-cyc up">↑ 多</span>';
+  if(v==="down") return '<span class="tri-cyc down">↓ 空</span>';
+  return '<span class="tri-cyc flat">→ 平</span>';
+}
+function renderSanZhou(){
+  const banner=document.getElementById("triBanner");
+  const summ=document.getElementById("triSummary");
+  const list=document.getElementById("triList");
+  if(!banner) return;
+  const d=window.sanZhou;
+  if(!d){
+    banner.className="tri-banner";
+    banner.innerHTML='<span class="tri-wait">等待三周期选股报告…（请通过预览/本地服务器打开，或先运行每日三周期选股自动化）</span>';
+    if(summ) summ.innerHTML="";
+    if(list) list.innerHTML='<div class="empty">暂无信号。</div>';
+    return;
+  }
+  const s=d.summary||{};
+  banner.className="tri-banner";
+  banner.innerHTML='<span class="tri-warn">📅 报告生成日 '+(d.generatedAt||"—")+'</span>'+
+    '<span>'+(s.marketPhase||"三周期多空状态见下方标的")+'</span>';
+  if(summ){
+    const parts=[["达标数",s.total],["三周期共振",s.resonance],["部分共振",s.partial],["周期背离",s.diverge]].filter(p=>p[1]!=null);
+    summ.innerHTML=parts.map(p=>'<span class="s">'+p[0]+'<b>'+(p[1]!=null?p[1]:"—")+'</b></span>').join("");
+  }
+  if(list){
+    const stocks=d.stocks||[];
+    if(!stocks.length){ list.innerHTML='<div class="empty">暂无信号。</div>'; }
+    else{
+      list.innerHTML=stocks.map(b=>{
+        const tagCls=b.board==="kcb"?"tri-tag-kcb":(b.board==="cyb"?"tri-tag-cyb":"tri-tag-main");
+        const boardName=b.board==="kcb"?"科创板":(b.board==="cyb"?"创业板":"主板");
+        const alignCls=(b.month==="up"&&b.week==="up"&&b.day==="up")?"tri-align-res":((b.month==="down"||b.week==="down"||b.day==="down")?"tri-align-div":"tri-align-par");
+        const alignTxt=alignCls==="tri-align-res"?"三周期共振":(alignCls==="tri-align-div"?"周期背离":"部分共振");
+        const rlist=(b.reasons||[]).map(r=>'<span class="r">'+r+'</span>').join("");
+        return '<div class="tri-buy">'+
+          '<div class="tri-head">'+
+            '<span class="tri-name">'+b.name+'</span>'+
+            '<span class="tri-code">'+b.code+'</span>'+
+            '<span class="tri-tag '+tagCls+'">'+boardName+'</span>'+
+            '<span class="tri-align '+alignCls+'">'+alignTxt+'</span>'+
+          '</div>'+
+          '<div class="tri-cycles">'+triCycleBadge(b.month)+triCycleBadge(b.week)+triCycleBadge(b.day)+'</div>'+
+          '<div class="tri-price">'+
+            '<div class="p"><span class="lab">综合评分</span><span class="val">'+chgFmt2(b.score)+'</span></div>'+
+            '<div class="p"><span class="lab">计划入场</span><span class="val">'+chgFmt2(b.entry)+'</span></div>'+
+            '<div class="p lose"><span class="lab">止损价</span><span class="val">'+chgFmt2(b.stopLoss)+'</span></div>'+
+            '<div class="p gain"><span class="lab">目标价</span><span class="val">'+chgFmt2(b.target)+'</span></div>'+
+          '</div>'+
+          (rlist?'<div class="tri-reasons">'+rlist+'</div>':'')+
+        '</div>';
+      }).join("");
+    }
+  }
+}
+async function loadSanZhou(){
+  window.sanZhou=null;
+  if(location.protocol.indexOf("http")!==0){ renderSanZhou(); return; }
+  try{
+    const res=await fetch("选股结果/sanqizhou_report.json",{cache:"no-store"});
+    if(res.ok) window.sanZhou=await res.json();
+  }catch(e){}
+  renderSanZhou();
+}
 
 /* 双轨回测展示：主板(main_only) + 双创(创业板/科创板 独立加宽体系) 分别渲染，并画图 */
 function renderWinRate(p12, ch){
@@ -2024,6 +2134,7 @@ function renderWrChart(m, cBy){
 }
 /* ============ 版本更新日志 ============ */
 const VERSION_HISTORY = [
+  {v:"2.0.4",d:"2026-08-25",desc:"新增独立选股模块「三周期」(🔄 Tab, 置于双创信号之后): 读取每日自动化生成的选股结果/sanqizhou_report.json, 展示月/周/日三周期共振标的(趋势箭头↑多/↓空/→平 + 共振/背离徽章 + 综合评分 + 计划入场/止损/目标), 用于多周期共振研究参考; 缺数据时显示等待提示, 不臆造"},
   {v:"2.0.3",d:"2026-08-17",desc:"双创策略修正与指标升级: P0修复出场标签bug+跳空成交(修正旧-1.37%假象为+0.16%/笔真实基线, 48格全扫sweepPass=0); P1波动率叠加风险层(默认关, 降回撤非alpha); Step2双创/指数配对对冲原型(中证500/创业板指/科创50三基准对冲后期望全转负、回撤扩大至57-70%, 相对价值方向A证伪); Step3前端主指标由胜率切换为期望/PF/回撤(预警卡+对比图重排)"},
   {v:"2.0.2",d:"2026-08-08",desc:"选股体验修复两项：①选股评分页与选股历史同步到最新自动选股快照（import_final.json 按快照日期归档、每次打开页面先替换旧自动候选仅保留手动项，修复历史视图因无归档日期而漏显、评分页因同名去重而显示陈旧分数）；②动态选股导入剔除F级（RSI超买/MA60未向↑/G5盈利质量硬约束拒绝项不进候选池，当前90只自动选股中59只被判F、剔除后剩31只，导入提示显示剔除数）"},
   {v:"2.0.0",d:"2026-08-05",desc:"双创策略级重构·六观察轨道1270宇宙全量验证收尾：5.0反手证伪+5.1产业景气/5.4大市值深跌/5.5季报PEAD/5.6短线T+1~T+3 四条可计算轨道期望全负(−0.16%~−1.47%/笔，与动量baseline −1.27%同量级)，核心结论=切换驱动因子无法修复双创负期望；5.2龙头深坑+资金流因东方财富资金流主机(push2his.eastmoney.com)网络层不可达数据阻断、5.3盈利修正PEG因一致预期快照(2026-08-05)晚于回测窗口(2026-06-30)不可回测→均不纳入转正判定；5.7中报季闸门判定不通过，双创维持预警、六方案作废。修复项：生产回测文件 backtest_chuang.json 被 track 命令污染已恢复、config.data0 补 valuationFile、track 命令加1270宇宙全候选池与独立输出护栏、清 tracks.js 调试残留"},
@@ -2485,7 +2596,7 @@ document.getElementById('btnHighFreq').addEventListener('click',()=>switchMode('
 // 应用已保存的模式（默认高频）
 if(currentMode !== 'highFreq') { switchMode(currentMode); }  // 仅非默认时触发 UI 更新
 load(); initTheme(); syncCfgInputs(); refreshCand(); renderTrades(); renderDash(); renderChangelog(); renderFundFlow();
-if(location.protocol.indexOf("http")===0){ importToday(); loadBuySignal(); loadChuangSignal(); loadWinRate(); loadBriefings(); loadFundFlow().then(()=>{ startLiveFundFlow(); }); }
+if(location.protocol.indexOf("http")===0){ importToday(); loadBuySignal(); loadChuangSignal(); loadWinRate(); loadBriefings(); loadSanZhou(); loadFundFlow().then(()=>{ startLiveFundFlow(); }); }
 loadFundamental();   // 4.0 双创基本面（G5/G6），http 下 fetch、离线走 EMBED 兜底，到达后重渲染候选卡
 window.addEventListener("resize",()=>{ for(const id in charts){ charts[id]._resize(); } });
 </script>

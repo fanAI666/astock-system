@@ -1,0 +1,65 @@
+{
+  "_note": "示例数据（模板）。本文件由每日『三周期选股』自动化任务覆盖生成；字段: generatedAt/summary{total,resonance,partial,diverge,marketPhase}/stocks[{name,code,board(main|cyb|kcb),month|week|day(up|down|flat),score,entry,stopLoss,target,reasons[]}]。board 取值需与系统一致。",
+  "generatedAt": "2026-08-25",
+  "summary": {
+    "total": 4,
+    "resonance": 2,
+    "partial": 2,
+    "diverge": 0,
+    "marketPhase": "月线多头 / 周线整理 / 日线转强"
+  },
+  "stocks": [
+    {
+      "name": "宁德时代",
+      "code": "300750",
+      "board": "cyb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 85,
+      "entry": 265.00,
+      "stopLoss": 247.00,
+      "target": 298.00,
+      "reasons": ["月线站上MA20、多头排列", "周线缩量回踩MA20不破", "日线放量突破前高、MACD金叉"]
+    },
+    {
+      "name": "中芯国际",
+      "code": "688981",
+      "board": "kcb",
+      "month": "up",
+      "week": "up",
+      "day": "up",
+      "score": 81,
+      "entry": 96.50,
+      "stopLoss": 90.20,
+      "target": 108.00,
+      "reasons": ["月线创新高回落守MA10", "周线平台突破", "日线放量站上所有均线"]
+    },
+    {
+      "name": "北方华创",
+      "code": "002371",
+      "board": "main",
+      "month": "up",
+      "week": "flat",
+      "day": "up",
+      "score": 73,
+      "entry": 412.00,
+      "stopLoss": 385.00,
+      "target": 460.00,
+      "reasons": ["月线多头未破", "周线横盘蓄势", "日线回踩MA20后转强"]
+    },
+    {
+      "name": "汇川技术",
+      "code": "300124",
+      "board": "cyb",
+      "month": "flat",
+      "week": "up",
+      "day": "up",
+      "score": 70,
+      "entry": 68.30,
+      "stopLoss": 63.90,
+      "target": 76.50,
+      "reasons": ["月线高位震荡", "周线拐头向上", "日线突破短期下降趋势线"]
+    }
+  ]
+}
