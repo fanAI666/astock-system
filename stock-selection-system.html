@@ -197,6 +197,20 @@
 .tri-summ{display:flex;flex-wrap:wrap;gap:8px 12px;margin:6px 0 12px}
 .tri-summ .s{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 13px;font-size:12.5px;color:var(--sub)}
 .tri-summ .s b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums;margin-left:5px}
+.tri-analysis{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:10px 0 6px;box-shadow:0 4px 14px rgba(15,23,42,.06)}
+.tri-analysis .tri-a-head{font-weight:700;font-size:15px;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.tri-analysis .tri-a-market{font-size:13.5px;line-height:1.85;color:var(--sub);margin-bottom:10px}
+.tri-analysis .tri-a-kp{margin:4px 0 10px;padding-left:18px;font-size:13px;line-height:1.85;color:var(--sub)}
+.tri-analysis .tri-a-kp li{margin:4px 0}
+.tri-analysis .tri-a-block{font-size:13.5px;line-height:1.8;color:var(--ink);background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #bbf7d0;border-radius:10px;padding:9px 12px;margin-bottom:8px}
+.tri-analysis .tri-a-block .lab{display:inline-block;font-weight:700;color:#15803d;margin-right:6px}
+.tri-analysis .tri-a-detail{margin-top:6px}
+.tri-analysis .tri-a-detail summary{cursor:pointer;font-size:12.5px;color:var(--link);font-weight:600;list-style:none}
+.tri-analysis .tri-a-detail summary::-webkit-details-marker{display:none}
+.tri-analysis .tri-a-detail summary:before{content:"▸ "}
+.tri-analysis .tri-a-detail[open] summary:before{content:"▾ "}
+.tri-analysis .tri-a-method{font-size:12.5px;line-height:1.8;color:var(--sub);margin:8px 0}
+.tri-analysis .tri-a-risk{font-size:12.5px;line-height:1.7;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:8px 11px;margin-bottom:4px}
 .tri-buy{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin:10px 0;box-shadow:0 4px 14px rgba(15,23,42,.06)}
 .tri-buy .tri-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:9px}
 .tri-buy .tri-name{font-weight:700;font-size:15px;color:var(--ink)}
@@ -688,6 +702,7 @@
       <p class="hint">多周期共振选股：当月线、周线、日线三周期趋势同向（尤其三周期齐多）时为强信号。数据来自 <code>选股结果/sanqizhou_report.json</code>，由每日自动化任务生成并随站点上线。⚠️ 仅作策略研究参考，非实盘建议。</p>
       <div id="triBanner" class="tri-banner"><span class="tri-wait">等待三周期选股报告…</span></div>
       <div class="tri-summ" id="triSummary"></div>
+      <div class="tri-analysis" id="triAnalysis"></div>
       <h3 class="bs-sub">三周期共振标的</h3>
       <div id="triList"><div class="empty">暂无信号。</div></div>
     </div>
@@ -1976,6 +1991,30 @@ function renderSanZhou(){
     const parts=[["达标数",s.total],["三周期共振",s.resonance],["部分共振",s.partial],["周期背离",s.diverge]].filter(p=>p[1]!=null);
     summ.innerHTML=parts.map(p=>'<span class="s">'+p[0]+'<b>'+(p[1]!=null?p[1]:"—")+'</b></span>').join("");
   }
+  // —— 分析报告卡片 ——
+  const aEl=document.getElementById("triAnalysis");
+  if(aEl){
+    const a=d.analysis;
+    if(a){
+      const kp=(a.keyPoints||[]).map(k=>'<li>'+k+'</li>').join("");
+      const cc=a.cycleCounts||{};
+      aEl.className="tri-analysis";
+      aEl.innerHTML=
+        '<div class="tri-a-head">📊 三周期分析报告'+
+          (cc.monthUp!=null?'<span style="font-weight:500;font-size:12px;color:var(--sub)">（月多'+cc.monthUp+'% / 周多'+cc.weekUp+'% / 日多'+cc.dayUp+'%）</span>':'')+
+        '</div>'+
+        '<div class="tri-a-market">'+(a.market||"")+'</div>'+
+        (kp?'<ul class="tri-a-kp">'+kp+'</ul>':'')+
+        '<div class="tri-a-block"><span class="lab">策略建议</span>'+(a.strategy||"")+'</div>'+
+        '<details class="tri-a-detail"><summary>选股逻辑与风险提示（展开）</summary>'+
+          '<div class="tri-a-method">'+(a.method||"")+'</div>'+
+          '<div class="tri-a-risk">'+(a.risk||"")+'</div>'+
+        '</details>';
+    } else {
+      aEl.className="tri-analysis";
+      aEl.innerHTML='<div class="tri-a-head">📊 三周期分析报告</div><div class="tri-a-market">本报告版本未含分析字段，运行每日自动化（chuang/sanqizhou.js）即可生成。</div>';
+    }
+  }
   if(list){
     const stocks=d.stocks||[];
     if(!stocks.length){ list.innerHTML='<div class="empty">暂无信号。</div>'; }
@@ -2134,6 +2173,7 @@ function renderWrChart(m, cBy){
 }
 /* ============ 版本更新日志 ============ */
 const VERSION_HISTORY = [
+  {v:"2.0.5",d:"2026-08-25",desc:"三周期模块新增「分析报告」卡片: 每日自动化(chuang/sanqizhou.js)额外生成 market(三周期市场叙述)+keyPoints(关键观察)+strategy(策略建议)+method/risk(选股逻辑与风险提示), 前端 triAnalysis 独立渲染, 缺字段优雅回退"},
   {v:"2.0.4",d:"2026-08-25",desc:"新增独立选股模块「三周期」(🔄 Tab, 置于双创信号之后): 读取每日自动化生成的选股结果/sanqizhou_report.json, 展示月/周/日三周期共振标的(趋势箭头↑多/↓空/→平 + 共振/背离徽章 + 综合评分 + 计划入场/止损/目标), 用于多周期共振研究参考; 缺数据时显示等待提示, 不臆造"},
   {v:"2.0.3",d:"2026-08-17",desc:"双创策略修正与指标升级: P0修复出场标签bug+跳空成交(修正旧-1.37%假象为+0.16%/笔真实基线, 48格全扫sweepPass=0); P1波动率叠加风险层(默认关, 降回撤非alpha); Step2双创/指数配对对冲原型(中证500/创业板指/科创50三基准对冲后期望全转负、回撤扩大至57-70%, 相对价值方向A证伪); Step3前端主指标由胜率切换为期望/PF/回撤(预警卡+对比图重排)"},
   {v:"2.0.2",d:"2026-08-08",desc:"选股体验修复两项：①选股评分页与选股历史同步到最新自动选股快照（import_final.json 按快照日期归档、每次打开页面先替换旧自动候选仅保留手动项，修复历史视图因无归档日期而漏显、评分页因同名去重而显示陈旧分数）；②动态选股导入剔除F级（RSI超买/MA60未向↑/G5盈利质量硬约束拒绝项不进候选池，当前90只自动选股中59只被判F、剔除后剩31只，导入提示显示剔除数）"},

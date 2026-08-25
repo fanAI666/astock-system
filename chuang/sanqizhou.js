@@ -121,6 +121,68 @@ function reasonsOf(t) {
   return r;
 }
 
+// ===== 分析报告（文字叙述，供前端独立展示）=====
+function buildAnalysis(all, out, mu, wu, du, resonance, partial, diverge, total) {
+  const pct = x => (x * 100).toFixed(0);
+  const tot = Math.max(total, 1);
+
+  // —— 市场三周期叙述 ——
+  let market = '';
+  if (mu >= 0.4) market += `月线多头占比 ${pct(mu)}%，中期趋势整体向上，处于中期多头区间；`;
+  else if (mu >= 0.2) market += `月线多头占比 ${pct(mu)}%，中期多空大致平衡，趋势尚未明确；`;
+  else market += `月线多头占比仅 ${pct(mu)}%，中期仍偏空，绝大多数标的处于月线调整；`;
+
+  if (wu >= 0.4) market += `周线多头 ${pct(wu)}%，中期次级趋势同步走强；`;
+  else if (wu >= 0.2) market += `周线多头 ${pct(wu)}%，周线处于蓄势 / 整理；`;
+  else market += `周线多头仅 ${pct(wu)}%，周线仍在回调，中期整理未结束；`;
+
+  if (du >= 0.4) market += `日线多头 ${pct(du)}%，短线资金活跃、个股普遍转强，具备交易性机会。`;
+  else if (du >= 0.2) market += `日线多头 ${pct(du)}%，短线分化，仅少数个股转强。`;
+  else market += `日线多头仅 ${pct(du)}%，短线疲弱，缺乏普遍交易机会。`;
+
+  if (resonance > 0) market += ` 当前共筛选出 ${total} 支达标标的，其中 ${resonance} 支为月 / 周 / 日三周期共振（趋势最强），占达标标的 ${pct(resonance / tot)}%，处于主升结构。`;
+  if (diverge > 0) market += ` 另有 ${diverge} 支属周期背离（日线转强但长周期仍空），属逆势反弹性质，需严格止损。`;
+
+  // —— 关键观察 ——
+  const keyPoints = [];
+  const byBoard = {};
+  out.forEach(x => { byBoard[x.board] = (byBoard[x.board] || 0) + 1; });
+  const boardTxt = Object.keys(byBoard).map(b => {
+    const name = b === 'kcb' ? '科创板' : (b === 'cyb' ? '创业板' : '主板');
+    return name + byBoard[b] + '支';
+  }).join('、');
+  if (boardTxt) keyPoints.push(`达标标的板块分布：${boardTxt}。`);
+
+  if (resonance >= 5) keyPoints.push(`三周期共振标的达 ${resonance} 支，数量较多，说明多周期同向个股具备赚钱效应，可适度参与。`);
+  else if (resonance > 0) keyPoints.push(`三周期共振标的 ${resonance} 支，数量有限，宜精选其中评分最高者跟踪。`);
+  else keyPoints.push(`当前无三周期共振标的，市场以日线级别反弹为主，趋势性机会稀缺。`);
+
+  if (diverge > 0) keyPoints.push(`${diverge} 支标的日线转强但长周期（月 / 周）仍空，属逆势反弹，务必按 3:1 风险回报设止损，破位即离。`);
+
+  if (du - mu > 0.15) keyPoints.push(`日线多头占比(${pct(du)}%)明显高于月线(${pct(mu)}%)，呈「短强长弱」结构，当前更可能是反弹而非反转，仓位宜轻。`);
+  else if (mu - du > 0.15) keyPoints.push(`月线多头占比(${pct(mu)}%)高于日线(${pct(du)}%)，长周期已转强、短线在消化，属健康的回踩确认，回调可视为机会。`);
+
+  // —— 策略建议 ——
+  let strategy = '';
+  if (resonance >= 5 && du >= 0.4) strategy = '三周期共振标的较多且日线活跃，可适度参与短线，优先选择评分≥80、月周共振的标的，按 3:1 风险回报设止损止盈。';
+  else if (resonance > 0) strategy = '共振标的有限，以「精选 + 轻仓」为主，仅跟踪评分最高的 1–2 支，等待回踩确认后再介入。';
+  else strategy = '缺乏三周期共振，趋势性机会稀缺，建议以观望或极小仓位试错为主，不追高。';
+  strategy += ' 所有标的均须严格执行单笔止损纪律（主板 2% 止损 / 6% 止盈、双创 ATR 动态止损），破位即离场。';
+
+  const method = '选股逻辑：以双创（创业板 / 科创板）1270 支为样本，本地把日 K 重采样为周 / 月，用 MA 斜率 + 收盘价相对 MA 位置判定月 / 周 / 日三周期趋势（↑多 / ↓空 / →平）。筛选条件：日线转强（↑）且非「月空 & 周空」双长周期空头；综合评分（长周期权重更高 + 三周期齐多加分 + 近 5 日动量），取前 20 名。入场价取最新收盘价，止损价取近 10 日低或 −5%，目标价 = 入场 + (入场 − 止损) × 3（3:1 风险回报）。';
+
+  const risk = '⚠️ 本报告由程序基于历史 K 线自动生成，仅用于多周期共振策略研究参考，不构成任何实盘买卖建议。多周期共振可提升胜率但并非 100%，市场存在黑天鹅与流动性风险，请独立决策、自负盈亏。';
+
+  return {
+    market,
+    keyPoints,
+    strategy,
+    method,
+    risk,
+    cycleCounts: { monthUp: pct(mu), weekUp: pct(wu), dayUp: pct(du) },
+  };
+}
+
 // ===== 可选：网络刷新最近日K =====
 async function fetchRecent(code) {
   const tc = (/^6/.test(code) ? 'sh' : 'sz') + code;
@@ -225,6 +287,7 @@ async function refreshAll(items) {
   const report = {
     generatedAt: new Date().toISOString().slice(0, 10),
     summary: { total, resonance, partial, diverge, marketPhase },
+    analysis: buildAnalysis(all, out, mu, wu, du, resonance, partial, diverge, total),
     stocks: out,
   };
 
