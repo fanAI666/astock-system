@@ -17,7 +17,8 @@ const OUT = path.join(ROOT, '选股结果/sanqizhou_report.json');
 
 const DO_REFRESH = process.env.SANQIZHOU_REFRESH !== '0';
 const CONC = 6;          // 刷新并发
-const TOP_N = 20;        // 报告最多输出标的数
+const TOP_N = 20;        // 报告最多输出（精选展示）标的数
+const MAX_CANDIDATES = 300;  // 候选股池硬上限：优中选优前先把候选股收敛到 300 以内
 
 // ===== 工具：MA / 重采样 / 趋势 =====
 function sma(arr, n) {
@@ -122,7 +123,7 @@ function reasonsOf(t) {
 }
 
 // ===== 分析报告（文字叙述，供前端独立展示）=====
-function buildAnalysis(all, out, mu, wu, du, resonance, partial, diverge, total) {
+function buildAnalysis(all, out, mu, wu, du, resonance, partial, diverge, total, candidates) {
   const pct = x => (x * 100).toFixed(0);
   const tot = Math.max(total, 1);
 
@@ -140,7 +141,7 @@ function buildAnalysis(all, out, mu, wu, du, resonance, partial, diverge, total)
   else if (du >= 0.2) market += `日线多头 ${pct(du)}%，短线分化，仅少数个股转强。`;
   else market += `日线多头仅 ${pct(du)}%，短线疲弱，缺乏普遍交易机会。`;
 
-  if (resonance > 0) market += ` 当前共筛选出 ${total} 支达标标的，其中 ${resonance} 支为月 / 周 / 日三周期共振（趋势最强），占达标标的 ${pct(resonance / tot)}%，处于主升结构。`;
+  if (resonance > 0) market += ` 候选股池 ${candidates} 支（已收敛至 300 以内），优中选优筛选出 ${total} 支达标标的，其中 ${resonance} 支为月 / 周 / 日三周期共振（趋势最强），占候选池 ${pct(resonance / Math.max(candidates, 1))}%，处于主升结构。`;
   if (diverge > 0) market += ` 另有 ${diverge} 支属周期背离（日线转强但长周期仍空），属逆势反弹性质，需严格止损。`;
 
   // —— 关键观察 ——
@@ -169,7 +170,7 @@ function buildAnalysis(all, out, mu, wu, du, resonance, partial, diverge, total)
   else strategy = '缺乏三周期共振，趋势性机会稀缺，建议以观望或极小仓位试错为主，不追高。';
   strategy += ' 所有标的均须严格执行单笔止损纪律（主板 2% 止损 / 6% 止盈、双创 ATR 动态止损），破位即离场。';
 
-  const method = '选股逻辑：以双创（创业板 / 科创板）1270 支为样本，本地把日 K 重采样为周 / 月，用 MA 斜率 + 收盘价相对 MA 位置判定月 / 周 / 日三周期趋势（↑多 / ↓空 / →平）。筛选条件：日线转强（↑）且非「月空 & 周空」双长周期空头；综合评分（长周期权重更高 + 三周期齐多加分 + 近 5 日动量），取前 20 名。入场价取最新收盘价，止损价取近 10 日低或 −5%，目标价 = 入场 + (入场 − 止损) × 3（3:1 风险回报）。';
+  const method = '选股逻辑：以双创（创业板 / 科创板）1270 支为样本，本地把日 K 重采样为周 / 月，用 MA 斜率 + 收盘价相对 MA 位置判定月 / 周 / 日三周期趋势（↑多 / ↓空 / →平）。筛选条件：日线转强（↑）且非「月空 & 周空」双长周期空头；综合评分（长周期权重更高 + 三周期齐多加分 + 近 5 日动量）降序排列。优中选优两层：① 先按评分取候选股池前 300 支（候选股池上限 300，避免市况好时膨胀）；② 再从候选池中精选评分最高的 20 支展示。入场价取最新收盘价，止损价取近 10 日低或 −5%，目标价 = 入场 + (入场 − 止损) × 3（3:1 风险回报）。';
 
   const risk = '⚠️ 本报告由程序基于历史 K 线自动生成，仅用于多周期共振策略研究参考，不构成任何实盘买卖建议。多周期共振可提升胜率但并非 100%，市场存在黑天鹅与流动性风险，请独立决策、自负盈亏。';
 
@@ -258,7 +259,11 @@ async function refreshAll(items) {
     .filter(a => a.t.day === 'up' && !(a.t.month === 'down' && a.t.week === 'down'))
     .sort((a, b) => b.score - a.score);
 
-  const out = ranked.slice(0, TOP_N).map(a => {
+  // 候选股池：按综合评分取前 MAX_CANDIDATES（≤300），优中选优第一层（避免市况好时候选膨胀）
+  const cands = ranked.slice(0, MAX_CANDIDATES);
+
+  // 优中选优第二层：从候选池精选展示评分最高的前 TOP_N
+  const out = cands.slice(0, TOP_N).map(a => {
     const last = a.t.lastClose;
     let stop = Math.min(a.t.low10, last * 0.95);
     if (!(stop < last)) stop = last * 0.95;
@@ -275,6 +280,7 @@ async function refreshAll(items) {
   });
 
   const total = out.length;
+  const candidates = cands.length;
   const resonance = out.filter(x => x.month === 'up' && x.week === 'up' && x.day === 'up').length;
   const diverge = out.filter(x => x.week === 'down' || x.month === 'down').length;
   const partial = total - resonance - diverge;
@@ -286,8 +292,8 @@ async function refreshAll(items) {
 
   const report = {
     generatedAt: new Date().toISOString().slice(0, 10),
-    summary: { total, resonance, partial, diverge, marketPhase },
-    analysis: buildAnalysis(all, out, mu, wu, du, resonance, partial, diverge, total),
+    summary: { candidates, total, resonance, partial, diverge, marketPhase },
+    analysis: buildAnalysis(all, out, mu, wu, du, resonance, partial, diverge, total, candidates),
     stocks: out,
   };
 

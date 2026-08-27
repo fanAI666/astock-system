@@ -1988,7 +1988,7 @@ function renderSanZhou(){
   banner.innerHTML='<span class="tri-warn">📅 报告生成日 '+(d.generatedAt||"—")+'</span>'+
     '<span>'+(s.marketPhase||"三周期多空状态见下方标的")+'</span>';
   if(summ){
-    const parts=[["达标数",s.total],["三周期共振",s.resonance],["部分共振",s.partial],["周期背离",s.diverge]].filter(p=>p[1]!=null);
+    const parts=[["候选池",s.candidates],["精选达标",s.total],["三周期共振",s.resonance],["部分共振",s.partial],["周期背离",s.diverge]].filter(p=>p[1]!=null);
     summ.innerHTML=parts.map(p=>'<span class="s">'+p[0]+'<b>'+(p[1]!=null?p[1]:"—")+'</b></span>').join("");
   }
   // —— 分析报告卡片 ——
@@ -2173,6 +2173,7 @@ function renderWrChart(m, cBy){
 }
 /* ============ 版本更新日志 ============ */
 const VERSION_HISTORY = [
+  {v:"2.0.6",d:"2026-08-27",desc:"三周期模块候选股池收敛(优中选优): 选股流程改为两层——先按综合评分取候选股池前300支(硬上限, 避免市况好时候选膨胀), 再从中精选评分最高的20支展示; summary新增候选池字段并在前端显示(候选池/精选达标), 分析报告叙述同步(候选N→精选total)"},
   {v:"2.0.5",d:"2026-08-25",desc:"三周期模块新增「分析报告」卡片: 每日自动化(chuang/sanqizhou.js)额外生成 market(三周期市场叙述)+keyPoints(关键观察)+strategy(策略建议)+method/risk(选股逻辑与风险提示), 前端 triAnalysis 独立渲染, 缺字段优雅回退"},
   {v:"2.0.4",d:"2026-08-25",desc:"新增独立选股模块「三周期」(🔄 Tab, 置于双创信号之后): 读取每日自动化生成的选股结果/sanqizhou_report.json, 展示月/周/日三周期共振标的(趋势箭头↑多/↓空/→平 + 共振/背离徽章 + 综合评分 + 计划入场/止损/目标), 用于多周期共振研究参考; 缺数据时显示等待提示, 不臆造"},
   {v:"2.0.3",d:"2026-08-17",desc:"双创策略修正与指标升级: P0修复出场标签bug+跳空成交(修正旧-1.37%假象为+0.16%/笔真实基线, 48格全扫sweepPass=0); P1波动率叠加风险层(默认关, 降回撤非alpha); Step2双创/指数配对对冲原型(中证500/创业板指/科创50三基准对冲后期望全转负、回撤扩大至57-70%, 相对价值方向A证伪); Step3前端主指标由胜率切换为期望/PF/回撤(预警卡+对比图重排)"},
