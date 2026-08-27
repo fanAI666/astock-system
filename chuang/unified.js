@@ -3,13 +3,13 @@
 // 职责：合并 主板(import_final.json) + 双创(chuang_signals.json) + 三周期(sanqizhou_report.json)
 //       三支选股模块的输出，按 code 去重（同一标的可能被多模块选中），
 //       用统一「适应度 fitness = 模块原生评分 × 验证系数」全局排名，
-//       保留前 CAP(300) 支作为总选股池，其余判为淘汰（优胜劣汰），
+//       保留前 CAP(50) 支作为总选股池，其余判为淘汰（优胜劣汰），
 //       产出 选股结果/unified_selection.json，供 stock-selection-system.html 的「优中选优」Tab 渲染。
 //
 // 验证系数 EDGE 含义（反映各模块回测验证可信度，可调）：
 //   main   1.00 — 主板 main_only 回测期望 +0.59%/笔、PF 1.45，已转正；
 //   tri    0.90 — 三周期仅多周期共振研究参考，未经回测验证；
-//   chuang 0.75 — 双创全市场回测期望为负，仅作预警/研究，系数下调使其需更高原生分才能挤入 300。
+//   chuang 0.75 — 双创全市场回测期望为负，仅作预警/研究，系数下调使其需更高原生分才能挤入 50。
 // 说明：本脚本只做「跨模块汇总排名 + 硬上限」，不改动任何模块自身选股逻辑。
 
 const fs = require('fs');
@@ -19,7 +19,7 @@ const ROOT = 'D:/WorkBuddy';
 const SEL = path.join(ROOT, '选股结果');
 const OUT = path.join(SEL, 'unified_selection.json');
 
-const CAP = 300;                                   // 总选股硬上限：主板+双创+三周期 合计 ≤ 300
+const CAP = 50;                                    // 总选股硬上限：主板+双创+三周期 合计 ≤ 50
 const EDGE = { main: 1.0, tri: 0.9, chuang: 0.75 }; // 验证系数（可信度权重）
 
 function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
