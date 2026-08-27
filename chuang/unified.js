@@ -4,6 +4,8 @@
 //       三支选股模块的输出，按 code 去重（同一标的可能被多模块选中），
 //       用统一「适应度 fitness = 模块原生评分 × 验证系数」全局排名，
 //       保留前 CAP(50) 支作为总选股池，其余判为淘汰（优胜劣汰），
+//       并采用「平衡配额」：主板/双创/三周期每块至少保留 MIN_PER_BLOCK(3) 支，
+//       保证弱势板块（如双创全市场负期望）不被强势板块（主板/三周期）完全挤出，维持三块选股平衡。
 //       产出 选股结果/unified_selection.json，供 stock-selection-system.html 的「优中选优」Tab 渲染。
 //
 // 验证系数 EDGE 含义（反映各模块回测验证可信度，可调）：
@@ -20,6 +22,7 @@ const SEL = path.join(ROOT, '选股结果');
 const OUT = path.join(SEL, 'unified_selection.json');
 
 const CAP = 50;                                    // 总选股硬上限：主板+双创+三周期 合计 ≤ 50
+const MIN_PER_BLOCK = 3;                            // 平衡配额：每块（主板/双创/三周期）至少保留 3 支
 const EDGE = { main: 1.0, tri: 0.9, chuang: 0.75 }; // 验证系数（可信度权重）
 
 function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
@@ -102,7 +105,9 @@ function main() {
     } else {
       const cur = byCode[r.code];
       cur.sources.push(r.source);
-      if (fit > cur.fitness) { cur.fitness = fit; cur.bestSource = r.source; }
+      // 同 code 多次出现（双创常有重复信号）时，取适应度更高者；
+      // 同步更新 nativeScore 为产生该适应度的来源分值，避免显示与 fitness 不一致。
+      if (fit > cur.fitness) { cur.fitness = fit; cur.bestSource = r.source; cur.nativeScore = r.nativeScore; }
       if (r.cycle && !cur.cycle) cur.cycle = r.cycle;
     }
   }
@@ -111,8 +116,28 @@ function main() {
   const dedupTotal = all.length;
   all.sort((a, b) => b.fitness - a.fitness);
 
-  const survived = all.slice(0, CAP);
-  const eliminated = all.slice(CAP);
+  // —— 平衡配额：保证 main/tri/chuang 每块至少保留 MIN_PER_BLOCK 支 ——
+  // 先为每块保留其适应度最高的前 MIN_PER_BLOCK 支（若该块候选不足则尽力保留全部），
+  // 再按全局适应度把剩余名额补满至 CAP。已入选的标的（跨块去重）不再重复计入。
+  const SOURCES = ['main', 'tri', 'chuang'];
+  const chosen = new Map(); // code -> stock（去重后全局唯一）
+  for (const src of SOURCES) {
+    const pool = all.filter(x => x.sources.includes(src)).sort((a, b) => b.fitness - a.fitness);
+    const n = Math.min(MIN_PER_BLOCK, pool.length);
+    for (let i = 0; i < n; i++) chosen.set(pool[i].code, pool[i]);
+  }
+  let seats = CAP - chosen.size;
+  for (const s of all) {
+    if (seats <= 0) break;
+    if (chosen.has(s.code)) continue;
+    chosen.set(s.code, s);
+    seats--;
+  }
+  const selected = [...chosen.values()].sort((a, b) => b.fitness - a.fitness);
+
+  const survived = selected;
+  const chosenKeys = new Set(chosen.keys());
+  const eliminated = all.filter(x => !chosenKeys.has(x.code));
   const srcCnt = s => survived.filter(x => x.sources.includes(s)).length;
 
   const stocks = survived.map((x, i) => ({
