@@ -1,7 +1,43 @@
 {
-  "date": "2026-08-25",
-  "baselineDate": "2026-08-22",
-  "top3": [],
-  "trade": false,
-  "reason": "大盘空头(上证<MA20)"
+  "date": "2026-08-27",
+  "baselineDate": "2026-08-26",
+  "top3": [
+    {
+      "code": "600000",
+      "name": "浦发银行 600000",
+      "board": "main",
+      "win": 79.8,
+      "baseline": 9.21,
+      "open": 9.18,
+      "dev": -0.0033,
+      "tol": 0.02,
+      "decision": "hold",
+      "reason": "过滤未过(趋势)"
+    },
+    {
+      "code": "600999",
+      "name": "招商证券 600999",
+      "board": "main",
+      "win": 79.4,
+      "baseline": 18.58,
+      "open": 18.5,
+      "dev": -0.0043,
+      "tol": 0.02,
+      "decision": "hold",
+      "reason": "过滤未过(趋势)"
+    },
+    {
+      "code": "002415",
+      "name": "海康威视 002415",
+      "board": "main",
+      "win": 79,
+      "baseline": 34.78,
+      "open": 34.78,
+      "dev": 0.0,
+      "tol": 0.02,
+      "decision": "hold",
+      "reason": "过滤未过(趋势/量能)"
+    }
+  ],
+  "trade": false
 }
