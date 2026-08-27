@@ -236,6 +236,24 @@
 .tri-price .p.gain .val{color:var(--ok)}
 .tri-reasons{margin-top:8px;font-size:12.5px;color:#475569;line-height:1.65}
 .tri-reasons .r{display:inline-block;background:#f1f5f9;border-radius:6px;padding:2px 9px;margin:3px 6px 0 0;color:#334155}
+/* =========== 优中选优（总选股 ≤300） =========== */
+.uni-banner{padding:13px 16px;border-radius:13px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;font-weight:600;font-size:13.5px;margin:4px 0 12px;background:linear-gradient(135deg,#fff7ed,#ffedd5);color:#9a3412;border:1px solid #fed7aa}
+.uni-banner .uni-cap{background:#9a3412;color:#fff;border-radius:999px;padding:2px 11px;font-weight:800;font-size:12.5px}
+.uni-banner .uni-wait{font-weight:500;font-size:13px;color:#64748b}
+.uni-summ{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 10px}
+.uni-summ .s{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 13px;font-size:12.5px;color:var(--sub)}
+.uni-summ .s b{color:var(--ink);font-weight:800;margin-left:6px;font-size:14px}
+.uni-src{font-size:11px;font-weight:700;padding:2px 9px;border-radius:6px;margin-left:6px}
+.uni-src-main{background:#eef2f7;color:#475569}
+.uni-src-chuang{background:#eef4ff;color:#2563eb}
+.uni-src-tri{background:#fef3da;color:#b45309}
+.uni-method{font-size:12px;color:var(--sub);background:#f8fafc;border-left:3px solid #fb923c;padding:9px 12px;border-radius:0 8px 8px 0;margin:6px 0 14px;line-height:1.7}
+.uni-elim{margin-top:14px}
+.uni-elim summary{cursor:pointer;font-size:12.5px;color:var(--link);font-weight:600;list-style:none}
+.uni-elim summary::-webkit-details-marker{display:none}
+.uni-elim summary:before{content:"▸ "}
+.uni-elim[open] summary:before{content:"▾ "}
+.uni-elim .uni-elim-list{font-size:12.5px;color:var(--sub);line-height:1.9;margin-top:8px}
 /* =========== 交易胜率 置顶 =========== */
 .winrate-top{padding:0;margin-bottom:14px}
 .wr-card{display:flex;flex-wrap:wrap;align-items:center;gap:16px 30px;background:linear-gradient(135deg,#0f172a,#1e293b);color:#e2e8f0;border-radius:16px;padding:18px 24px;box-shadow:0 12px 34px rgba(15,23,42,.35);border:1px solid rgba(148,163,184,.18)}
@@ -404,6 +422,7 @@
     <button data-tab="buysig">📈 买入信号</button>
     <button data-tab="chuang">🚀 双创信号</button>
     <button data-tab="tri">🔄 三周期</button>
+    <button data-tab="uni">🏆 优中选优</button>
     <button data-tab="calc">🧮 仓位计算</button>
     <button data-tab="brief">📑 每日简报</button>
     <button data-tab="journal">📓 交易日志</button>
@@ -705,6 +724,23 @@
       <div class="tri-analysis" id="triAnalysis"></div>
       <h3 class="bs-sub">三周期共振标的</h3>
       <div id="triList"><div class="empty">暂无信号。</div></div>
+    </div>
+  </section>
+
+  <!-- ===================== 优中选优（主板+双创+三周期 总选股 ≤300） ===================== -->
+  <section class="panel" id="uni">
+    <div class="card">
+      <h2><span class="dot"></span>优中选优 · 主板 + 双创 + 三周期 总选股</h2>
+      <p class="hint">跨模块汇总：合并主板(import_final)、双创(chuang_signals)、三周期(sanqizhou_report) 三套选股结果，按 code 去重后，以「综合适应度 = 模块原生评分 × 验证系数」全局排名，保留前 300 支作为总选股池，余者判为淘汰（优胜劣汰）。验证系数：主板 1.0（回测转正）/ 三周期 0.9（研究参考）/ 双创 0.75（全市场负期望·预警）。</p>
+      <div id="uniBanner" class="uni-banner"><span class="uni-wait">等待优中选优汇总…</span></div>
+      <div class="uni-summ" id="uniSummary"></div>
+      <div class="uni-method" id="uniMethod"></div>
+      <h3 class="bs-sub">总选股池（优中选优 ≤ 300）</h3>
+      <div id="uniList"><div class="empty">暂无信号。</div></div>
+      <details class="uni-elim" id="uniElimWrap">
+        <summary>查看被淘汰标的（未进入 300 上限）</summary>
+        <div class="uni-elim-list" id="uniElim"></div>
+      </details>
     </div>
   </section>
 
@@ -2055,6 +2091,107 @@ async function loadSanZhou(){
   renderSanZhou();
 }
 
+/* 优中选优（总选股 ≤300）展示（unified_selection.json） */
+function uniSrcBadge(s){
+  const map={main:['uni-src-main','主板'],chuang:['uni-src-chuang','双创'],tri:['uni-src-tri','三周期']};
+  const m=map[s]||['uni-src-main',s];
+  return '<span class="uni-src '+m[0]+'">'+m[1]+'</span>';
+}
+function uniBoardName(b){ return b==='kcb'?'科创板':(b==='cyb'?'创业板':'主板'); }
+function uniBoardCls(b){ return b==='kcb'?'tri-tag-kcb':(b==='cyb'?'tri-tag-cyb':'tri-tag-main'); }
+function renderUnified(){
+  const banner=document.getElementById("uniBanner");
+  const summ=document.getElementById("uniSummary");
+  const method=document.getElementById("uniMethod");
+  const list=document.getElementById("uniList");
+  const elimWrap=document.getElementById("uniElimWrap");
+  const elim=document.getElementById("uniElim");
+  if(!banner) return;
+  const d=window.unified;
+  if(!d){
+    banner.className="uni-banner";
+    banner.innerHTML='<span class="uni-wait">等待优中选优汇总…（请通过预览/本地服务器打开，或先运行 chuang/unified.js 生成 选股结果/unified_selection.json）</span>';
+    if(summ) summ.innerHTML="";
+    if(method) method.innerHTML="";
+    if(list) list.innerHTML='<div class="empty">暂无信号。</div>';
+    if(elimWrap) elimWrap.style.display="none";
+    return;
+  }
+  const cap=d.cap||300, surv=d.survived||0, elimN=d.eliminated||0;
+  banner.className="uni-banner";
+  banner.innerHTML='<span class="uni-cap">总选股 ≤ '+cap+'</span>'+
+    '<span>📅 生成日 '+(d.generatedAt||"—")+'</span>'+
+    '<span>去重后合计 <b style="color:#9a3412">'+d.dedupTotal+'</b> 支</span>'+
+    '<span>入选 <b style="color:#15803d">'+surv+'</b></span>'+
+    (elimN>0?('<span>淘汰 <b style="color:#991b1b">'+elimN+'</b></span>'):'<span>当前未触顶，全部入选</span>');
+  if(summ){
+    const src=d.sources||{};
+    const parts=[["主板入选",src.main],["双创入选",src.chuang],["三周期入选",src.tri],["被淘汰",elimN]];
+    summ.innerHTML=parts.map(p=>'<span class="s">'+p[0]+'<b>'+(p[1]!=null?p[1]:"—")+'</b></span>').join("");
+  }
+  if(method){
+    const e=d.edge||{main:1,tri:0.9,chuang:0.75};
+    method.innerHTML='综合适应度 = 模块原生评分 × 验证系数（主板 '+e.main+' / 三周期 '+e.tri+' / 双创 '+e.chuang+'）。三套选股合并去重后全局排名，保留前 '+cap+' 支，余者淘汰（优胜劣汰）。今日去重 '+d.dedupTotal+' 支 → 入选 '+surv+(elimN>0?('，淘汰 '+elimN+' 支'):'，未触顶全部入选')+'。';
+  }
+  if(list){
+    const stocks=d.stocks||[];
+    if(!stocks.length){ list.innerHTML='<div class="empty">暂无信号。</div>'; }
+    else{
+      list.innerHTML=stocks.map(b=>{
+        const code=String(b.code);
+        const nm=(b.name&&b.name.indexOf(code)>=0)?b.name:(b.name+' '+code);
+        const srcs=(b.sources||[]).map(uniSrcBadge).join("");
+        const rlist=(b.reasons||[]).filter(r=>r&&r!=='final'&&r!=='watch').map(r=>'<span class="r">'+r+'</span>').join("");
+        const cyc=b.cycle?'<span class="tri-cyc '+(b.cycle.month==='up'?'up':b.cycle.month==='down'?'down':'flat')+'">月'+(b.cycle.month==='up'?'↑':b.cycle.month==='down'?'↓':'→')+'</span><span class="tri-cyc '+(b.cycle.week==='up'?'up':b.cycle.week==='down'?'down':'flat')+'">周'+(b.cycle.week==='up'?'↑':b.cycle.week==='down'?'↓':'→')+'</span><span class="tri-cyc '+(b.cycle.day==='up'?'up':b.cycle.day==='down'?'down':'flat')+'">日'+(b.cycle.day==='up'?'↑':b.cycle.day==='down'?'↓':'→')+'</span>':'';
+        return '<div class="tri-buy">'+
+          '<div class="tri-head">'+
+            '<span class="tri-name">'+nm+'</span>'+
+            '<span class="tri-code">'+code+'</span>'+
+            '<span class="tri-tag '+uniBoardCls(b.board)+'">'+uniBoardName(b.board)+'</span>'+
+            srcs+
+            (cyc?'<span style="margin-left:6px">'+cyc+'</span>':'')+
+          '</div>'+
+          '<div class="meter"><span style="font-size:12px;color:var(--sub);min-width:74px">综合适应度</span>'+
+            '<div class="bar"><i style="width:'+Math.max(0,Math.min(100,b.fitness))+'%"></i></div>'+
+            '<span class="num">'+b.fitness+'</span></div>'+
+          '<div class="tri-price">'+
+            '<div class="p"><span class="lab">原生评分</span><span class="val">'+chgFmt2(b.nativeScore)+'</span></div>'+
+            (b.win!=null?'<div class="p"><span class="lab">历史胜率</span><span class="val">'+chgFmt2(b.win)+'%</span></div>':'')+
+            '<div class="p"><span class="lab">计划入场</span><span class="val">'+chgFmt2(b.entry)+'</span></div>'+
+            '<div class="p lose"><span class="lab">止损价</span><span class="val">'+chgFmt2(b.stop)+'</span></div>'+
+            '<div class="p gain"><span class="lab">目标价</span><span class="val">'+chgFmt2(b.target)+'</span></div>'+
+          '</div>'+
+          (rlist?'<div class="tri-reasons">'+rlist+'</div>':'')+
+        '</div>';
+      }).join("");
+    }
+  }
+  if(elimWrap){
+    if(elimN>0){
+      elimWrap.style.display="";
+      if(elim){
+        const rows=(d.eliminated||[]).map(x=>{
+          const code=String(x.code);
+          const nm=(x.name&&x.name.indexOf(code)>=0)?x.name:(x.name+' '+code);
+          return nm+' ('+code+') 适应度'+x.fitness+' · '+((x.sources||[]).map(s=>s==='main'?'主板':s==='chuang'?'双创':'三周期').join('/'))+'';
+        });
+        elim.innerHTML=rows.join('；');
+      }
+    } else {
+      elimWrap.style.display="none";
+    }
+  }
+}
+async function loadUnified(){
+  window.unified=null;
+  if(location.protocol.indexOf("http")!==0){ renderUnified(); return; }
+  try{
+    const res=await fetch("选股结果/unified_selection.json",{cache:"no-store"});
+    if(res.ok) window.unified=await res.json();
+  }catch(e){}
+  renderUnified();
+}
+
 /* 双轨回测展示：主板(main_only) + 双创(创业板/科创板 独立加宽体系) 分别渲染，并画图 */
 function renderWinRate(p12, ch){
   const set=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
@@ -2173,6 +2310,7 @@ function renderWrChart(m, cBy){
 }
 /* ============ 版本更新日志 ============ */
 const VERSION_HISTORY = [
+  {v:"2.0.7",d:"2026-08-27",desc:"新增「优中选优」总选股汇总(Tab🏆, 置于三周期之后): 合并主板(import_final)+双创(chuang_signals)+三周期(sanqizhou_report)三套选股, 按code去重后以「综合适应度=原生评分×验证系数(主板1.0/三周期0.9/双创0.75)」全局排名, 硬上限300保留优胜者、余者判为淘汰; 前端展示入选池(来源徽章+适应度条+入场/止损/目标)与被淘汰清单, 满足「主板+双创+三周期总选股量≤300, 优胜劣汰」"},
   {v:"2.0.6",d:"2026-08-27",desc:"三周期模块候选股池收敛(优中选优): 选股流程改为两层——先按综合评分取候选股池前300支(硬上限, 避免市况好时候选膨胀), 再从中精选评分最高的20支展示; summary新增候选池字段并在前端显示(候选池/精选达标), 分析报告叙述同步(候选N→精选total)"},
   {v:"2.0.5",d:"2026-08-25",desc:"三周期模块新增「分析报告」卡片: 每日自动化(chuang/sanqizhou.js)额外生成 market(三周期市场叙述)+keyPoints(关键观察)+strategy(策略建议)+method/risk(选股逻辑与风险提示), 前端 triAnalysis 独立渲染, 缺字段优雅回退"},
   {v:"2.0.4",d:"2026-08-25",desc:"新增独立选股模块「三周期」(🔄 Tab, 置于双创信号之后): 读取每日自动化生成的选股结果/sanqizhou_report.json, 展示月/周/日三周期共振标的(趋势箭头↑多/↓空/→平 + 共振/背离徽章 + 综合评分 + 计划入场/止损/目标), 用于多周期共振研究参考; 缺数据时显示等待提示, 不臆造"},
@@ -2637,7 +2775,7 @@ document.getElementById('btnHighFreq').addEventListener('click',()=>switchMode('
 // 应用已保存的模式（默认高频）
 if(currentMode !== 'highFreq') { switchMode(currentMode); }  // 仅非默认时触发 UI 更新
 load(); initTheme(); syncCfgInputs(); refreshCand(); renderTrades(); renderDash(); renderChangelog(); renderFundFlow();
-if(location.protocol.indexOf("http")===0){ importToday(); loadBuySignal(); loadChuangSignal(); loadWinRate(); loadBriefings(); loadSanZhou(); loadFundFlow().then(()=>{ startLiveFundFlow(); }); }
+if(location.protocol.indexOf("http")===0){ importToday(); loadBuySignal(); loadChuangSignal(); loadWinRate(); loadBriefings(); loadSanZhou(); loadUnified(); loadFundFlow().then(()=>{ startLiveFundFlow(); }); }
 loadFundamental();   // 4.0 双创基本面（G5/G6），http 下 fetch、离线走 EMBED 兜底，到达后重渲染候选卡
 window.addEventListener("resize",()=>{ for(const id in charts){ charts[id]._resize(); } });
 </script>
