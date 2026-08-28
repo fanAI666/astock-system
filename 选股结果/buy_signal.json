@@ -1,42 +1,42 @@
 {
-  "date": "2026-08-27",
-  "baselineDate": "2026-08-26",
+  "date": "2026-08-28",
+  "baselineDate": "2026-08-27",
   "top3": [
+    {
+      "code": "601939",
+      "name": "建设银行 601939",
+      "board": "main",
+      "win": 81.2,
+      "baseline": 10.57,
+      "open": 10.54,
+      "dev": -0.002838,
+      "tol": 0.02,
+      "decision": "hold",
+      "reason": "过滤未过(趋势未过,量能未过)"
+    },
     {
       "code": "600000",
       "name": "浦发银行 600000",
       "board": "main",
       "win": 79.8,
-      "baseline": 9.21,
-      "open": 9.18,
-      "dev": -0.0033,
+      "baseline": 9.07,
+      "open": 9.01,
+      "dev": -0.006615,
       "tol": 0.02,
       "decision": "hold",
-      "reason": "过滤未过(趋势)"
-    },
-    {
-      "code": "600999",
-      "name": "招商证券 600999",
-      "board": "main",
-      "win": 79.4,
-      "baseline": 18.58,
-      "open": 18.5,
-      "dev": -0.0043,
-      "tol": 0.02,
-      "decision": "hold",
-      "reason": "过滤未过(趋势)"
+      "reason": "过滤未过(趋势未过)"
     },
     {
       "code": "002415",
       "name": "海康威视 002415",
       "board": "main",
       "win": 79,
-      "baseline": 34.78,
-      "open": 34.78,
-      "dev": 0.0,
+      "baseline": 35.29,
+      "open": 35.2,
+      "dev": -0.00255,
       "tol": 0.02,
       "decision": "hold",
-      "reason": "过滤未过(趋势/量能)"
+      "reason": "过滤未过(趋势未过,量能未过)"
     }
   ],
   "trade": false
