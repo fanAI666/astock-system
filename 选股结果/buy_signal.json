@@ -1,10 +1,49 @@
 {
-  "date": "2026-08-31",
+  "date": "2026-09-01",
   "baselineDate": "2026-08-28",
-  "top3": [],
-  "trade": false,
-  "reason": "westock-mcp 完全不可用：本会话未加载腾讯自选股 MCP（data_kline / data_quote 工具缺失），无法抓取上证指数(sh000001)与 Top3 个股次日开盘价，无法执行 ⑤ 大盘硬过滤与容差/全市场过滤判定。按自动化约束写 trade:false、top3 空数组，当日全市场不交易。",
-  "note": "import_final.json 基线日 2026-08-28（197 项：main109/cyb58/kcb30）。若 westock-mcp 可用，按 win 降序的候选 Top3 为：600999 招商证券(win=80.5,基线18.71)、600000 浦发银行(win=79.8,基线9.00)、002415 海康威视(win=79.0,基线35.10)。待 westock-mcp 连接器接入后可重跑本自动化。",
-  "generatedBy": "automation-1783746752370",
-  "dataSource": "import_final.json (local) + westock-mcp (unavailable)"
+  "top3": [
+    {
+      "code": "601038",
+      "name": "一拖股份 601038",
+      "board": "main",
+      "win": 79.0,
+      "baseline": 14.57,
+      "open": 14.59,
+      "dev": 0.0014,
+      "tol": 0.02,
+      "decision": "buy"
+    },
+    {
+      "code": "601857",
+      "name": "中国石油 601857",
+      "board": "main",
+      "win": 79.0,
+      "baseline": 11.42,
+      "open": 11.46,
+      "dev": 0.0035,
+      "tol": 0.02,
+      "decision": "hold",
+      "reason": "过滤未过 trend=True vol=False(1419124>=1492230) gap=0.0142(True)"
+    },
+    {
+      "code": "000977",
+      "name": "浪潮信息 000977",
+      "board": "main",
+      "win": 79.0,
+      "baseline": 85.18,
+      "open": 85.9,
+      "dev": 0.0085,
+      "tol": 0.02,
+      "decision": "buy"
+    }
+  ],
+  "trade": true,
+  "index": {
+    "sh000001": {
+      "last": 3986.3,
+      "ma20": 3924.9,
+      "bearish": false
+    }
+  },
+  "generatedAt": "2026-09-01T10:15:18"
 }
