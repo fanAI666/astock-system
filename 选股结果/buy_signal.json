@@ -1,49 +1,40 @@
 {
-  "date": "2026-09-01",
+  "date": "2026-09-02",
   "baselineDate": "2026-08-28",
   "top3": [
+    {
+      "code": "300770",
+      "name": "新媒股份 300770",
+      "board": "cyb",
+      "win": 81.5,
+      "baseline": 35.68,
+      "open": 35.41,
+      "dev": -0.0076,
+      "tol": 0.03,
+      "decision": "buy"
+    },
     {
       "code": "601038",
       "name": "一拖股份 601038",
       "board": "main",
-      "win": 79.0,
-      "baseline": 14.57,
-      "open": 14.59,
-      "dev": 0.0014,
+      "win": 80.8,
+      "baseline": 15.02,
+      "open": 14.9,
+      "dev": -0.008,
       "tol": 0.02,
       "decision": "buy"
     },
     {
-      "code": "601857",
-      "name": "中国石油 601857",
+      "code": "600036",
+      "name": "招商银行 600036",
       "board": "main",
-      "win": 79.0,
-      "baseline": 11.42,
-      "open": 11.46,
-      "dev": 0.0035,
-      "tol": 0.02,
-      "decision": "hold",
-      "reason": "过滤未过 trend=True vol=False(1419124>=1492230) gap=0.0142(True)"
-    },
-    {
-      "code": "000977",
-      "name": "浪潮信息 000977",
-      "board": "main",
-      "win": 79.0,
-      "baseline": 85.18,
-      "open": 85.9,
-      "dev": 0.0085,
+      "win": 80.8,
+      "baseline": 40.86,
+      "open": 40.9,
+      "dev": 0.001,
       "tol": 0.02,
       "decision": "buy"
     }
   ],
-  "trade": true,
-  "index": {
-    "sh000001": {
-      "last": 3986.3,
-      "ma20": 3924.9,
-      "bearish": false
-    }
-  },
-  "generatedAt": "2026-09-01T10:15:18"
+  "trade": true
 }
