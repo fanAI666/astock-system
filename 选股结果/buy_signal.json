@@ -1,16 +1,16 @@
 {
-  "date": "2026-09-02",
-  "baselineDate": "2026-08-28",
+  "date": "2026-09-03",
+  "baselineDate": "2026-09-02",
   "top3": [
     {
       "code": "300770",
       "name": "新媒股份 300770",
       "board": "cyb",
       "win": 81.5,
-      "baseline": 35.68,
-      "open": 35.41,
-      "dev": -0.0076,
       "tol": 0.03,
+      "baseline": 34.91,
+      "open": 34.91,
+      "dev": 0.0,
       "decision": "buy"
     },
     {
@@ -18,10 +18,10 @@
       "name": "一拖股份 601038",
       "board": "main",
       "win": 80.8,
-      "baseline": 15.02,
-      "open": 14.9,
-      "dev": -0.008,
       "tol": 0.02,
+      "baseline": 14.51,
+      "open": 14.59,
+      "dev": 0.0055,
       "decision": "buy"
     },
     {
@@ -29,12 +29,14 @@
       "name": "招商银行 600036",
       "board": "main",
       "win": 80.8,
-      "baseline": 40.86,
-      "open": 40.9,
-      "dev": 0.001,
       "tol": 0.02,
-      "decision": "buy"
+      "baseline": 40.87,
+      "open": 40.76,
+      "dev": -0.0027,
+      "decision": "hold",
+      "reason": "过滤未过：量能不足(648611<867354)"
     }
   ],
-  "trade": true
+  "trade": true,
+  "reason": "大盘多头(上证 2026-09-02 收 3941.39 ≥ MA20 3935.92)；Top3 中 2 笔通过容差+全市场过滤（同日上限 3 笔）"
 }
