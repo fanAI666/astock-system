@@ -1,7 +1,7 @@
 {
   "baseVersion": "1.0.0",
-  "version": "2.1.0",
-  "featurePoints": 110,
+  "version": "2.1.1",
+  "featurePoints": 111,
   "rule": "以 1.0.0 为基准；每新增 1 个功能点版本 +0.0.1；满 10 个点进 1（即 0.0.9 → 0.1.0，相对基准为 1.0.9 → 1.1.0）；满 10 个次版本进 1（1.9.0 → 2.0.0）。版本号 = 基准主版本 + 功能点数按 10 进 1 进位。",
   "history": [
     {
@@ -253,6 +253,12 @@
       "date": "2026-08-28",
       "points": 1,
       "desc": "撤销优中选优独立模块: 三模块各自独立展示, 不做跨块数量对齐, 仅弱板块(双创)保底≥3(当前60支); 移除unified.js与unified_selection.json"
+    },
+    {
+      "version": "2.1.1",
+      "date": "2026-09-03",
+      "points": 1,
+      "desc": "选股评分历史覆盖三模块: importToday 并入主板(import_final)+双创(chuang_signals)+三周期(sanqizhou_report) 三源, 外部模块按(src,名称)去重、仅入历史视图(排名/交易候选区排除), 徽章+CAT样式新增双创/三周期"
     }
   ]
 }

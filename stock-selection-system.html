@@ -121,6 +121,8 @@
   .cat{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-left:6px;vertical-align:middle}
   .cat-manual{background:#eef2f7;color:#6b7280}
   .cat-final{background:#e7f7ec;color:#16a34a}
+  .cat-chuang{background:#eef4ff;color:#2563eb}
+  .cat-tri{background:#fef3da;color:#b45309}
   /* ---- K线 ---- */
   .klwrap{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:8px;background:#fcfdff}
   .kltabs{display:flex;gap:6px;margin-bottom:6px}
@@ -1304,6 +1306,8 @@ function scoreCardHTML(c,pfx){
   pfx=pfx||'';
   const r=c._r; const bp=boardParams(c.board); const src=c.src||"manual";
   const badge = src==="manual"?'<span class="cat cat-manual">手动</span>'
+    : src==="chuang"?'<span class="cat cat-chuang">双创</span>'
+    : src==="tri"?'<span class="cat cat-tri">三周期</span>'
     : '<span class="cat cat-final">盘后·定稿</span>';
   const kl = c.kline ? `<div class="klwrap" id="klwrap_${pfx}${c.id}">
       <div class="kltabs">
@@ -1345,7 +1349,7 @@ function renderCandidates(){
   const groups={manual:"手动",final:"盘后定稿"};
   charts={};
   if(!candidates.length){box.innerHTML='<div class="empty">还没有候选股。可在上方「评分并加入候选」，或点「📥 导入今日自动选股」。</div>';return;}
-  let list=candidates.filter(c=>(curFilter==="all"?true:(c.src||"manual")===curFilter) && (c.src||"manual")!=="pre");
+  let list=candidates.filter(c=>(curFilter==="all"?true:(c.src||"manual")===curFilter) && (c.src||"manual")!=="pre" && c.src!=="chuang" && c.src!=="tri");
   if(!list.length){box.innerHTML='<div class="empty">当前筛选「'+(curFilter==="all"?"全部":groups[curFilter])+'」下没有候选。</div>';return;}
   list.sort((a,b)=>b._r.winRate - a._r.winRate);
   box.innerHTML=list.map(c=>scoreCardHTML(c,'')).join("");
@@ -1373,8 +1377,8 @@ function renderHistory(){
   if(!keys.length){box.innerHTML='<div class="hist-empty">暂无可按日期归档的选股。</div>';return;}
   box.innerHTML=keys.map(k=>{
     const arr=groups[k].slice().sort((a,b)=>b._r.winRate-a._r.winRate);
-    const cnt={manual:0,pre:0,final:0}; arr.forEach(c=>{cnt[c.src]=(cnt[c.src]||0)+1;});
-    const tag=[cnt.manual?("手动 "+cnt.manual):"",cnt.final?("盘后 "+cnt.final):""].filter(Boolean).join(" · ");
+    const cnt={manual:0,pre:0,final:0,chuang:0,tri:0}; arr.forEach(c=>{cnt[c.src]=(cnt[c.src]||0)+1;});
+    const tag=[cnt.manual?("手动 "+cnt.manual):"",cnt.final?("盘后 "+cnt.final):"",cnt.chuang?("双创 "+cnt.chuang):"",cnt.tri?("三周期 "+cnt.tri):""].filter(Boolean).join(" · ");
     const head=k?("📅 "+k):"📋 未标注日期";
     return `<div class="hist-group">
       <div class="hist-date">${head}<span class="pill">${tag}</span></div>
@@ -1385,6 +1389,8 @@ function renderHistory(){
 function histRowHTML(c){
   const r=c._r;
   const badge = c.src==="manual"?'<span class="cat cat-manual">手动</span>'
+    : c.src==="chuang"?'<span class="cat cat-chuang">双创</span>'
+    : c.src==="tri"?'<span class="cat cat-tri">三周期</span>'
     : '<span class="cat cat-final">盘后·定稿</span>';
   return `<div class="hist-row">
     <button class="hist-exp" onclick="toggleHist('${c.id}')">${c.name} <span class="tagboard">${c.board==="main"?"主板":c.board==="cyb"?"创业板":"科创板"}</span>${badge}
@@ -1692,18 +1698,50 @@ function showImportMsg(added, got, fSkip){
   }
   setTimeout(()=>m.style.display="none",3000);
 }
+/* 外部选股模块（双创 / 三周期）并入「选股历史」：字段与主板 6 维不同，不重算评分，
+   直接采用模块自带 score/win，按文件生成日归档；仅进入历史视图（不进排名/交易候选区）。
+   dedup 按 (src, 名称) 而非日期，避免双创(滚动回测固定名单)按生成日重复堆积。 */
+function mergeExternal(srcLabel, items, dateStr){
+  let added=0;
+  (items||[]).forEach((it,idx)=>{
+    const c=Object.assign({},it);
+    c.id="ext_"+srcLabel+"_"+Date.now()+"_"+(idx++);
+    c.src=srcLabel;                                   // "chuang" / "tri"
+    c.cat = srcLabel==="chuang" ? "双创信号" : "三周期";
+    c.board = it.board || "main";
+    c.date = dateStr;
+    const sc = (it.score!=null) ? it.score : 0;
+    const wr = (it.win!=null) ? it.win : (it.score!=null ? it.score : 0);
+    c._r = { score: sc, winRate: wr, pass: (wr>=70), grade:"", reasons: it.reasons||[], isCalibrated:true, ext:true };
+    if(candidates.some(x=>x.src===srcLabel && x.name===it.name)) return;   // 按(src,名称)去重
+    candidates.push(c); added++;
+  });
+  return added;
+}
 async function importToday(){
-  const files=["选股结果/import_final.json"];
-  // 清掉上一批自动导入（非手动）候选，仅当成功拉到数据时才替换，避免网络失败时清空；保留手动候选
+  // 主板(import_final) / 双创(chuang_signals) / 三周期(sanqizhou_report) 三源合并进「选股历史」
+  const files=[
+    {f:"选股结果/import_final.json",    kind:"final"},
+    {f:"选股结果/chuang_signals.json",  kind:"chuang"},
+    {f:"选股结果/sanqizhou_report.json",kind:"tri"}
+  ];
   let got=false, total=0, fSkip=0, cleared=false;
-  for(const f of files){
-    try{ const res=await fetch(f,{cache:"no-store"}); if(!res.ok) continue;
+  for(const cfg of files){
+    try{
+      const res=await fetch(cfg.f,{cache:"no-store"}); if(!res.ok) continue;
       const data=await res.json();
-      AUTO_SNAPSHOT_DATE=(data.updated||"").slice(0,10)||todayStr();   // 快照日期→历史归档
-      got=true;
-      if(!cleared){ candidates=candidates.filter(c=>c.src==="manual"); cleared=true; }
-      const r1=mergeItems(data.items||[]); total+=r1.added; fSkip+=r1.fSkip;
-      const r2=mergeItems(data.watch||[]); total+=r2.added; fSkip+=r2.fSkip;   // P6: 观察池（超行业上限降级）
+      const snapDate=(data.updated||data.generatedAt||todayStr()).slice(0,10);
+      if(cfg.kind==="final"){
+        AUTO_SNAPSHOT_DATE=snapDate; got=true;
+        // 清掉上一批自动导入（非手动/外部）候选，仅当成功拉到数据时才替换；保留手动与已并入的外部模块
+        if(!cleared){ candidates=candidates.filter(c=>["manual","chuang","tri"].includes(c.src)); cleared=true; }
+        const r1=mergeItems(data.items||[]); total+=r1.added; fSkip+=r1.fSkip;
+        const r2=mergeItems(data.watch||[]); total+=r2.added; fSkip+=r2.fSkip;   // P6: 观察池
+      } else if(cfg.kind==="chuang"){
+        total+=mergeExternal("chuang", data.buys||[], snapDate);
+      } else if(cfg.kind==="tri"){
+        total+=mergeExternal("tri", data.stocks||[], snapDate);
+      }
     }catch(e){}
   }
   showImportMsg(total, got, fSkip);
@@ -2175,6 +2213,7 @@ function renderWrChart(m, cBy){
 }
 /* ============ 版本更新日志 ============ */
 const VERSION_HISTORY = [
+  {v:"2.1.1",d:"2026-09-04",desc:"修复+增强「选股评分/选股历史」: ① 15:40收盘选股自动化移除已停用的tdx-connector硬依赖(改走已连接的westock-mcp+腾讯公开端点), 解除因连接器断开导致的盘后定稿硬终止(此前import_final.json冻结于09-01致评分历史停滞); ② 评分历史覆盖三模块——importToday 并入主板(import_final)+双创(chuang_signals)+三周期(sanqizhou_report) 三源, 外部模块按(src,名称)去重、仅入历史视图(排名/交易候选区排除), 新增双创/三周期徽章样式"},
   {v:"2.1.0",d:"2026-08-28",desc:"撤销「优中选优」独立模块: 改回主板/双创/三周期三套选股各自独立展示(不合并、不单开Tab), 不做跨块数量对齐与上限裁剪, 仅保证弱板块(双创)至少3支被纳入/展示(当前双创信号60支远超保底); 同步移除 unified.js 聚合链路与 unified_selection.json 部署, 清理未上线的2.0.8/2.0.9日志条目"},
   {v:"2.0.7",d:"2026-08-27",desc:"新增「优中选优」总选股汇总(Tab🏆, 置于三周期之后): 合并主板(import_final)+双创(chuang_signals)+三周期(sanqizhou_report)三套选股, 按code去重后以「综合适应度=原生评分×验证系数(主板1.0/三周期0.9/双创0.75)」全局排名, 硬上限300保留优胜者、余者判为淘汰; 前端展示入选池(来源徽章+适应度条+入场/止损/目标)与被淘汰清单, 满足「主板+双创+三周期总选股量≤300, 优胜劣汰」"},
   {v:"2.0.6",d:"2026-08-27",desc:"三周期模块候选股池收敛(优中选优): 选股流程改为两层——先按综合评分取候选股池前300支(硬上限, 避免市况好时候选膨胀), 再从中精选评分最高的20支展示; summary新增候选池字段并在前端显示(候选池/精选达标), 分析报告叙述同步(候选N→精选total)"},
