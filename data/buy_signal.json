@@ -1,0 +1,44 @@
+{
+  "date": "2026-09-05",
+  "baselineDate": "2026-09-04",
+  "top3": [
+    {
+      "code": "300770",
+      "name": "新媒股份 300770",
+      "board": "cyb",
+      "win": 81.5,
+      "baseline": 35.38,
+      "open": null,
+      "dev": null,
+      "tol": 0.03,
+      "decision": "hold",
+      "reason": "非交易日(周六)，无 09:30 实时开盘价，无法确认入场"
+    },
+    {
+      "code": "601038",
+      "name": "一拖股份 601038",
+      "board": "main",
+      "win": 80.8,
+      "baseline": 14.59,
+      "open": null,
+      "dev": null,
+      "tol": 0.02,
+      "decision": "hold",
+      "reason": "非交易日(周六)，无 09:30 实时开盘价，无法确认入场"
+    },
+    {
+      "code": "600036",
+      "name": "招商银行 600036",
+      "board": "main",
+      "win": 80.8,
+      "baseline": 41.69,
+      "open": null,
+      "dev": null,
+      "tol": 0.02,
+      "decision": "hold",
+      "reason": "非交易日(周六)，无 09:30 实时开盘价，无法确认入场"
+    }
+  ],
+  "trade": false,
+  "note": "非交易日(周六)降级：无实时开盘价，Top3 全部 hold；大盘过滤仅作参考。import_final.json 仍停留 2026-09-01(15:40盘后定稿自09-01起未刷新)。"
+}

@@ -1,0 +1,1714 @@
+{
+  "generatedAt": "2026-09-05",
+  "config": {
+    "kAtrDyn": 1.5,
+    "maxHoldDyn": 5,
+    "regime": "none",
+    "boards": "chuang_only",
+    "period": {
+      "from": "20230828",
+      "to": "20260905"
+    }
+  },
+  "method": "chuang-strategy-refactor",
+  "summary": {
+    "total": 199,
+    "winRate": 0.4623,
+    "expectancy": 0.159,
+    "profitFactor": 1.1191319755554512,
+    "kelly": 0.049
+  },
+  "sellRules": {
+    "stopLoss": "跌破入场价下方 K_ATR×ATR14 止损位即卖出（双创动态止损）",
+    "takeProfit": "触及 E1 弹性止盈 max(2.0×SL, 1.8×ATR14) 即卖出",
+    "trailingStop": "持仓创新高后，从高点回撤 2%（双创）/ 3%（主板）触发跟踪止损卖出",
+    "maxHold": "持有满 5 日强制平仓（周期结束）"
+  },
+  "buys": [
+    {
+      "code": "300442",
+      "name": "润泽科技",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260630",
+      "entryDate": "20260701",
+      "entry": 83.156,
+      "stopLoss": 76.0985,
+      "takeProfit": 97.271,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 86.926,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260630（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 76.10（-8.5%）",
+        "计划目标价 97.27（+17.0%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300033",
+      "name": "同花顺",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260622",
+      "entryDate": "20260623",
+      "entry": 244.91,
+      "stopLoss": 226.99142857142857,
+      "takeProfit": 280.7471428571429,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 246.24,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260622（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 226.99（-7.3%）",
+        "计划目标价 280.75（+14.6%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "301041",
+      "name": "金百泽",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260617",
+      "entryDate": "20260618",
+      "entry": 35.953,
+      "stopLoss": 32.86192857142858,
+      "takeProfit": 42.13514285714285,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 36.86074,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260617（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 32.86（-8.6%）",
+        "计划目标价 42.14（+17.2%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300031",
+      "name": "宝通科技",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260615",
+      "entryDate": "20260616",
+      "entry": 26.94,
+      "stopLoss": 24.767142857142858,
+      "takeProfit": 31.285714285714285,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 26.86,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260615（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 24.77（-8.1%）",
+        "计划目标价 31.29（+16.1%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300628",
+      "name": "亿联网络",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260602",
+      "entryDate": "20260603",
+      "entry": 39.11,
+      "stopLoss": 37.07642857142857,
+      "takeProfit": 43.17714285714286,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 38.75,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260602（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 37.08（-5.2%）",
+        "计划目标价 43.18（+10.4%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300219",
+      "name": "鸿利智汇",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260528",
+      "entryDate": "20260529",
+      "entry": 8.51,
+      "stopLoss": 7.870357142857142,
+      "takeProfit": 9.789285714285715,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 7.870357142857142,
+        "holdDays": 1
+      },
+      "reasons": [
+        "信号日 20260528（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 7.87（-7.5%）",
+        "计划目标价 9.79（+15.0%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300327",
+      "name": "中颖电子",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260526",
+      "entryDate": "20260527",
+      "entry": 28.03,
+      "stopLoss": 26.371428571428574,
+      "takeProfit": 31.347142857142856,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 29.11,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260526（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 26.37（-5.9%）",
+        "计划目标价 31.35（+11.8%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300037",
+      "name": "新宙邦",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260522",
+      "entryDate": "20260525",
+      "entry": 72.75,
+      "stopLoss": 67.57821428571428,
+      "takeProfit": 83.09357142857144,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 67.74,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260522（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 67.58（-7.1%）",
+        "计划目标价 83.09（+14.2%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300341",
+      "name": "麦克奥迪",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260520",
+      "entryDate": "20260521",
+      "entry": 15.94,
+      "stopLoss": 15.118214285714284,
+      "takeProfit": 17.583571428571428,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 15.35,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260520（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 15.12（-5.2%）",
+        "计划目标价 17.58（+10.3%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300018",
+      "name": "中元股份",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260518",
+      "entryDate": "20260519",
+      "entry": 15.18,
+      "stopLoss": 13.938214285714286,
+      "takeProfit": 17.663571428571426,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 15.75,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260518（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 13.94（-8.2%）",
+        "计划目标价 17.66（+16.4%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300040",
+      "name": "九洲集团",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260514",
+      "entryDate": "20260515",
+      "entry": 7.44,
+      "stopLoss": 6.8925,
+      "takeProfit": 8.535,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 7.34,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260514（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 6.89（-7.4%）",
+        "计划目标价 8.54（+14.7%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300249",
+      "name": "依米康",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260512",
+      "entryDate": "20260513",
+      "entry": 18.41,
+      "stopLoss": 17.296785714285715,
+      "takeProfit": 20.63642857142857,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 19.139400000000002,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260512（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 17.30（-6.0%）",
+        "计划目标价 20.64（+12.1%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300407",
+      "name": "凯发电气",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260508",
+      "entryDate": "20260511",
+      "entry": 13.521,
+      "stopLoss": 12.768857142857144,
+      "takeProfit": 15.025285714285715,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 13.511,
+        "holdDays": 3
+      },
+      "reasons": [
+        "信号日 20260508（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 12.77（-5.6%）",
+        "计划目标价 15.03（+11.1%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300012",
+      "name": "华测检测",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260506",
+      "entryDate": "20260507",
+      "entry": 16.31,
+      "stopLoss": 15.407857142857141,
+      "takeProfit": 18.114285714285714,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 16.316999999999997,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260506（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 15.41（-5.5%）",
+        "计划目标价 18.11（+11.1%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300409",
+      "name": "道氏技术",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260429",
+      "entryDate": "20260430",
+      "entry": 27.014,
+      "stopLoss": 25.479714285714284,
+      "takeProfit": 30.082571428571427,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 27.72812,
+        "holdDays": 5
+      },
+      "reasons": [
+        "信号日 20260429（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 25.48（-5.7%）",
+        "计划目标价 30.08（+11.4%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300215",
+      "name": "电科院",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260427",
+      "entryDate": "20260428",
+      "entry": 8.498,
+      "stopLoss": 7.992285714285713,
+      "takeProfit": 9.509428571428572,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 8.573039999999999,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260427（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 7.99（-6.0%）",
+        "计划目标价 9.51（+11.9%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300005",
+      "name": "探路者",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260423",
+      "entryDate": "20260424",
+      "entry": 14.99,
+      "stopLoss": 14.189642857142857,
+      "takeProfit": 16.590714285714284,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 16.590714285714284,
+        "holdDays": 1
+      },
+      "reasons": [
+        "信号日 20260423（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 14.19（-5.3%）",
+        "计划目标价 16.59（+10.7%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300018",
+      "name": "中元股份",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260421",
+      "entryDate": "20260422",
+      "entry": 13.1,
+      "stopLoss": 12.1025,
+      "takeProfit": 15.094999999999999,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 15.094999999999999,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260421（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 12.10（-7.6%）",
+        "计划目标价 15.09（+15.2%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300050",
+      "name": "世纪鼎利",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260316",
+      "entryDate": "20260317",
+      "entry": 6.48,
+      "stopLoss": 6.185357142857144,
+      "takeProfit": 7.069285714285715,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 6.34,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260316（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 6.19（-4.5%）",
+        "计划目标价 7.07（+9.1%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300037",
+      "name": "新宙邦",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260312",
+      "entryDate": "20260313",
+      "entry": 58.082,
+      "stopLoss": 54.56128571428572,
+      "takeProfit": 65.12342857142858,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 59.072,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260312（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 54.56（-6.1%）",
+        "计划目标价 65.12（+12.1%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300389",
+      "name": "艾比森",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260310",
+      "entryDate": "20260311",
+      "entry": 18.87,
+      "stopLoss": 17.57357142857143,
+      "takeProfit": 21.462857142857146,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 18.92,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260310（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 17.57（-6.9%）",
+        "计划目标价 21.46（+13.7%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300034",
+      "name": "钢研高纳",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260306",
+      "entryDate": "20260309",
+      "entry": 21.874,
+      "stopLoss": 19.89935714285714,
+      "takeProfit": 25.82328571428571,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 22.33812,
+        "holdDays": 3
+      },
+      "reasons": [
+        "信号日 20260306（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 19.90（-9.0%）",
+        "计划目标价 25.82（+18.1%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300040",
+      "name": "九洲集团",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260304",
+      "entryDate": "20260305",
+      "entry": 7.53,
+      "stopLoss": 7.11,
+      "takeProfit": 8.370000000000001,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 7.54,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260304（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 7.11（-5.6%）",
+        "计划目标价 8.37（+11.2%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300387",
+      "name": "富邦科技",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260302",
+      "entryDate": "20260303",
+      "entry": 9.7,
+      "stopLoss": 9.119285714285713,
+      "takeProfit": 10.861428571428572,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 9.22,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260302（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 9.12（-6.0%）",
+        "计划目标价 10.86（+12.0%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300140",
+      "name": "节能环境",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260226",
+      "entryDate": "20260227",
+      "entry": 7.64,
+      "stopLoss": 7.105357142857143,
+      "takeProfit": 8.709285714285715,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 7.54,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260226（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 7.11（-7.0%）",
+        "计划目标价 8.71（+14.0%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300040",
+      "name": "九洲集团",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260224",
+      "entryDate": "20260225",
+      "entry": 7.13,
+      "stopLoss": 6.790357142857142,
+      "takeProfit": 7.809285714285714,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 7.34,
+        "holdDays": 4
+      },
+      "reasons": [
+        "信号日 20260224（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 6.79（-4.8%）",
+        "计划目标价 7.81（+9.5%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300040",
+      "name": "九洲集团",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260212",
+      "entryDate": "20260213",
+      "entry": 7.06,
+      "stopLoss": 6.727857142857142,
+      "takeProfit": 7.724285714285714,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 7.53,
+        "holdDays": 5
+      },
+      "reasons": [
+        "信号日 20260212（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 6.73（-4.7%）",
+        "计划目标价 7.72（+9.4%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300008",
+      "name": "天海防务",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260210",
+      "entryDate": "20260211",
+      "entry": 8.868,
+      "stopLoss": 8.220857142857144,
+      "takeProfit": 10.162285714285714,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 8.838,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260210（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 8.22（-7.3%）",
+        "计划目标价 10.16（+14.6%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300320",
+      "name": "海达股份",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260206",
+      "entryDate": "20260209",
+      "entry": 10.88,
+      "stopLoss": 10.330357142857144,
+      "takeProfit": 11.979285714285716,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 10.7016,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260206（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 10.33（-5.1%）",
+        "计划目标价 11.98（+10.1%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300228",
+      "name": "富瑞特装",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260204",
+      "entryDate": "20260205",
+      "entry": 10.71,
+      "stopLoss": 9.896785714285716,
+      "takeProfit": 12.336428571428572,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 10.33,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260204（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 9.90（-7.6%）",
+        "计划目标价 12.34（+15.2%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300040",
+      "name": "九洲集团",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260202",
+      "entryDate": "20260203",
+      "entry": 6.83,
+      "stopLoss": 6.490357142857143,
+      "takeProfit": 7.5092857142857135,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 6.91,
+        "holdDays": 3
+      },
+      "reasons": [
+        "信号日 20260202（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 6.49（-5.0%）",
+        "计划目标价 7.51（+9.9%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300041",
+      "name": "回天新材",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260129",
+      "entryDate": "20260130",
+      "entry": 12.2,
+      "stopLoss": 11.588214285714285,
+      "takeProfit": 13.423571428571428,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 12.279399999999999,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260129（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 11.59（-5.0%）",
+        "计划目标价 13.42（+10.0%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300406",
+      "name": "九强生物",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260127",
+      "entryDate": "20260128",
+      "entry": 13.504,
+      "stopLoss": 12.7315,
+      "takeProfit": 15.049,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 12.884,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260127（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 12.73（-5.7%）",
+        "计划目标价 15.05（+11.4%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300073",
+      "name": "当升科技",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260123",
+      "entryDate": "20260126",
+      "entry": 64.897,
+      "stopLoss": 61.39021428571429,
+      "takeProfit": 71.91057142857143,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 61.847,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260123（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 61.39（-5.4%）",
+        "计划目标价 71.91（+10.8%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300443",
+      "name": "金雷股份",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260121",
+      "entryDate": "20260122",
+      "entry": 30.88,
+      "stopLoss": 29.31142857142857,
+      "takeProfit": 34.01714285714286,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 31.4,
+        "holdDays": 3
+      },
+      "reasons": [
+        "信号日 20260121（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 29.31（-5.1%）",
+        "计划目标价 34.02（+10.2%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300140",
+      "name": "节能环境",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260119",
+      "entryDate": "20260120",
+      "entry": 7.19,
+      "stopLoss": 6.806428571428572,
+      "takeProfit": 7.957142857142857,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 7.2,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260119（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 6.81（-5.3%）",
+        "计划目标价 7.96（+10.7%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300073",
+      "name": "当升科技",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260115",
+      "entryDate": "20260116",
+      "entry": 63.017,
+      "stopLoss": 59.90878571428572,
+      "takeProfit": 69.23342857142858,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 61.97226,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260115（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 59.91（-4.9%）",
+        "计划目标价 69.23（+9.9%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300596",
+      "name": "利安隆",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260113",
+      "entryDate": "20260114",
+      "entry": 45.29,
+      "stopLoss": 43.121428571428574,
+      "takeProfit": 49.62714285714286,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 44.42,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260113（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 43.12（-4.8%）",
+        "计划目标价 49.63（+9.6%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "301345",
+      "name": "涛涛车业",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260109",
+      "entryDate": "20260112",
+      "entry": 248.2,
+      "stopLoss": 229.6042857142857,
+      "takeProfit": 285.39142857142855,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 229.6042857142857,
+        "holdDays": 1
+      },
+      "reasons": [
+        "信号日 20260109（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 229.60（-7.5%）",
+        "计划目标价 285.39（+15.0%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300445",
+      "name": "康斯特",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260107",
+      "entryDate": "20260108",
+      "entry": 26.23,
+      "stopLoss": 24.022857142857145,
+      "takeProfit": 30.644285714285715,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 26.705,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260107（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 24.02（-8.4%）",
+        "计划目标价 30.64（+16.8%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300008",
+      "name": "天海防务",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20260105",
+      "entryDate": "20260106",
+      "entry": 8.268,
+      "stopLoss": 7.774071428571429,
+      "takeProfit": 9.255857142857144,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 8.259440000000001,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20260105（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 7.77（-6.0%）",
+        "计划目标价 9.26（+11.9%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300432",
+      "name": "富临精工",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251230",
+      "entryDate": "20251231",
+      "entry": 16.56,
+      "stopLoss": 15.75642857142857,
+      "takeProfit": 18.167142857142856,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 17.444,
+        "holdDays": 3
+      },
+      "reasons": [
+        "信号日 20251230（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 15.76（-4.9%）",
+        "计划目标价 18.17（+9.7%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300697",
+      "name": "电工合金",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251226",
+      "entryDate": "20251229",
+      "entry": 17.34,
+      "stopLoss": 16.37142857142857,
+      "takeProfit": 19.277142857142856,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 16.05,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20251226（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 16.37（-5.6%）",
+        "计划目标价 19.28（+11.2%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300140",
+      "name": "节能环境",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251224",
+      "entryDate": "20251225",
+      "entry": 6.84,
+      "stopLoss": 6.361071428571428,
+      "takeProfit": 7.797857142857143,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 6.7620000000000005,
+        "holdDays": 3
+      },
+      "reasons": [
+        "信号日 20251224（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 6.36（-7.0%）",
+        "计划目标价 7.80（+14.0%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300398",
+      "name": "飞凯材料",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251222",
+      "entryDate": "20251223",
+      "entry": 22.925,
+      "stopLoss": 21.865357142857142,
+      "takeProfit": 25.044285714285717,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 23.025,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20251222（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 21.87（-4.6%）",
+        "计划目标价 25.04（+9.2%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300170",
+      "name": "汉得信息",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251208",
+      "entryDate": "20251209",
+      "entry": 18.685,
+      "stopLoss": 17.212857142857143,
+      "takeProfit": 21.629285714285714,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 18.105,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20251208（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 17.21（-7.9%）",
+        "计划目标价 21.63（+15.8%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300971",
+      "name": "博亚精工",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251120",
+      "entryDate": "20251121",
+      "entry": 25.55,
+      "stopLoss": 23.884999999999998,
+      "takeProfit": 28.880000000000003,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 23.884999999999998,
+        "holdDays": 1
+      },
+      "reasons": [
+        "信号日 20251120（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 23.88（-6.5%）",
+        "计划目标价 28.88（+13.0%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300008",
+      "name": "天海防务",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251118",
+      "entryDate": "20251119",
+      "entry": 6.838,
+      "stopLoss": 6.499428571428572,
+      "takeProfit": 7.515142857142857,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 7.515142857142857,
+        "holdDays": 1
+      },
+      "reasons": [
+        "信号日 20251118（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 6.50（-5.0%）",
+        "计划目标价 7.52（+9.9%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300040",
+      "name": "九洲集团",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251114",
+      "entryDate": "20251117",
+      "entry": 6.98,
+      "stopLoss": 6.653214285714286,
+      "takeProfit": 7.633571428571429,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 6.909,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20251114（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 6.65（-4.7%）",
+        "计划目标价 7.63（+9.4%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300049",
+      "name": "福瑞医科",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251112",
+      "entryDate": "20251113",
+      "entry": 72.85,
+      "stopLoss": 66.37964285714285,
+      "takeProfit": 85.79071428571427,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 71.883,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20251112（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 66.38（-8.9%）",
+        "计划目标价 85.79（+17.8%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300848",
+      "name": "美瑞新材",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251110",
+      "entryDate": "20251111",
+      "entry": 16.95,
+      "stopLoss": 15.434999999999999,
+      "takeProfit": 19.98,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 16.807,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20251110（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 15.43（-8.9%）",
+        "计划目标价 19.98（+17.9%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300001",
+      "name": "特锐德",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251105",
+      "entryDate": "20251106",
+      "entry": 29.822,
+      "stopLoss": 27.776642857142857,
+      "takeProfit": 33.91271428571429,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 29.793960000000002,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20251105（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 27.78（-6.9%）",
+        "计划目标价 33.91（+13.7%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300342",
+      "name": "天银机电",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251103",
+      "entryDate": "20251104",
+      "entry": 18.72,
+      "stopLoss": 17.66892857142857,
+      "takeProfit": 20.822142857142858,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 18.38,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20251103（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 17.67（-5.6%）",
+        "计划目标价 20.82（+11.2%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300037",
+      "name": "新宙邦",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251030",
+      "entryDate": "20251031",
+      "entry": 50.492,
+      "stopLoss": 47.20164285714286,
+      "takeProfit": 57.07271428571428,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 52.002,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20251030（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 47.20（-6.5%）",
+        "计划目标价 57.07（+13.0%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300342",
+      "name": "天银机电",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251028",
+      "entryDate": "20251029",
+      "entry": 18.29,
+      "stopLoss": 17.249642857142856,
+      "takeProfit": 20.370714285714286,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 18.570999999999998,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20251028（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 17.25（-5.7%）",
+        "计划目标价 20.37（+11.4%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300191",
+      "name": "潜能恒信",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251024",
+      "entryDate": "20251027",
+      "entry": 20.7,
+      "stopLoss": 19.149642857142855,
+      "takeProfit": 23.800714285714285,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 20.35,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20251024（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 19.15（-7.5%）",
+        "计划目标价 23.80（+15.0%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300327",
+      "name": "中颖电子",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251022",
+      "entryDate": "20251023",
+      "entry": 27.48,
+      "stopLoss": 25.71857142857143,
+      "takeProfit": 31.002857142857142,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 26.940199999999997,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20251022（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 25.72（-6.4%）",
+        "计划目标价 31.00（+12.8%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300414",
+      "name": "中光防雷",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251020",
+      "entryDate": "20251021",
+      "entry": 12.744,
+      "stopLoss": 11.862214285714286,
+      "takeProfit": 14.507571428571428,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 12.774,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20251020（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 11.86（-6.9%）",
+        "计划目标价 14.51（+13.8%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300414",
+      "name": "中光防雷",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251016",
+      "entryDate": "20251017",
+      "entry": 12.734,
+      "stopLoss": 11.956142857142858,
+      "takeProfit": 14.289714285714286,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "win",
+        "exit": 13.15552,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20251016（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 11.96（-6.1%）",
+        "计划目标价 14.29（+12.2%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    },
+    {
+      "code": "300681",
+      "name": "英搏尔",
+      "board": "cyb",
+      "boardName": "创业板",
+      "signalDate": "20251014",
+      "entryDate": "20251015",
+      "entry": 31.438,
+      "stopLoss": 29.196571428571428,
+      "takeProfit": 35.920857142857145,
+      "trailingStopPct": 0.02,
+      "maxHoldDays": 5,
+      "positionPct": 0.0246,
+      "positionLabel": "试探",
+      "regime": "n/a",
+      "resolved": {
+        "outcome": "loss",
+        "exit": 30.985639999999997,
+        "holdDays": 2
+      },
+      "reasons": [
+        "信号日 20251014（无市况约束）",
+        "买入板块：创业板；已通过 G1 流动性 / G2 波动率带 / G3 动量洁净 / G4 相对强度 / G5 盈利质量 + E2 回踩入场 + E1 弹性止盈",
+        "计划止损价 29.20（-7.1%）",
+        "计划目标价 35.92（+14.3%）",
+        "最长持有 5 日，跟踪止损 2%"
+      ]
+    }
+  ],
+  "stats": {
+    "total": 199,
+    "inWindow": 60,
+    "newAlerts": 5
+  }
+}
