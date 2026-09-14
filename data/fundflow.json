@@ -1,0 +1,54 @@
+{
+ "updatedAt": "2026-09-14 15:50",
+ "source": "腾讯行情(指数/风格) + 东方财富(行业主力净流入/北向)，盘后抓取",
+ "indices": [
+  {
+   "name": "上证指数",
+   "val": 3885.33,
+   "pct": -0.07
+  },
+  {
+   "name": "深证成指",
+   "val": 13384.57,
+   "pct": -0.64
+  },
+  {
+   "name": "创业板指",
+   "val": 3285.58,
+   "pct": -1.1
+  }
+ ],
+ "fundThread": "今日盘面：上证-0.07%、深证成指-0.64%、创业板指-1.1%。资金主攻方向为 无明显主线。北向当日净额接口归零（盘后）。",
+ "heatSectors": [],
+ "fundFlow": [],
+ "styleFactors": [
+  {
+   "name": "大盘成长",
+   "score": 41,
+   "up": false
+  },
+  {
+   "name": "大盘价值",
+   "score": 52,
+   "up": true
+  },
+  {
+   "name": "小盘成长",
+   "score": 52,
+   "up": true
+  },
+  {
+   "name": "小盘价值",
+   "score": 51,
+   "up": true
+  }
+ ],
+ "northFlow": {
+  "todayNet": 0.0,
+  "shNet": 0.0,
+  "szNet": 0.0,
+  "history": [],
+  "note": "沪股通+深股通当日净买入(亿元)；盘后较晚时段接口可能归零"
+ },
+ "recommendations": []
+}
