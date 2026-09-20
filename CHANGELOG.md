@@ -38,6 +38,7 @@
 - **v2.0.9** (2026-08-27) +1 功能点：优中选优平衡配额: 主板/双创/三周期每块最少保留3支; 修复同code重复信号时nativeScore与fitness不一致
 - **v2.1.0** (2026-08-28) +1 功能点：撤销优中选优独立模块: 三模块各自独立展示, 不做跨块数量对齐, 仅弱板块(双创)保底≥3(当前60支); 移除unified.js与unified_selection.json
 - **v2.1.1** (2026-09-03) +1 功能点：选股评分历史覆盖三模块: importToday 并入主板(import_final)+双创(chuang_signals)+三周期(sanqizhou_report) 三源, 外部模块按(src,名称)去重、仅入历史视图(排名/交易候选区排除), 徽章+CAT样式新增双创/三周期
+- **v2.1.2** (2026-09-20) +1 功能点：引入开源Sequoia-X作为第4信号源: baostock数据基建+7策略盘后导出sequoia_signals.json, 评分历史并入第4源(徽章Sequoia, 仅历史视图)
 
 ## 历史
 
