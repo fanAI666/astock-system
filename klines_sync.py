@@ -84,9 +84,18 @@ def db_connect() -> sqlite3.Connection:
     return conn
 
 
-def load_universe() -> list[tuple[str, str, str]]:
-    """返回四源并集 [(symbol, name, board)]，symbol 为 6 位纯数字（按 symbol 去重）"""
+def load_universe(conn: sqlite3.Connection | None = None) -> list[tuple[str, str, str]]:
+    """返回「库内已有 symbol ∪ 四源并集」[(symbol, name, board)]，symbol 为 6 位纯数字。
+
+    先纳入库内已有代码，保证即使外部信号源/宇宙文件被清理，已入库股票也不会
+    从维护范围中掉出（避免增量同步覆盖不全导致库内数据陈旧）。
+    """
     seen: dict[str, tuple[str, str, str]] = {}
+    if conn is not None:
+        for (sym,) in conn.execute("SELECT DISTINCT symbol FROM kline_daily"):
+            sym = str(sym).strip()
+            if len(sym) == 6:
+                seen[sym] = (sym, "", "")
     for rel, keys in CODE_SOURCES:
         fp = BASE / rel
         if not fp.exists():
@@ -110,8 +119,12 @@ def load_universe() -> list[tuple[str, str, str]]:
             if not isinstance(it, dict):
                 continue
             code = str(it.get("code", "")).strip()
-            if len(code) == 6 and code not in seen:
-                seen[code] = (code, it.get("name", "") or it.get("stockName", ""), it.get("board", ""))
+            if len(code) != 6:
+                continue
+            nm = it.get("name", "") or it.get("stockName", "") or ""
+            # 库内已有代码若名称为空（DB 只存 symbol），用外部源补全
+            if code not in seen or not seen[code][1]:
+                seen[code] = (code, nm, it.get("board", "") or seen.get(code, ("", "", ""))[2])
     return list(seen.values())
 
 
@@ -265,7 +278,7 @@ def cmd_backfill(refit: bool = False) -> None:
     import baostock as bs
 
     conn = db_connect()
-    universe = load_universe()
+    universe = load_universe(conn)
     existing = last_dates(conn)
     today = date.today().isoformat()
 
@@ -368,7 +381,7 @@ def cmd_sync() -> None:
     if latest <= st["max"]:
         # 无新交易日，但仍可能有「库内完全没有」的代码（候选池只增不减 → 新进候选）
         existing0 = last_dates(conn)
-        uni0 = load_universe()
+        uni0 = load_universe(conn)
         missing0 = [(s, n) for s, n, _ in uni0 if not existing0.get(s)]
         if not missing0:
             print(f"[✓] 无新数据（库内已到 {st['max']}，可得 {latest}）")
@@ -382,7 +395,7 @@ def cmd_sync() -> None:
 
     # 守卫3：只拉缺口股票（缺失=全历史；已存在=仅增量）
     existing = last_dates(conn)
-    universe = load_universe()
+    universe = load_universe(conn)
     todo: list[tuple[str, str, bool]] = []
     for s, n, _ in universe:
         ld = existing.get(s)

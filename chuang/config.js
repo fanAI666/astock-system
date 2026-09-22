@@ -26,10 +26,12 @@ function todayYmd() {
 
 const CHUANG_CONFIG = {
   // ===== 数据源（与旧 BT_* env 兼容）=====
-  // 默认切到全宇宙 universe_klines.json（1270 支）：
-  // ① signals 不再因 import_final.json 仅 18 支双创而恒出 0 → 双创 Tab 不再空白；
-  // ② backtest 不带 BT_SRC 时也默认扫全宇宙，避免 n=0 事故。需窄池时显式 BT_SRC=import_final.json。
-  src: env.BT_SRC || 'D:/WorkBuddy/选股结果/universe_klines.json',
+  // 默认数据源已切到 baostock 本地库导出（前复权，2022-01 起 ~1144 根/支，1408 支覆盖四源并集）：
+  // ① 腾讯 qfq 是逐日链式复权，非除权日收益率存在系统性失真（实测 75.7% 交易日偏离 >0.01%，最大 2.1%），
+  //    baostock 前复权为分段比例复权，非除权日偏离 0.000000% —— 回测结论更可信；
+  // ② 旧的 选股结果/universe_klines.json（腾讯抓取，停更于 2026-08-05）已作废。
+  // 需窄池时显式 BT_SRC=选股结果/import_final.json；需旧口径时用 BT_SRC 指回旧文件。
+  src: env.BT_SRC || 'D:/WorkBuddy/data/universe_klines_ext.json',
   out: env.BT_OUT || 'D:/WorkBuddy/选股结果/backtest_chuang.json',
   fundFile: env.BT_FUND || 'D:/WorkBuddy/选股结果/fundamental.json',
   indexFile: 'D:/WorkBuddy/选股结果/index_sh.json',
@@ -37,7 +39,9 @@ const CHUANG_CONFIG = {
   // ===== 回测区间 =====
   // to 默认滚动到「今天」，避免写死日期后长期滞后导致近月信号被区间右端截断
   // （2026-08-06 前写死 20260630，已滞后 5 周）。需复现历史结果时用 BT_TO=20260630 覆盖。
-  period: { from: env.BT_FROM || '20230828', to: env.BT_TO || todayYmd() },
+  // from 默认放开到 2022-01（与本地库起点对齐）。此前锁在 20230828 是因为 index_sh.json 只覆盖 440 根，
+  // G4 相对强度门对指数缺失日静默剔除信号；指数文件已于 2026-09-22 重建为 1144 根，窗口不再被截断。
+  period: { from: env.BT_FROM || '20220101', to: env.BT_TO || todayYmd() },
 
   // ===== 板块门控：主板完全不动；仅 chuang_only 走 G/E 体系 =====
   boards: 'chuang_only',
