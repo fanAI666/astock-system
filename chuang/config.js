@@ -147,7 +147,7 @@ const CHUANG_CONFIG = {
   // 变体（短线冲浪手简化版）：ma20Required=true、rsRequired=false、volRequired=false → 仅"创业板指站上20日线"
   marketSwitch: {
     enabled: boolEnv('CHUANG_SWITCH', false),
-    indexFile: 'D:/WorkBuddy/选股结果/switch_index.json',
+    indexFile: env.SW_FILE || 'D:/WorkBuddy/选股结果/switch_index.json',
     rsLookback: 5,        // RS 回望窗口（日）
     maWin: 20,            // 创业板指站上 N 日线
     volMult: 1.0,         // 量 > 前 N 日均量 × volMult 才开门
