@@ -31,3 +31,9 @@ _repo_body.json
 pages/
 .github_remote
 Sequoia-X/
+
+# 本地日K库与大数据文件（禁止入库）
+data/
+*.db
+*.db-journal
+*.db-wal
