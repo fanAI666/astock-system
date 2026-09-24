@@ -1,18 +1,19 @@
 'use strict';
 // chuang/sanqizhou.js — 「三周期」选股分析报告生成器
-// 职责：读取 选股结果/universe_klines.json（双创 1270 支日K），本地把日K重采样为周/月，
+// 职责：读取 data/universe_klines_ext.json（四源并集日K，默认取双创 cyb/kcb 样本），本地把日K重采样为周/月，
 //       用 MA 斜率 + 价格相对 MA 位置判定 月/周/日 三周期趋势(up/down/flat)，
 //       按「日线转强且非双长周期空头」选股，综合评分后排前 N 名，
 //       产出 选股结果/sanqizhou_report.json（与 stock-selection-system.html 的 renderSanZhou 严格对齐）。
 // 数据刷新：默认尝试探测腾讯 ifzq 端点，若通则刷新每支最近 ~40 根日K（合并到本地快照）；
-//           网络不可达时自动回退到本地 universe_klines.json 快照，保证每日仍能产出报告。
+//           网络不可达时自动回退到本地 data/universe_klines_ext.json 快照，保证每日仍能产出报告。
+//   ⚠️ 原 选股结果/universe_klines.json 已于 09-23 清理删除，宇宙源统一切到 data/universe_klines_ext.json（本地库导出）。
 // 注意：仅生成「多周期共振研究参考」报告，非实盘建议；不真实下单。
 
 const fs = require('fs');
 const path = require('path');
 
 const ROOT = 'D:/WorkBuddy';
-const UNI = path.join(ROOT, '选股结果/universe_klines.json');
+const UNI = path.join(ROOT, 'data/universe_klines_ext.json');
 const OUT = path.join(ROOT, '选股结果/sanqizhou_report.json');
 
 const DO_REFRESH = process.env.SANQIZHOU_REFRESH !== '0';
@@ -170,7 +171,7 @@ function buildAnalysis(all, out, mu, wu, du, resonance, partial, diverge, total,
   else strategy = '缺乏三周期共振，趋势性机会稀缺，建议以观望或极小仓位试错为主，不追高。';
   strategy += ' 所有标的均须严格执行单笔止损纪律（主板 2% 止损 / 6% 止盈、双创 ATR 动态止损），破位即离场。';
 
-  const method = '选股逻辑：以双创（创业板 / 科创板）1270 支为样本，本地把日 K 重采样为周 / 月，用 MA 斜率 + 收盘价相对 MA 位置判定月 / 周 / 日三周期趋势（↑多 / ↓空 / →平）。筛选条件：日线转强（↑）且非「月空 & 周空」双长周期空头；综合评分（长周期权重更高 + 三周期齐多加分 + 近 5 日动量）降序排列。优中选优两层：① 先按评分取候选股池前 300 支（候选股池上限 300，避免市况好时膨胀）；② 再从候选池中精选评分最高的 20 支展示。入场价取最新收盘价，止损价取近 10 日低或 −5%，目标价 = 入场 + (入场 − 止损) × 3（3:1 风险回报）。';
+  const method = '选股逻辑：以双创（创业板 / 科创板）为样本，本地把日 K 重采样为周 / 月，用 MA 斜率 + 收盘价相对 MA 位置判定月 / 周 / 日三周期趋势（↑多 / ↓空 / →平）。筛选条件：日线转强（↑）且非「月空 & 周空」双长周期空头；综合评分（长周期权重更高 + 三周期齐多加分 + 近 5 日动量）降序排列。优中选优两层：① 先按评分取候选股池前 300 支（候选股池上限 300，避免市况好时膨胀）；② 再从候选池中精选评分最高的 20 支展示。入场价取最新收盘价，止损价取近 10 日低或 −5%，目标价 = 入场 + (入场 − 止损) × 3（3:1 风险回报）。';
 
   const risk = '⚠️ 本报告由程序基于历史 K 线自动生成，仅用于多周期共振策略研究参考，不构成任何实盘买卖建议。多周期共振可提升胜率但并非 100%，市场存在黑天鹅与流动性风险，请独立决策、自负盈亏。';
 
@@ -248,10 +249,13 @@ async function refreshAll(items) {
   console.log('原始股票数:', items.length);
   items = items.filter(s => s.code && s.kline && Array.isArray(s.kline.day) && s.kline.day.length >= 60);
   console.log('有效(日K≥60):', items.length);
+  const beforeBoard = items.length;
+  items = items.filter(s => s.board === 'cyb' || s.board === 'kcb');  // 仅取双创样本，保证名称/板块完整
+  console.log('双创样本(cyb/kcb):', items.length, '(过滤前', beforeBoard + ')');
 
   items = await refreshAll(items);
 
-  const all = items.map(s => ({ name: s.name, code: s.code, board: s.board, t: trendOf(s.kline.day) }));
+  const all = items.map(s => ({ name: s.name || s.code, code: s.code, board: s.board, t: trendOf(s.kline.day) }));
 
   // 选股：日线转强(up) 且 非(月空 & 周空)
   const ranked = all
