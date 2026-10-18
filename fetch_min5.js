@@ -30,8 +30,10 @@ const argv = process.argv.slice(2);
 let importPath = 'D:/WorkBuddy/选股结果/import_final.json';
 let days = 5;
 let outPath = null;
+let anchor = null; // 可选：锚定“今天”的日期(YYYY-MM-DD)，用于节假日场景下取最近 N 个交易日
 for (const a of argv) {
   if (a.startsWith('--out=')) outPath = a.slice('--out='.length);
+  else if (a.startsWith('--anchor=')) anchor = a.slice('--anchor='.length);
   else if (/^\d+$/.test(a)) days = parseInt(a, 10);
   else if (a && !a.startsWith('--')) importPath = a;
 }
@@ -53,10 +55,10 @@ function ymdToCompact(ymd) { // "2026-07-28" -> "20260728"
 }
 function pad2(n) { return n < 10 ? '0' + n : '' + n; }
 
-// 生成候选交易日（从今天往回 lookback 个日历日，仅工作日），返回 YYYY-MM-DD 数组（新->旧）
-function candidateTradingDates(n, lookback) {
+// 生成候选交易日（从锚定日期往回 lookback 个日历日，仅工作日），返回 YYYY-MM-DD 数组（新->旧）
+function candidateTradingDates(n, lookback, anchorStr) {
   const out = [];
-  const today = new Date();
+  const today = anchorStr ? new Date(anchorStr + 'T00:00:00') : new Date();
   for (let i = 0; i < lookback && out.length < n; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() - i);
@@ -161,7 +163,7 @@ async function main() {
   const items = Array.isArray(data) ? data : (data.items || []);
   if (!items.length) { console.log('[fetch_min5] 无候选股，退出'); return; }
 
-  const dates = candidateTradingDates(days, Math.max(12, days * 3 + 4));
+  const dates = candidateTradingDates(days, Math.max(12, days * 3 + 4), anchor);
   console.log(`[fetch_min5] 候选交易日(${dates.length}): ${dates.join(', ')}`);
 
   let okStocks = 0, skipStocks = 0, totalBars = 0, dayHits = 0;
